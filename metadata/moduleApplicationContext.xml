@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- Beans to add to the current Application context definition -->
+
+<beans>
+	<!--  Configure the Flag Service -->
+   	<bean parent="serviceContext" id="identifierSourceService">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.idgen.service.IdentifierSourceService</value>
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager"><ref bean="transactionManager"/></property>
+					<property name="target">
+						<bean class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
+							<property name="dao">
+								<bean class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
+									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
+								</bean>
+							</property>
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<list>
+							<ref bean="authorizationInterceptor"/>
+						</list>
+					</property>
+					<property name="transactionAttributeSource">
+						<bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>

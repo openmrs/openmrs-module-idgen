@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.idgen" >
+
+	<class name="IdentifierSource" table="idgen_identifier_source">
+	
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<property name="uuid" type="string" length="38" not-null="true" />
+		<property name="name" type="string" not-null="true" />
+		<property name="description" type="string" />
+		<many-to-one name="identifierType" class="org.openmrs.PatientIdentifierType" column="identifier_type" not-null="true" />
+		<many-to-one name="creator" class="org.openmrs.User" not-null="true" />
+		<property name="dateCreated" type="java.util.Date" column="date_created" not-null="true" />
+		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by" />
+		<property name="dateChanged" type="java.util.Date" column="date_changed" />		
+		<property name="retired" type="java.lang.Boolean" length="1" not-null="true"/>
+		<many-to-one name="retiredBy" class="org.openmrs.User" column="retired_by" />
+		<property name="dateRetired" type="java.util.Date" column="date_retired" />	
+		<property name="retireReason" type="string" column="retire_reason" />
+		
+		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
+			<key column="id"/>
+			<property name="nextSequenceValue" type="long" column="next_sequence_value" not-null="true"/>
+			<property name="validCharacters" type="string" column="valid_characters" not-null="true" />
+			<property name="prefix" type="string" />
+			<property name="suffix" type="string" />
+			<property name="length" type="int" />
+		</joined-subclass>
+
+		<joined-subclass name="RestIdentifierGenerator" table="idgen_rest_id_gen">
+			<key column="id"/>
+			<property name="url" type="string" not-null="true" />
+			<property name="username" type="string" />
+			<property name="password" type="string" />
+		</joined-subclass>
+
+		<joined-subclass name="IdentifierPool" table="idgen_id_pool">
+			<key column="id"/>
+			<many-to-one name="source" class="IdentifierSource" />
+			<property name="batchSize" type="int" column="batch_size" />
+			<property name="minPoolSize" type="int" column="min_pool_size" />
+			<set name="availableIdentifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field" order-by="identifier asc"
+				 where="status = 'AVAILABLE'">
+				<key column="pool_id" not-null="true" />
+				<one-to-many class="PooledIdentifier" />
+			</set>
+			<set name="usedIdentifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field"
+				 where="status != 'AVAILABLE'">
+				<key column="pool_id" not-null="true" />
+				<one-to-many class="PooledIdentifier" />
+			</set>
+		</joined-subclass>
+		
+	</class>
+	
+	<class name="PooledIdentifier" table="idgen_pooled_identifier">
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<many-to-one name="pool" class="IdentifierPool" column="pool_id" not-null="true" />
+		<property name="identifier" type="string" not-null="true" />
+		<property name="status" type="string" not-null="true" />
+		<property name="statusDate" type="java.util.Date" column="status_date" not-null="true" />	
+	</class>
+
+</hibernate-mapping>

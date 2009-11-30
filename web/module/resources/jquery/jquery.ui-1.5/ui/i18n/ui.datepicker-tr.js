@@ -1,0 +1,22 @@
+/* Turkish initialisation for the jQuery UI date picker plugin. */
+/* Written by Izzet Emre Erkan (kara@karalamalar.net). */
+jQuery(function($){
+	$.datepicker.regional['tr'] = {clearText: 'temizle', clearStatus: 'ge????erli tarihi temizler',
+		closeText: 'kapat', closeStatus: 'sadece g????stergeyi kapat',
+		prevText: '&#x3c;geri', prevStatus: '????nceki ay???? g????ster',
+		nextText: 'ileri&#x3e', nextStatus: 'sonraki ay???? g????ster',
+		currentText: 'bug????n', currentStatus: '',
+		monthNames: ['Ocak','????ubat','Mart','Nisan','May????s','Haziran',
+		'Temmuz','A????ustos','Eyl????l','Ekim','Kas????m','Aral????k'],
+		monthNamesShort: ['Oca','????ub','Mar','Nis','May','Haz',
+		'Tem','A????u','Eyl','Eki','Kas','Ara'],
+		monthStatus: 'ba????ka ay', yearStatus: 'ba????ka y????l',
+		weekHeader: 'Hf', weekStatus: 'Ay????n haftalar????',
+		dayNames: ['Pazar','Pazartesi','Sal????','????ar????amba','Per????embe','Cuma','Cumartesi'],
+		dayNamesShort: ['Pz','Pt','Sa','????a','Pe','Cu','Ct'],
+		dayNamesMin: ['Pz','Pt','Sa','????a','Pe','Cu','Ct'],
+		dayStatus: 'Haftan????n ilk g????n????n???? belirleyin', dateStatus: 'D, M d se????iniz',
+		dateFormat: 'dd.mm.yy', firstDay: 1, 
+		initStatus: 'Bir tarih se????iniz', isRTL: false};
+	$.datepicker.setDefaults($.datepicker.regional['tr']);
+});

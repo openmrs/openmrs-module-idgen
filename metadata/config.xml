@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "../lib-common/config-1.0.dtd">
+
+<module configVersion="1.0">
+	
+	<id>idgen</id>
+	<name>ID Generation</name>
+	<version>1.4.0</version>
+	<package>org.openmrs.module.@MODULE_ID@</package>
+	<author>Partners In Health</author>
+	<description>Provides ID Generation</description>
+	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>	
+	<require_version>1.4.0</require_version>
+	
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+
+	<mappingFiles>
+		IdentifierSource.hbm.xml
+	</mappingFiles>
+	
+</module>
+
