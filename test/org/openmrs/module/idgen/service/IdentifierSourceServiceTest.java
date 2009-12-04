@@ -24,7 +24,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
-import org.openmrs.module.idgen.RestIdentifierGenerator;
+import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
@@ -57,10 +57,10 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 	 * @see {@link IdentifierSourceService#getIdentifierSource(Integer)}
 	 */
 	@Test
-	@Verifies(value = "should return a saved rest identifier generator", method = "getIdentifierSource(Integer)")
+	@Verifies(value = "should return a saved remote identifier source", method = "getIdentifierSource(Integer)")
 	public void getIdentifierSource_shouldReturnASavedRestIdentifierGenerator() throws Exception {
-		RestIdentifierGenerator rig = (RestIdentifierGenerator)iss.getIdentifierSource(2);
-		Assert.assertEquals(rig.getName(), "Test Rest Generator");
+		RemoteIdentifierSource rig = (RemoteIdentifierSource)iss.getIdentifierSource(2);
+		Assert.assertEquals(rig.getName(), "Test Remote Source");
 		Assert.assertNotNull(rig.getUrl());
 	}
 
@@ -124,7 +124,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		String name = "Sample Id Gen";
 		String url = "http://localhost";
 		
-		RestIdentifierGenerator idgen = new RestIdentifierGenerator();
+		RemoteIdentifierSource idgen = new RemoteIdentifierSource();
 		idgen.setName(name);
 		idgen.setUrl(url);
 		idgen.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
@@ -132,9 +132,9 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		
 		Assert.assertNotNull(source.getId());
 		IdentifierSource s = iss.getIdentifierSource(source.getId());
-		Assert.assertEquals(s.getClass(), RestIdentifierGenerator.class);
+		Assert.assertEquals(s.getClass(), RemoteIdentifierSource.class);
 		Assert.assertEquals(s.getName(), name);
-		Assert.assertEquals(((RestIdentifierGenerator)s).getUrl(), url);
+		Assert.assertEquals(((RemoteIdentifierSource)s).getUrl(), url);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		pooledIdentifiers.add(new PooledIdentifier(pool, "ABC01"));
 		pooledIdentifiers.add(new PooledIdentifier(pool, "ABC02"));
 		pooledIdentifiers.add(new PooledIdentifier(pool, "ABC03"));
-		pool.setAvailableIdentifiers(pooledIdentifiers);
+		pool.setIdentifiers(pooledIdentifiers);
 		
 		IdentifierSource source = iss.saveIdentifierSource(pool);
 		

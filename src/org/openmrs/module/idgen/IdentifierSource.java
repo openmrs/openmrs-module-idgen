@@ -29,21 +29,14 @@ public interface IdentifierSource {
 	/**
 	 * Returns a new, single identifier from this source
 	 */
-    public String getIdentifier();
+    public String nextIdentifier();
     
     /**
      * Return List of new identifiers from this source
      * @param batchSize the number of new identifiers to return
      * @return a list of new identifiers from this source
      */
-    public List<String> getIdentifiers(int batchSize);
-    
-    /**
-     * Returns true if the passed identifier is considered a valid identifier for this identifier source
-     * @param identifier the identifier to check
-     * @return true if the identifier is valid for this identifier source
-     */
-    public boolean isValid(String identifier);
+    public List<String> nextIdentifiers(int batchSize);
     
     //****** PROPERTY ACCESS METHODS ******
     

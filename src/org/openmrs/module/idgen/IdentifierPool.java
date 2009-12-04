@@ -13,14 +13,15 @@
  */
 package org.openmrs.module.idgen;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * Identifier Source which contains a pre-generated pool of identifiers,
  * and which typically is used in conjunction with another IdentifierSource 
- * which generates these identifiers in batch
+ * which populates the pool
  */
 public class IdentifierPool extends BaseIdentifierSource {
 	
@@ -29,41 +30,56 @@ public class IdentifierPool extends BaseIdentifierSource {
     private IdentifierSource source;
     private int batchSize = 1000; // for requests to pool
     private int minPoolSize = 500; // request more when we go below this number
-    private Set<PooledIdentifier> usedIdentifiers;
-    private Set<PooledIdentifier> availableIdentifiers;
+    private Set<PooledIdentifier> identifiers;
 	
     //***** INSTANCE METHODS *****
+   
+    /**
+     * Returns all available PooledIdentifiers
+     */
+    public synchronized Set<PooledIdentifier> getAvailableIdentifiers() {
+    	Set<PooledIdentifier> ret = new HashSet<PooledIdentifier>();
+    	for (PooledIdentifier i : getIdentifiers()) {
+    		if (i.getStatus().equals(PooledIdentifier.AVAILABLE)) {
+    			ret.add(i);
+    		}
+    	}
+    	return ret;
+    }
+    
+    /**
+     * Returns all used PooledIdentifiers
+     */
+    public synchronized Set<PooledIdentifier> getUsedIdentifiers() {
+    	Set<PooledIdentifier> ret = new HashSet<PooledIdentifier>();
+    	for (PooledIdentifier i : getIdentifiers()) {
+    		if (i.getStatus().equals(PooledIdentifier.RESERVED)) {
+    			ret.add(i);
+    		}
+    	}
+    	return ret;
+    }
     
 	/** 
-	 * @see IdentifierSource#getIdentifier()
+	 * @see IdentifierSource#nextIdentifier()
 	 */
-	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/** 
-	 * @see IdentifierSource#getIdentifiers(int)
-	 */
-	public List<String> getIdentifiers(int batchSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/** 
-	 * @see IdentifierSource#isValid(java.lang.String)
-	 */
-	public boolean isValid(String identifier) {
-		// TODO Auto-generated method stub
-		return false;
+	public synchronized String nextIdentifier() {
+		for (PooledIdentifier p : getIdentifiers()) {
+			if (p.getStatus().equals(PooledIdentifier.AVAILABLE)) {
+				p.setStatus(PooledIdentifier.RESERVED);
+				p.setStatusDate(new Date());
+				return p.getIdentifier();
+			}
+		}
+		throw new RuntimeException("Not enough available identifiers in pool");
 	}
 	
 	/**
 	 * Adds a new identifier to the pool 
 	 * @param identifier the identifier to add
 	 */
-	public void addIdentifierToPool(String identifier) {
-		getAvailableIdentifiers().add(new PooledIdentifier(this, identifier));
+	public synchronized void addIdentifierToPool(String identifier) {
+		getIdentifiers().add(new PooledIdentifier(this, identifier));
 	}
 	
 	//***** PROPERTY ACCESS *****
@@ -111,36 +127,19 @@ public class IdentifierPool extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the pooledIdentifiers
+	 * @return the identifiers
 	 */
-	public Set<PooledIdentifier> getUsedIdentifiers() {
-		if (usedIdentifiers == null) {
-			usedIdentifiers = new LinkedHashSet<PooledIdentifier>();
+	public Set<PooledIdentifier> getIdentifiers() {
+		if (identifiers == null) {
+			identifiers = new LinkedHashSet<PooledIdentifier>();
 		}
-		return usedIdentifiers;
+		return identifiers;
 	}
 
 	/**
-	 * @param pooledIdentifiers the pooledIdentifiers to set
+	 * @param identifiers the pooledIdentifiers to set
 	 */
-	public void setUsedIdentifiers(Set<PooledIdentifier> usedIdentifiers) {
-		this.usedIdentifiers = usedIdentifiers;
-	}
-
-	/**
-	 * @return the availableIdentifiers
-	 */
-	public Set<PooledIdentifier> getAvailableIdentifiers() {
-		if (availableIdentifiers == null) {
-			availableIdentifiers = new LinkedHashSet<PooledIdentifier>();
-		}
-		return availableIdentifiers;
-	}
-
-	/**
-	 * @param availableIdentifiers the availableIdentifiers to set
-	 */
-	public void setAvailableIdentifiers(Set<PooledIdentifier> availableIdentifiers) {
-		this.availableIdentifiers = availableIdentifiers;
+	public void setIdentifiers(Set<PooledIdentifier> identifiers) {
+		this.identifiers = identifiers;
 	}
 }

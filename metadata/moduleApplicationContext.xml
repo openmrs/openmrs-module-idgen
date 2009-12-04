@@ -4,7 +4,7 @@
 <!-- Beans to add to the current Application context definition -->
 
 <beans>
-	<!--  Configure the Flag Service -->
+	<!--  Configure the Service -->
    	<bean parent="serviceContext" id="identifierSourceService">
 		<property name="moduleService">
 			<list>

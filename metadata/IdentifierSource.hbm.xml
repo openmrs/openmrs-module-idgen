@@ -21,18 +21,16 @@
 		
 		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
 			<key column="id"/>
-			<property name="nextSequenceValue" type="long" column="next_sequence_value" not-null="true"/>
+			<property name="nextSequenceValue" type="int" column="next_sequence_value" not-null="true"/>
 			<property name="validCharacters" type="string" column="valid_characters" not-null="true" />
 			<property name="prefix" type="string" />
-			<property name="suffix" type="string" />
-			<property name="length" type="int" />
+			<property name="minSequenceLength" type="int" column="min_sequence_length" />
+			<property name="initialSequenceValue" type="int" column="initial_sequence_value" />
 		</joined-subclass>
 
-		<joined-subclass name="RestIdentifierGenerator" table="idgen_rest_id_gen">
+		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
 			<key column="id"/>
 			<property name="url" type="string" not-null="true" />
-			<property name="username" type="string" />
-			<property name="password" type="string" />
 		</joined-subclass>
 
 		<joined-subclass name="IdentifierPool" table="idgen_id_pool">
@@ -40,13 +38,7 @@
 			<many-to-one name="source" class="IdentifierSource" />
 			<property name="batchSize" type="int" column="batch_size" />
 			<property name="minPoolSize" type="int" column="min_pool_size" />
-			<set name="availableIdentifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field" order-by="identifier asc"
-				 where="status = 'AVAILABLE'">
-				<key column="pool_id" not-null="true" />
-				<one-to-many class="PooledIdentifier" />
-			</set>
-			<set name="usedIdentifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field"
-				 where="status != 'AVAILABLE'">
+			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field" order-by="identifier asc">
 				<key column="pool_id" not-null="true" />
 				<one-to-many class="PooledIdentifier" />
 			</set>

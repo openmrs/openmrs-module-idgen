@@ -13,7 +13,9 @@
  */
 package org.openmrs.module.idgen;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -43,6 +45,49 @@ public abstract class BaseIdentifierSource implements IdentifierSource {
 	
 	public BaseIdentifierSource() {}
 	
+	//***** INSTANCE METHODS *****
+	
+	/** 
+	 * @see IdentifierSource#getIdentifiers(int)
+	 */
+	public synchronized List<String> nextIdentifiers(int batchSize) {
+		List<String> batch = new ArrayList<String>();
+		for (int i=0; i<batchSize; i++) {
+			batch.add(nextIdentifier());
+		}
+		return batch;
+	}
+	
+	/** @see Object#equals(Object) */
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof IdentifierSource) {
+			IdentifierSource that = (IdentifierSource) obj;
+			if (this.getId() != null) {
+				return (this.getId().equals(that.getId()));
+			}
+		}
+		return this == obj;
+	}
+	
+	/**
+	 * @see Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		if (getId() != null) {
+			return 31 * getId().hashCode();
+		}
+		return super.hashCode();
+	}
+	
+	/** 
+	 * @see Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 	//***** PROPERTY ACCESS ******
 	/**
 	 * @return the id

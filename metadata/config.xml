@@ -12,6 +12,11 @@
 	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>	
 	<require_version>1.4.0</require_version>
 	
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+	</extension>
+	
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>

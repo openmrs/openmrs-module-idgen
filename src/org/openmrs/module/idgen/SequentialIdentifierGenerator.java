@@ -13,63 +13,96 @@
  */
 package org.openmrs.module.idgen;
 
-import java.util.List;
+import org.openmrs.api.context.Context;
+import org.openmrs.patient.IdentifierValidator;
 
 /**
  * Auto-generating Identifier Source, which returns Identifiers in sequence
  */
 public class SequentialIdentifierGenerator extends BaseIdentifierSource {
-	
+
 	//***** PROPERTIES *****
 	
-	private long nextSequenceValue;
+	private int nextSequenceValue = -1;
     private String prefix; // Optional prefix
-    private String suffix; // Optional suffix
-    private Integer length; // Stores the length of the identifier, if <= 0 or null, then variable length
+    private Integer initialSequenceValue; // Enables configuration of this generator to start at a number other than 1
+    private Integer minSequenceLength; // If this is set, will pad sequential part of identifier with leading "0"s to this length
     private String validCharacters; // Enables configuration in appropriate Base
 	
     //***** INSTANCE METHODS *****
     
+    /**
+     * Returns a boolean indicating whether this generator has already started producing identifiers
+     */
+    public boolean isInitialized() {
+    	return nextSequenceValue > 0;
+    }
+    
 	/** 
-	 * @see IdentifierSource#getIdentifier()
+	 * @see IdentifierSource#nextIdentifier()
 	 */
-	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public synchronized String nextIdentifier() {
+    	
+    	// Initialize sequence if needed
+    	if (nextSequenceValue < 0) {
+    		if (initialSequenceValue != null) {
+    			nextSequenceValue = initialSequenceValue;
+    		}
+    		else {
+    			nextSequenceValue = 1;
+    		}
+    	}
+    	
+    	// Convert the next sequence integer into a String with the appropriate Base characters
+    	StringBuilder base = new StringBuilder();
+    	char[] chars = validCharacters.toCharArray();
+    	int n = nextSequenceValue++;
+    	while (n > 0) {
+    		base.insert(0, chars[n % chars.length]);
+    		n = (int)(n / chars.length);
+    	}
+    	
+    	// Pad the base, if needed, to reach a minimum required length
+    	if (minSequenceLength != null && minSequenceLength > 0) {
+	    	while (base.length() < minSequenceLength) {
+	    		base.insert(0, "0");
+	    	}
+    	}
 
-	/** 
-	 * @see IdentifierSource#getIdentifiers(int)
-	 */
-	public List<String> getIdentifiers(int batchSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/** 
-	 * @see IdentifierSource#isValid(java.lang.String)
-	 */
-	public boolean isValid(String identifier) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	//***** PROPERTY ACCESS *****
+    	String identifier = base.toString();
+    	
+    	// Add a check-digit, if required
+    	if (getIdentifierType().getValidator() != null) {
+    		try {
+	    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
+	    		IdentifierValidator v = (IdentifierValidator)c.newInstance();
+	    		identifier = v.getValidIdentifier(identifier);
+    		}
+    		catch (Exception e) {
+    			throw new RuntimeException("Error generating check digit with " + getIdentifierType().getValidator(), e);
+    		}
+    	}
+    	
+    	// Return identifier with check-digit, prepended with prefix if required
+    	return (prefix == null ? "" : prefix) + identifier;
+    }
+    
+    //***** PROPERTY ACCESS *****
 
 	/**
 	 * @return the nextSequenceValue
 	 */
-	protected long getNextSequenceValue() {
+	protected int getNextSequenceValue() {
 		return nextSequenceValue;
 	}
 
 	/**
 	 * @param nextSequenceValue the nextSequenceValue to set
 	 */
-	protected void setNextSequenceValue(long nextSequenceValue) {
+	protected void setNextSequenceValue(int nextSequenceValue) {
 		this.nextSequenceValue = nextSequenceValue;
 	}
-	
+
 	/**
 	 * @return the prefix
 	 */
@@ -85,31 +118,31 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the suffix
+	 * @return the initialSequenceValue
 	 */
-	public String getSuffix() {
-		return suffix;
+	public Integer getInitialSequenceValue() {
+		return initialSequenceValue;
 	}
 
 	/**
-	 * @param suffix the suffix to set
+	 * @param initialSequenceValue the initialSequenceValue to set
 	 */
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
+	public void setInitialSequenceValue(Integer initialSequenceValue) {
+		this.initialSequenceValue = initialSequenceValue;
 	}
 
 	/**
-	 * @return the length
+	 * @return the minSequenceLength
 	 */
-	public Integer getLength() {
-		return length;
+	public Integer getMinSequenceLength() {
+		return minSequenceLength;
 	}
 
 	/**
-	 * @param length the length to set
+	 * @param minSequenceLength the minSequenceLength to set
 	 */
-	public void setLength(Integer length) {
-		this.length = length;
+	public void setMinSequenceLength(Integer minSequenceLength) {
+		this.minSequenceLength = minSequenceLength;
 	}
 
 	/**

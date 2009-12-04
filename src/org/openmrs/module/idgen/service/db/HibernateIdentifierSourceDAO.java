@@ -13,10 +13,16 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.Order;
 import org.openmrs.api.APIException;
+import org.openmrs.api.db.DAOException;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +46,19 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException {
 		return (IdentifierSource) sessionFactory.getCurrentSession().get(IdentifierSource.class, id);
+	}
+
+	/** 
+	 * @see IdentifierSourceDAO#getAllIdentifierSources(boolean)
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
+		if (!includeRetired) {
+			criteria.add(Expression.like("retired", false));
+		}
+		criteria.addOrder(Order.asc("name"));
+		return criteria.list();
 	}
 
 	/**

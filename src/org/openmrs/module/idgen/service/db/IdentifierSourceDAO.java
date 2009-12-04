@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import java.util.List;
+
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,14 @@ public interface IdentifierSourceDAO {
 	 */
 	@Transactional(readOnly = true)
 	public IdentifierSource getIdentifierSource(Integer id) throws DAOException;
+	
+	/**
+	 * @param includeRetired if true, also returns retired IdentifierSources
+	 * @return all IdentifierSources
+	 * @should return all identifier sources
+	 */
+	@Transactional(readOnly = true)
+	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException;
 
 	/**
 	 * Persists a IdentifierSource, either as a save or update.
