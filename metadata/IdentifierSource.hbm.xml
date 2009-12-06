@@ -3,7 +3,7 @@
 
 <hibernate-mapping package="org.openmrs.module.idgen" >
 
-	<class name="IdentifierSource" table="idgen_identifier_source">
+	<class name="IdentifierSource" table="idgen_identifier_source" abstract="true">
 	
 		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
 		<property name="uuid" type="string" length="38" not-null="true" />
@@ -21,11 +21,12 @@
 		
 		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
 			<key column="id"/>
-			<property name="nextSequenceValue" type="int" column="next_sequence_value" not-null="true"/>
-			<property name="validCharacters" type="string" column="valid_characters" not-null="true" />
+			<property name="nextSequenceValue" type="long" column="next_sequence_value" not-null="true"/>
+			<property name="baseCharacterSet" type="string" column="base_character_set" not-null="true" />
+			<property name="firstIdentifierBase" type="string" column="first_identifier_base" not-null="true" />
 			<property name="prefix" type="string" />
-			<property name="minSequenceLength" type="int" column="min_sequence_length" />
-			<property name="initialSequenceValue" type="int" column="initial_sequence_value" />
+			<property name="suffix" type="string" />
+			<property name="length" type="int" column="length" />
 		</joined-subclass>
 
 		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
@@ -35,10 +36,11 @@
 
 		<joined-subclass name="IdentifierPool" table="idgen_id_pool">
 			<key column="id"/>
-			<many-to-one name="source" class="IdentifierSource" />
+			<many-to-one name="source" class="IdentifierSource" lazy="false" />
 			<property name="batchSize" type="int" column="batch_size" />
 			<property name="minPoolSize" type="int" column="min_pool_size" />
-			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field" order-by="identifier asc">
+			<property name="sequential" type="java.lang.Boolean" length="1" not-null="true"/>
+			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field">
 				<key column="pool_id" not-null="true" />
 				<one-to-many class="PooledIdentifier" />
 			</set>
@@ -48,10 +50,11 @@
 	
 	<class name="PooledIdentifier" table="idgen_pooled_identifier">
 		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<property name="uuid" type="string" length="38" not-null="true" />
 		<many-to-one name="pool" class="IdentifierPool" column="pool_id" not-null="true" />
 		<property name="identifier" type="string" not-null="true" />
-		<property name="status" type="string" not-null="true" />
-		<property name="statusDate" type="java.util.Date" column="status_date" not-null="true" />	
+		<property name="dateUsed" type="java.util.Date" column="date_used" />
+		<property name="comment" type="string"/>	
 	</class>
 
 </hibernate-mapping>

@@ -14,7 +14,6 @@
 package org.openmrs.module.idgen;
 
 import java.util.Date;
-import java.util.List;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -23,22 +22,8 @@ import org.openmrs.User;
  * An IdentifierSource is a construct which can supply identifiers of a particular type
  */
 public interface IdentifierSource {
-	
-	//****** METHODS TO BE IMPLEMENTED BY CONCRETE CLASSES
-	
-	/**
-	 * Returns a new, single identifier from this source
-	 */
-    public String nextIdentifier();
     
-    /**
-     * Return List of new identifiers from this source
-     * @param batchSize the number of new identifiers to return
-     * @return a list of new identifiers from this source
-     */
-    public List<String> nextIdentifiers(int batchSize);
-    
-    //****** PROPERTY ACCESS METHODS ******
+    //****** PROPERTY ACCESS ******
     
 	/**
 	 * @return id - The unique Identifier for the object

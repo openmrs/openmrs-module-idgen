@@ -18,12 +18,15 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,6 +78,46 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	public void purgeIdentifierSource(IdentifierSource identifierSource) {
 		sessionFactory.getCurrentSession().delete(identifierSource);
+	}
+	
+	/**
+	 * 
+	 * @see IdentifierSourceDAO#getAvailableIdentifiers(IdentifierPool, boolean, boolean)
+	 */
+	@Transactional(readOnly=true)
+	@SuppressWarnings("unchecked")
+	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PooledIdentifier.class);
+		criteria.add(Expression.isNull("dateUsed"));
+		criteria.add(Expression.eq("pool", pool));
+		criteria.setMaxResults(quantity);
+		if (pool.isSequential()) {
+			criteria.addOrder(Order.asc("identifier"));
+		}
+		else {
+			criteria.addOrder(Order.asc("uuid"));
+		}
+		List<PooledIdentifier> results = (List<PooledIdentifier>) criteria.list();
+		if (results.size() < quantity) {
+			throw new RuntimeException("Unable to retrieve " + quantity + " available identifiers from Pool " + pool);
+		}
+		return results;
+	}
+	
+	/**
+	 * @see IdentifierSourceDAO#getQuantityInPool(IdentifierPool, boolean, boolean)
+	 */
+	@Transactional(readOnly=true)
+	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) {
+		String hql = "select count(*) from PooledIdentifier where pool_id = " + pool.getId();
+		if (availableOnly) {
+			hql += " and date_used is null";
+		}
+		if (usedOnly) {
+			hql += " and date_used is not null";
+		}
+		Query query = sessionFactory.getCurrentSession().createQuery(hql);
+		return Integer.parseInt(query.uniqueResult().toString());
 	}
 	
 	//***** PROPERTY ACCESS *****

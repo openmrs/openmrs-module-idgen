@@ -62,7 +62,7 @@
 	<classpathentry kind="lib" path="/openmrs-1.4.x/lib/benerator/databene-webdecs-0.4.5.jar"/>
 	<classpathentry kind="lib" path="/openmrs-1.4.x/lib/commons-io/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="/openmrs-1.4.x/lib/hibernate/hibernate325-mod.jar"/>
-	<classpathentry kind="lib" path="lib-common/openmrs-api-1.4.5.00.11137.jar"/>
+	<classpathentry kind="lib" path="lib-common/openmrs-api-1.4.5.00.11137.jar" sourcepath="/openmrs-1.4.x"/>
 	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.4.5.00.11137.jar"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.4.5.00.11137.jar"/>
 	<classpathentry kind="lib" path="lib/commons-csv-20070730.jar"/>

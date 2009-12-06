@@ -15,6 +15,7 @@ package org.openmrs.module.idgen.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,10 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class BaseIdentifierSourceService extends BaseOpenmrsService implements IdentifierSourceService {
 	
 	protected Log log = LogFactory.getLog(getClass());
+	
+	/**
+	 * Registry of Processors for Identifier Sources
+	 */
+	private static Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = null;
 	
 	//***** PROPERTIES *****
 	
@@ -63,6 +71,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getIdentifierSource(Integer)
 	 */
+	@Transactional(readOnly = true)
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException {
 		return dao.getIdentifierSource(id);
 	}
@@ -70,6 +79,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getAllIdentifierSources(boolean)
 	 */
+	@Transactional(readOnly = true)
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws APIException {
 		return dao.getAllIdentifierSources(includeRetired);
 	}
@@ -77,6 +87,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getIdentifierSourcesByType(boolean)
 	 */
+	@Transactional(readOnly = true)
 	public Map<PatientIdentifierType, List<IdentifierSource>> getIdentifierSourcesByType(boolean includeRetired) throws APIException {
 		Map<PatientIdentifierType, List<IdentifierSource>> m = new LinkedHashMap<PatientIdentifierType, List<IdentifierSource>>();
 		for (PatientIdentifierType t : Context.getPatientService().getAllPatientIdentifierTypes()) {
@@ -121,13 +132,44 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 		dao.purgeIdentifierSource(identifierSource);
 	}
 	
+	/**
+	 * 
+	 * @see IdentifierSourceService#getProcessor(IdentifierSource)
+	 */
+	public IdentifierSourceProcessor getProcessor(IdentifierSource source) {
+		return getProcessors().get(source.getClass());
+	}
+	
+	/**
+	 * @see IdentifierSourceService#registerProcessor(Class, IdentifierSourceProcessor)
+	 */
+	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException {
+		getProcessors().put(type, processorToRegister);
+	}
+	
 	/** 
 	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer)
 	 */
 	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException {
-		List<String> is = source.nextIdentifiers(batchSize);
-		Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
-		return is;
+		IdentifierSourceProcessor processor = getProcessor(source);
+		if (processor == null) {
+			throw new APIException("No registered processor found for source: " + source);
+		}
+		return processor.getIdentifiers(source, batchSize);
+	}
+
+	/** 
+	 * @see IdentifierSourceService#getAvailableIdentifiers(IdentifierPool, int)
+	 */
+	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException {
+		return dao.getAvailableIdentifiers(pool, quantity);
+	}
+
+	/** 
+	 * @see IdentifierSourceService#getQuantityInPool(IdentifierPool, boolean, boolean)
+	 */
+	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException {
+		return dao.getQuantityInPool(pool, availableOnly, usedOnly);
 	}
 
 	/** 
@@ -162,5 +204,27 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 */
 	public void setDao(IdentifierSourceDAO dao) {
 		this.dao = dao;
+	}
+	
+	/**
+	 * @return the processors
+	 */
+	public Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> getProcessors() {
+		if (processors == null) {
+			processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
+		}
+		return processors;
+	}
+
+	/**
+	 * ADDS, doesn't simply set
+	 * @param processors the processors to set
+	 */
+	public void setProcessors(Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processorsToAdd) {
+		if (processorsToAdd != null) {
+			for (Map.Entry<Class<? extends IdentifierSource>, IdentifierSourceProcessor> entry : processorsToAdd.entrySet()) {
+				registerProcessor(entry.getKey(), entry.getValue());
+			}
+		}
 	}
 }

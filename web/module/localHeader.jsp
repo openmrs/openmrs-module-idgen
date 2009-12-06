@@ -9,4 +9,11 @@
 			</a>
 		</li>
 	</openmrs:hasPrivilege>
+	<openmrs:hasPrivilege privilege="Manage Identifier Types">
+		<li <c:if test='<%= request.getRequestURI().contains("patientIdentifierType") %>'>class="active"</c:if>>
+			<a href="${pageContext.request.contextPath}/admin/patients/patientIdentifierType.list">
+				<spring:message code="PatientIdentifierType.manage"/>
+			</a>
+		</li>
+	</openmrs:hasPrivilege>
 </ul>

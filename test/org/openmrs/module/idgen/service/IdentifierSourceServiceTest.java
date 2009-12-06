@@ -50,7 +50,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 	public void getIdentifierSource_shouldReturnASavedSequentialIdentifierGenerator() throws Exception {
 		SequentialIdentifierGenerator sig = (SequentialIdentifierGenerator)iss.getIdentifierSource(1);
 		Assert.assertEquals(sig.getName(), "Test Sequential Generator");
-		Assert.assertNotNull(sig.getValidCharacters());
+		Assert.assertNotNull(sig.getBaseCharacterSet());
 	}
 
 	/**
@@ -99,11 +99,11 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 	public void saveIdentifierSource_shouldSaveASequentialIdentifierGeneratorForLaterRetrieval() throws Exception {
 		
 		String name = "Sample Id Gen";
-		String validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		String baseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		
 		SequentialIdentifierGenerator sig = new SequentialIdentifierGenerator();
 		sig.setName(name);
-		sig.setValidCharacters(validChars);
+		sig.setBaseCharacterSet(baseChars);
 		sig.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
 		IdentifierSource source = iss.saveIdentifierSource(sig);
 		
@@ -111,7 +111,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		IdentifierSource s = iss.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getClass(), SequentialIdentifierGenerator.class);
 		Assert.assertEquals(s.getName(), name);
-		Assert.assertEquals(((SequentialIdentifierGenerator)s).getValidCharacters(), validChars);
+		Assert.assertEquals(((SequentialIdentifierGenerator)s).getBaseCharacterSet(), baseChars);
 	}
 
 	/**

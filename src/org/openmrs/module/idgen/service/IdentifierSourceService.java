@@ -21,6 +21,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.PooledIdentifier;
+import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -90,6 +92,35 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional
 	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException;
+	
+	/**
+	 * Returns an appropriate IdentifierSourceProcessor for the given IdentifierSource
+	 * @param source
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public IdentifierSourceProcessor getProcessor(IdentifierSource source);
+	
+	/**
+	 * Registers a new Processor to handle a particular IdentifierSource
+	 * @param type
+	 * @param processorToRegister
+	 * @throws APIException
+	 */
+	@Transactional(readOnly = true)
+	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException;
+
+	/**
+	 * Returns available identifiers from a pool 
+	 */
+	@Transactional(readOnly=true)
+	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException;
+	
+	/**
+	 * Returns Pooled Identifiers for the given source, with the given status options
+	 */
+	@Transactional(readOnly=true)
+	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException;
 	
 	/**
 	 * Adds a List of Identifiers to the given pool

@@ -14,48 +14,57 @@
 package org.openmrs.module.idgen;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Component which encapsulates an identifier that has been allocated to an Identifier Pool
  */
 public class PooledIdentifier {
 	
-	public static final String AVAILABLE = "AVAILABLE";
-	public static final String RESERVED = "RESERVED";
-	
 	//***** PROPERTIES *****
 	
     private Integer id;
+    private String uuid;  // Mainly here to support random sorting of pooled identifiers
     private IdentifierPool pool;
     private String identifier;
-    private String status;
-    private Date statusDate;
+    private Date dateUsed;
+    private String comment;
 	
     //***** CONSTRUCTORS *****
     
     /**
      * Default Constructor
      */
-    public PooledIdentifier() {}
+    public PooledIdentifier() {
+    	this.uuid = UUID.randomUUID().toString();
+    }
     
 	/**
 	 * Identifier-only constructor
 	 */
 	public PooledIdentifier(IdentifierPool pool, String identifier) {
-		this(pool, identifier, AVAILABLE, new Date());
+		this(pool, identifier, null, null);
 	}
 	
 	/**
 	 * Full constructor
 	 */
-	public PooledIdentifier(IdentifierPool pool, String identifier, String status, Date statusDate) {
+	public PooledIdentifier(IdentifierPool pool, String identifier, Date dateUsed, String comment) {
+		this();
 		this.pool = pool;
 		this.identifier = identifier;
-		this.status = status;
-		this.statusDate = statusDate;
+		this.dateUsed = dateUsed;
+		this.comment = comment;
 	}
 	
     //***** INSTANCE METHODS *****
+	
+	/**
+	 * Boolean indicating whether this identifier is available
+	 */
+	public boolean isAvailable() {
+		return dateUsed == null;
+	}
     
 	/** @see Object#equals(Object) */
 	public boolean equals(Object obj) {
@@ -102,6 +111,19 @@ public class PooledIdentifier {
 		this.id = id;
 	}
 	/**
+	 * @return the uuid
+	 */
+	public String getUuid() {
+		return uuid;
+	}
+
+	/**
+	 * @param uuid the uuid to set
+	 */
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	/**
 	 * @return the pool
 	 */
 	public IdentifierPool getPool() {
@@ -126,27 +148,27 @@ public class PooledIdentifier {
 		this.identifier = identifier;
 	}
 	/**
-	 * @return the status
+	 * @return the dateUsed
 	 */
-	public String getStatus() {
-		return status;
+	public Date getDateUsed() {
+		return dateUsed;
 	}
 	/**
-	 * @param status the status to set
+	 * @param dateUsed the dateUsed to set
 	 */
-	public void setStatus(String status) {
-		this.status = status;
+	public void setDateUsed(Date dateUsed) {
+		this.dateUsed = dateUsed;
 	}
 	/**
-	 * @return the statusDate
+	 * @return the comment
 	 */
-	public Date getStatusDate() {
-		return statusDate;
+	public String getComment() {
+		return comment;
 	}
 	/**
-	 * @param statusDate the statusDate to set
+	 * @param comment the comment to set
 	 */
-	public void setStatusDate(Date statusDate) {
-		this.statusDate = statusDate;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 }

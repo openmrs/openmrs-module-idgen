@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -30,6 +31,7 @@ public class IdentifierPool extends BaseIdentifierSource {
     private IdentifierSource source;
     private int batchSize = 1000; // for requests to pool
     private int minPoolSize = 500; // request more when we go below this number
+    private boolean sequential = false;
     private Set<PooledIdentifier> identifiers;
 	
     //***** INSTANCE METHODS *****
@@ -37,27 +39,27 @@ public class IdentifierPool extends BaseIdentifierSource {
     /**
      * Returns all available PooledIdentifiers
      */
-    public synchronized Set<PooledIdentifier> getAvailableIdentifiers() {
+    public Set<PooledIdentifier> getAvailableIdentifiers() {
     	Set<PooledIdentifier> ret = new HashSet<PooledIdentifier>();
     	for (PooledIdentifier i : getIdentifiers()) {
-    		if (i.getStatus().equals(PooledIdentifier.AVAILABLE)) {
+    		if (i.isAvailable()) {
     			ret.add(i);
     		}
     	}
-    	return ret;
+    	return Collections.unmodifiableSet(ret);
     }
-    
-    /**
+
+	/**
      * Returns all used PooledIdentifiers
      */
-    public synchronized Set<PooledIdentifier> getUsedIdentifiers() {
+    public Set<PooledIdentifier> getUsedIdentifiers() {
     	Set<PooledIdentifier> ret = new HashSet<PooledIdentifier>();
     	for (PooledIdentifier i : getIdentifiers()) {
-    		if (i.getStatus().equals(PooledIdentifier.RESERVED)) {
+    		if (!i.isAvailable()) {
     			ret.add(i);
     		}
     	}
-    	return ret;
+    	return Collections.unmodifiableSet(ret);
     }
     
 	/** 
@@ -65,9 +67,8 @@ public class IdentifierPool extends BaseIdentifierSource {
 	 */
 	public synchronized String nextIdentifier() {
 		for (PooledIdentifier p : getIdentifiers()) {
-			if (p.getStatus().equals(PooledIdentifier.AVAILABLE)) {
-				p.setStatus(PooledIdentifier.RESERVED);
-				p.setStatusDate(new Date());
+			if (p.isAvailable()) {
+				p.setDateUsed(new Date());
 				return p.getIdentifier();
 			}
 		}
@@ -124,6 +125,20 @@ public class IdentifierPool extends BaseIdentifierSource {
 	 */
 	public void setMinPoolSize(int minPoolSize) {
 		this.minPoolSize = minPoolSize;
+	}
+
+	/**
+	 * @return the sequential
+	 */
+	public boolean isSequential() {
+		return sequential;
+	}
+
+	/**
+	 * @param sequential the sequential to set
+	 */
+	public void setSequential(boolean sequential) {
+		this.sequential = sequential;
 	}
 
 	/**

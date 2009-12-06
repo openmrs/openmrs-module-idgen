@@ -16,7 +16,9 @@ package org.openmrs.module.idgen.service.db;
 import java.util.List;
 
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.PooledIdentifier;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -54,4 +56,16 @@ public interface IdentifierSourceDAO {
 	 */
 	@Transactional
 	public void purgeIdentifierSource(IdentifierSource identifierSource) throws DAOException;
+	
+	/**
+	 * Returns available identifiers from a pool 
+	 */
+	@Transactional(readOnly=true)
+	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws DAOException;
+	
+	/**
+	 * Returns Pooled Identifiers for the given source, with the given status options
+	 */
+	@Transactional(readOnly=true)
+	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws DAOException;
 }

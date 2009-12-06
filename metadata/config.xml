@@ -17,6 +17,11 @@
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
 	
+	<extension>
+		<point>org.openmrs.admin.patients.localHeader</point>
+		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+	</extension>
+
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>

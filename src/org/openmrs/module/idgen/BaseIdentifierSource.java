@@ -13,9 +13,7 @@
  */
 package org.openmrs.module.idgen;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -46,17 +44,6 @@ public abstract class BaseIdentifierSource implements IdentifierSource {
 	public BaseIdentifierSource() {}
 	
 	//***** INSTANCE METHODS *****
-	
-	/** 
-	 * @see IdentifierSource#getIdentifiers(int)
-	 */
-	public synchronized List<String> nextIdentifiers(int batchSize) {
-		List<String> batch = new ArrayList<String>();
-		for (int i=0; i<batchSize; i++) {
-			batch.add(nextIdentifier());
-		}
-		return batch;
-	}
 	
 	/** @see Object#equals(Object) */
 	public boolean equals(Object obj) {

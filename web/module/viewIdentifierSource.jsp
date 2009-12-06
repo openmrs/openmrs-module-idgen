@@ -16,7 +16,11 @@
 <table id="sourceTable">
 	<tr>
 		<th><spring:message code="idgen.sourceName" /></th>
-		<td>${source.name}</td>
+		<td>
+			${source.name}
+			&nbsp;&nbsp;
+			(<a href="editIdentifierSource.form?source=${source.id}"><spring:message code="general.edit" />)
+		</td>
 	</tr>
 	<tr>
 		<th><spring:message code="general.description" />:</th>
@@ -25,6 +29,19 @@
 	<tr>
 		<th><spring:message code="PatientIdentifier.identifierType" /></th>
 		<td>${source.identifierType.name}</td>
+	</tr>
+	<tr>
+		<th><spring:message code="idgen.checkDigitAlgorithm" />:</td>
+		<td>
+			<c:choose>
+				<c:when test="${!empty source.identifierType.validator}">
+					${source.identifierType.validator}
+				</c:when>
+				<c:otherwise>
+					<spring:message code="general.none" />
+				</c:otherwise>
+			</c:choose>
+		</td>
 	</tr>
 </table>
 <br/>
@@ -35,20 +52,24 @@
 	
 	<table id="sourceTable">
 		<tr>
-			<th><spring:message code="idgen.initialSequenceValue"/></th>
-			<td>${source.initialSequenceValue}</td>
+			<th><spring:message code="idgen.baseCharacterSet"/>:</th>
+			<td>${source.baseCharacterSet}</td>
 		</tr>
 		<tr>
-			<th><spring:message code="idgen.prefix"/></th>
+			<th><spring:message code="idgen.firstIdentifierBase"/>:</th>
+			<td>${source.firstIdentifierBase}</td>
+		</tr>
+		<tr>
+			<th><spring:message code="idgen.prefix"/>:</th>
 			<td>${source.prefix}</td>
 		</tr>
 		<tr>
-			<th><spring:message code="idgen.minSequenceLength"/></th>
-			<td>${source.minSequenceLength}</td>
+			<th><spring:message code="idgen.suffix"/>:</th>
+			<td>${source.suffix}</td>
 		</tr>
 		<tr>
-			<th><spring:message code="idgen.validCharacters"/></th>
-			<td>${source.validCharacters}</td>
+			<th><spring:message code="idgen.length"/>:</th>
+			<td>${source.length}</td>
 		</tr>
 	</table>
 </c:if>
@@ -87,7 +108,7 @@
 	<br/>
 	
 </c:if>
-
+<hr/>
 <form action="exportIdentifiers.form">
 	<b>Export Identifiers: </b>
 	<c:set var="available" value="t"/>

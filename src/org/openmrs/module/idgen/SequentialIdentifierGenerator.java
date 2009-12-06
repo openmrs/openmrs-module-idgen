@@ -23,11 +23,12 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 
 	//***** PROPERTIES *****
 	
-	private int nextSequenceValue = -1;
+	private long nextSequenceValue = -1;
     private String prefix; // Optional prefix
-    private Integer initialSequenceValue; // Enables configuration of this generator to start at a number other than 1
-    private Integer minSequenceLength; // If this is set, will pad sequential part of identifier with leading "0"s to this length
-    private String validCharacters; // Enables configuration in appropriate Base
+    private String suffix; // Optional suffix
+    private String firstIdentifierBase; // First identifier to start at
+    private Integer length; // If > 0, will always return identifiers with the given length
+    private String baseCharacterSet; // Enables configuration in appropriate Base
 	
     //***** INSTANCE METHODS *****
     
@@ -38,40 +39,21 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     	return nextSequenceValue > 0;
     }
     
-	/** 
-	 * @see IdentifierSource#nextIdentifier()
-	 */
-    public synchronized String nextIdentifier() {
-    	
-    	// Initialize sequence if needed
-    	if (nextSequenceValue < 0) {
-    		if (initialSequenceValue != null) {
-    			nextSequenceValue = initialSequenceValue;
-    		}
-    		else {
-    			nextSequenceValue = 1;
-    		}
-    	}
+    /**
+     * Returns a new identifier for the given seed.  This does not change the state of the source
+     * @param seed the seed to use for generation of the identifier
+     * @return a new identifier for the given seed
+     */
+    public String getIdentifierForSeed(long seed) {
     	
     	// Convert the next sequence integer into a String with the appropriate Base characters
-    	StringBuilder base = new StringBuilder();
-    	char[] chars = validCharacters.toCharArray();
-    	int n = nextSequenceValue++;
-    	while (n > 0) {
-    		base.insert(0, chars[n % chars.length]);
-    		n = (int)(n / chars.length);
-    	}
+    	String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray());
     	
-    	// Pad the base, if needed, to reach a minimum required length
-    	if (minSequenceLength != null && minSequenceLength > 0) {
-	    	while (base.length() < minSequenceLength) {
-	    		base.insert(0, "0");
-	    	}
-    	}
-
-    	String identifier = base.toString();
+    	// Add optional prefix and suffix
+    	identifier = (prefix == null ? identifier : prefix + identifier);
+    	identifier = (suffix == null ? identifier : identifier + suffix);
     	
-    	// Add a check-digit, if required
+    	// Add check-digit, if required
     	if (getIdentifierType().getValidator() != null) {
     		try {
 	    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
@@ -82,9 +64,13 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     			throw new RuntimeException("Error generating check digit with " + getIdentifierType().getValidator(), e);
     		}
     	}
-    	
-    	// Return identifier with check-digit, prepended with prefix if required
-    	return (prefix == null ? "" : prefix) + identifier;
+
+    	if (length != null && length > 0) {
+    		if (identifier.length() != length) {
+    			throw new RuntimeException("Invalid configuration for IdentifierSource. Length set to " + length + " but generated " + identifier);
+    		}
+    	}
+    	return identifier;
     }
     
     //***** PROPERTY ACCESS *****
@@ -92,14 +78,14 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	/**
 	 * @return the nextSequenceValue
 	 */
-	protected int getNextSequenceValue() {
+	public long getNextSequenceValue() {
 		return nextSequenceValue;
 	}
 
 	/**
 	 * @param nextSequenceValue the nextSequenceValue to set
 	 */
-	protected void setNextSequenceValue(int nextSequenceValue) {
+	public void setNextSequenceValue(long nextSequenceValue) {
 		this.nextSequenceValue = nextSequenceValue;
 	}
 
@@ -118,44 +104,58 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the initialSequenceValue
+	 * @return the suffix
 	 */
-	public Integer getInitialSequenceValue() {
-		return initialSequenceValue;
+	public String getSuffix() {
+		return suffix;
 	}
 
 	/**
-	 * @param initialSequenceValue the initialSequenceValue to set
+	 * @param suffix the suffix to set
 	 */
-	public void setInitialSequenceValue(Integer initialSequenceValue) {
-		this.initialSequenceValue = initialSequenceValue;
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
 	}
 
 	/**
-	 * @return the minSequenceLength
+	 * @return the firstIdentifierBase
 	 */
-	public Integer getMinSequenceLength() {
-		return minSequenceLength;
+	public String getFirstIdentifierBase() {
+		return firstIdentifierBase;
 	}
 
 	/**
-	 * @param minSequenceLength the minSequenceLength to set
+	 * @param firstIdentifierBase the firstIdentifierBase to set
 	 */
-	public void setMinSequenceLength(Integer minSequenceLength) {
-		this.minSequenceLength = minSequenceLength;
+	public void setFirstIdentifierBase(String firstIdentifierBase) {
+		this.firstIdentifierBase = firstIdentifierBase;
 	}
 
 	/**
-	 * @return the validCharacters
+	 * @return the length
 	 */
-	public String getValidCharacters() {
-		return validCharacters;
+	public Integer getLength() {
+		return length;
 	}
 
 	/**
-	 * @param validCharacters the validCharacters to set
+	 * @param length the length to set
 	 */
-	public void setValidCharacters(String validCharacters) {
-		this.validCharacters = validCharacters;
+	public void setLength(Integer length) {
+		this.length = length;
+	}
+
+	/**
+	 * @return the baseCharacterSet
+	 */
+	public String getBaseCharacterSet() {
+		return baseCharacterSet;
+	}
+
+	/**
+	 * @param baseCharacterSet the baseCharacterSet to set
+	 */
+	public void setBaseCharacterSet(String baseCharacterSet) {
+		this.baseCharacterSet = baseCharacterSet;
 	}
 }
