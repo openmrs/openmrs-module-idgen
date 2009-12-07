@@ -9,6 +9,13 @@
 			</a>
 		</li>
 	</openmrs:hasPrivilege>
+	<openmrs:hasPrivilege privilege="Manage Identifier Sources">
+		<li <c:if test='<%= request.getRequestURI().contains("manageAutoGenerationOptions") %>'>class="active"</c:if>>
+			<a href="${pageContext.request.contextPath}/module/idgen/manageAutoGenerationOptions.list">
+				<spring:message code="idgen.autoGenerationOptionHeader"/>
+			</a>
+		</li>
+	</openmrs:hasPrivilege>	
 	<openmrs:hasPrivilege privilege="Manage Identifier Types">
 		<li <c:if test='<%= request.getRequestURI().contains("patientIdentifierType") %>'>class="active"</c:if>>
 			<a href="${pageContext.request.contextPath}/admin/patients/patientIdentifierType.list">

@@ -16,11 +16,24 @@
 		<point>org.openmrs.admin.list</point>
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
+	<extension>
+		<point>newPatientForm.identifierHeader</point>
+		<class>@MODULE_PACKAGE@.extension.html.CreatePatientIdGenCheckBoxHeader</class>
+	</extension>
+	<extension>
+		<point>newPatientForm.identifierBody</point>
+		<class>@MODULE_PACKAGE@.extension.html.CreatePatientIdGenCheckBoxBody</class>
+	</extension>
 	
 	<extension>
 		<point>org.openmrs.admin.patients.localHeader</point>
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
+	
+	<advice>
+		<point>org.openmrs.api.PatientService</point>
+		<class>@MODULE_PACKAGE@.advice.PatientServiceIdGenAdvisor</class>
+	</advice>
 
 	<messages>
 		<lang>en</lang>

@@ -22,8 +22,10 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
@@ -120,8 +122,33 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 		return Integer.parseInt(query.uniqueResult().toString());
 	}
 	
-	//***** PROPERTY ACCESS *****
+	/** 
+	 * @see IdentifierSourceDAO#getAutoGenerationOption(oPatientIdentifierType)
+	 */
+	@Transactional(readOnly=true)
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
+		criteria.add(Expression.eq("identifierType", type));
+		return (AutoGenerationOption)criteria.uniqueResult();
+	}
+
+	/** 
+	 * @see IdentifierSourceDAO#saveAutoGenerationOption(AutoGenerationOption)
+	 */
+	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
+		sessionFactory.getCurrentSession().saveOrUpdate(option);
+		return option;
+	}
+
+	/** 
+	 * @see IdentifierSourceDAO#purgeAutoGenerationOption(AutoGenerationOption)
+	 */
+	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
+		sessionFactory.getCurrentSession().delete(option);
+	}
 	
+	//***** PROPERTY ACCESS *****
+
 	/**
 	 * @return the sessionFactory
 	 */

@@ -15,7 +15,9 @@ package org.openmrs.module.idgen.service.db;
 
 import java.util.List;
 
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
@@ -68,4 +70,27 @@ public interface IdentifierSourceDAO {
 	 */
 	@Transactional(readOnly=true)
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws DAOException;
+	
+	/**
+	 * @param id the id to retrieve for the given type
+	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
+	 */
+	@Transactional(readOnly = true)
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws DAOException;
+	
+	/**
+	 * Persists a AutoGenerationOption, either as a save or update.
+	 * @param option
+	 * @return the AutoGenerationOption that was passed in
+	 */
+	@Transactional
+	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws DAOException;
+	
+	/**
+	 * Deletes a AutoGenerationOption from the database.
+	 * @param option the AutoGenerationOption to purge
+	 * @should delete an AutoGenerationOption from the system
+	 */
+	@Transactional
+	public void purgeAutoGenerationOption(AutoGenerationOption option) throws DAOException;
 }

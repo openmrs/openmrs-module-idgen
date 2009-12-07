@@ -19,6 +19,7 @@ import java.util.Map;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
@@ -87,6 +88,13 @@ public interface IdentifierSourceService extends OpenmrsService {
 	public void purgeIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
+	 * Generates a Single Identifiers from the given source
+	 * @throws APIException
+	 */
+	@Transactional
+	public String generateIdentifier(IdentifierSource source) throws APIException;
+	
+	/**
 	 * Generates a List of Identifiers from the given source in the given quantity
 	 * @throws APIException
 	 */
@@ -135,4 +143,27 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
+	
+	/**
+	 * @param id the id to retrieve for the given type
+	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
+	 */
+	@Transactional(readOnly = true)
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
+	
+	/**
+	 * Persists a AutoGenerationOption, either as a save or update.
+	 * @param option
+	 * @return the AutoGenerationOption that was passed in
+	 */
+	@Transactional
+	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException;
+	
+	/**
+	 * Deletes a AutoGenerationOption from the database.
+	 * @param option the AutoGenerationOption to purge
+	 * @should delete an AutoGenerationOption from the system
+	 */
+	@Transactional
+	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException;
 }

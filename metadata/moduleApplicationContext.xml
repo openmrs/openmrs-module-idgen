@@ -48,4 +48,14 @@
 			</list>
 		</property>
 	</bean>
+	<bean parent="patientServiceTarget">
+		<property name="identifierValidators">
+			<map>
+				<entry>
+					<key><value>org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator</value></key>
+					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
 </beans>

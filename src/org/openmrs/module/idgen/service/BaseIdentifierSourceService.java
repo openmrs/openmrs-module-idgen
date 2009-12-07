@@ -28,6 +28,7 @@ import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
@@ -159,6 +160,17 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	}
 
 	/** 
+	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource)
+	 */
+	public String generateIdentifier(IdentifierSource source) throws APIException {
+		List<String> l = generateIdentifiers(source, 1);
+		if (l == null || l.size() != 1) {
+			throw new RuntimeException("Generate identifier method did not return only one identifier");
+		}
+		return l.get(0);
+	}
+
+	/** 
 	 * @see IdentifierSourceService#getAvailableIdentifiers(IdentifierPool, int)
 	 */
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException {
@@ -188,6 +200,28 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException {
 		List<String> identifiers = generateIdentifiers(pool.getSource(), batchSize);
 		addIdentifiersToPool(pool, identifiers);
+	}
+	
+	/** 
+	 * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType)
+	 */
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
+		return dao.getAutoGenerationOption(type);
+	}
+
+	/** 
+	 * @see IdentifierSourceService#saveAutoGenerationOption(AutoGenerationOption)
+	 */
+	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
+		return dao.saveAutoGenerationOption(option);
+	}
+
+	/** 
+	 * @see .IdentifierSourceService#purgeAutoGenerationOption(AutoGenerationOption)
+	 */
+	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
+		dao.purgeAutoGenerationOption(option);
+		
 	}
 	
 	//***** PROPERTY ACCESS *****

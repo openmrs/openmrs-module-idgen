@@ -80,6 +80,17 @@
 			  CONSTRAINT `pool_id for idgen_pooled_identifier` FOREIGN KEY (`pool_id`) REFERENCES `idgen_id_pool` (`id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+			CREATE TABLE `idgen_auto_generation_option` (
+			  `id` int(11) NOT NULL auto_increment,
+			  `identifier_type` int(11) unique NOT NULL,
+			  `source` int(11) NOT NULL,
+			  `manual_entry_enabled` tinyint(1) NOT NULL default 1,
+			  `automatic_generation_enabled` tinyint(1) NOT NULL default 1,
+			  PRIMARY KEY  (`id`),
+			  CONSTRAINT `identifier_type for idgen_auto_generation_option` FOREIGN KEY (`identifier_type`) REFERENCES `patient_identifier_type` (`patient_identifier_type_id`),
+			  CONSTRAINT `source for idgen_auto_generation_option` FOREIGN KEY (`source`) REFERENCES `idgen_identifier_source` (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 		</sql>
 	</diff>
 </sqldiff>

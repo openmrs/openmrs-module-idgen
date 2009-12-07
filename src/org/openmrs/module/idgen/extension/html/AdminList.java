@@ -44,7 +44,8 @@ public class AdminList extends AdministrationSectionExt {
 	public Map<String, String> getLinks() {
 		
 		Map<String, String> map = new LinkedHashMap<String, String>();
-		map.put("module/idgen/manageIdentifierSources.list", "idgen.manage.title");		
+		map.put("module/idgen/manageIdentifierSources.list", "idgen.manage.title");
+		map.put("module/idgen/manageAutoGenerationOptions.list", "idgen.autoGenerationOptionHeader");
 		return map;
 	}
 	

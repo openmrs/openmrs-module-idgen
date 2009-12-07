@@ -13,16 +13,22 @@
  */
 package org.openmrs.module.idgen.validator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
-import org.springframework.stereotype.Component;
+import org.openmrs.patient.IdentifierValidator;
+import org.openmrs.patient.UnallowedIdentifierException;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * Validates a SequentialIdentifierGenerator
  */
-@Component
-public class SequentialIdentifierGeneratorValidator implements Validator {
+public class SequentialIdentifierGeneratorValidator extends IdentifierSourceValidator {
+	
+	protected static Log log = LogFactory.getLog(SequentialIdentifierGeneratorValidator.class);
 	
 	@SuppressWarnings("unchecked")
 	public boolean supports(Class clazz) {
@@ -32,7 +38,54 @@ public class SequentialIdentifierGeneratorValidator implements Validator {
 	/** 
 	 * @see Validator#validate(Object, Errors)
 	 */
-	public void validate(Object arg0, Errors arg1) {
-		// TODO: Implement this
+	public void validate(Object o, Errors errors) {
+		
+		super.validate(o, errors);
+		
+		SequentialIdentifierGenerator source = (SequentialIdentifierGenerator)o;
+		
+		// FirstIdentifierBase is required
+		if (!StringUtils.hasText(source.getFirstIdentifierBase())) {
+			errors.reject("First Identifier Base is required");
+		}
+		
+		if (source.getIdentifierType() == null) {
+			errors.reject("Identifier Type is required");
+		}
+		else {
+			String prefix = (source.getPrefix() == null ? "" : source.getPrefix());
+			String suffix = (source.getSuffix() == null ? "" : source.getSuffix());
+			String firstId = prefix + source.getFirstIdentifierBase() + suffix;
+			if (StringUtils.hasText(source.getIdentifierType().getValidator())) {
+				try {
+					Class<?> validatorClass = Context.loadClass(source.getIdentifierType().getValidator());
+					IdentifierValidator v = (IdentifierValidator) validatorClass.newInstance();
+					firstId = v.getValidIdentifier(firstId);
+				}
+				catch (UnallowedIdentifierException uie) {
+					errors.reject("Invalid identifier. " + uie.getMessage() + "");
+				}
+				catch (Exception e) {
+					log.error("Error loading validator class " + source.getIdentifierType().getValidator(), e);
+					errors.reject("Validator named " + source.getIdentifierType().getValidator() + " cannot be loaded");
+				}
+			}
+			if (source.getLength() != null && source.getLength() > 0) {
+				if (source.getLength() != firstId.length()) {
+					errors.reject("Invalid configuration. First identifier generated would be '" + firstId + "' which does not match length of " + source.getLength());
+				}
+			}
+			for (char c : firstId.toCharArray()) {
+				boolean found = false;
+				for (char b : source.getBaseCharacterSet().toCharArray()) {
+					if (c == b) {
+						found = true;
+					}
+				}
+				if (!found) {
+					errors.reject("First identifier of '" + firstId + "' contains characters that are not in the base character set");
+				}
+			}
+		}
 	}
 }

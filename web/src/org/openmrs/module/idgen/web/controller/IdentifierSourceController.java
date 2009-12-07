@@ -18,13 +18,19 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.RemoteIdentifierSource;
+import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.propertyeditor.IdentifierSourceEditor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.idgen.validator.IdentifierSourceValidator;
+import org.openmrs.module.idgen.validator.RemoteIdentifierSourceValidator;
+import org.openmrs.module.idgen.validator.SequentialIdentifierGeneratorValidator;
 import org.openmrs.propertyeditor.PatientIdentifierTypeEditor;
 import org.openmrs.util.OpenmrsClassLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -41,10 +47,14 @@ public class IdentifierSourceController {
 
 	protected static Log log = LogFactory.getLog(IdentifierSourceController.class);
 	
+	//***** CONSTRUCTORS *****
+	
 	/**
 	 * Default Constructor
 	 */
 	public IdentifierSourceController() { }
+	
+	//***** INSTANCE METHODS *****
 	
 	@InitBinder
 	public void initBinder(HttpServletRequest request, ServletRequestDataBinder binder) throws Exception {
@@ -128,8 +138,16 @@ public class IdentifierSourceController {
     @RequestMapping("/module/idgen/saveIdentifierSource")
     public ModelAndView saveIdentifierSource(@ModelAttribute("source") IdentifierSource source, BindingResult result, SessionStatus status) {
 		
-    	// TODO: Implement validation here
-		
+    	// Validate input
+    	Validator v = new IdentifierSourceValidator();
+    	if (source instanceof SequentialIdentifierGenerator) {
+    		v = new SequentialIdentifierGeneratorValidator();
+    	}
+    	else if (source instanceof RemoteIdentifierSource) {
+    		v = new RemoteIdentifierSourceValidator();
+    	}
+    	v.validate(source, result);
+    	
 		if (result.hasErrors()) {
 			return new ModelAndView("/module/idgen/editIdentifierSource");
 		}
