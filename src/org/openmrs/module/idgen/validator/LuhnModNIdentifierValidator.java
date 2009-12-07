@@ -30,50 +30,6 @@ public abstract class LuhnModNIdentifierValidator implements IdentifierValidator
 	 */
 	public abstract String getBaseCharacters();
 	
-	public char getCheckDigit(String undecoratedIdentifier) {
-		
-		int factor = 2;
-		int sum = 0;
-		char[] inputChars = standardizeValidIdentifier(undecoratedIdentifier).toCharArray();
-		char[] baseChars = getBaseCharacters().toCharArray();
-		int mod = baseChars.length;
-	 
-		// Starting from the right and working leftwards is easier since the initial "factor" will always be "2" 
-		for (int i = inputChars.length - 1; i >= 0; i--) {
-			int codePoint = -1;
-			for (int j=0; j<baseChars.length; j++) {
-				if (baseChars[j] == inputChars[i]) {
-					codePoint = j;
-				}
-			}
-			if (codePoint == -1) {
-				throw new UnallowedIdentifierException("Invalid character specified for validator");
-			}
-			int addend = factor * codePoint;
-	 
-			// Alternate the "factor" that each "codePoint" is multiplied by
-			factor = (factor == 2) ? 1 : 2;
-	 
-			// Sum the digits as expressed in base "n"
-			addend = (addend / mod) + (addend % mod);
-			sum += addend;
-		}
-	 
-		// Calculate the number that must be added to the "sum" to make it divisible by "n"
-		int remainder = sum % mod;
-		int checkCodePoint = mod - remainder;
-		checkCodePoint %= mod;
-		
-		return baseChars[checkCodePoint];
-	}
-	
-	/**
-	 * If a separator should be placed between the undecorated identifier and check digit, specify that here
-	 */
-	public String getSeparator() {
-		return "";
-	}
-	
 	/**
 	 * This method converts all identifiers to a standard format.  This may include things
 	 * like converting to upper-case, adding hyphens, etc.
@@ -113,7 +69,7 @@ public abstract class LuhnModNIdentifierValidator implements IdentifierValidator
 	 */
 	public String getValidIdentifier(String undecoratedIdentifier) throws UnallowedIdentifierException {
 		String standardized = standardizeValidIdentifier(undecoratedIdentifier);
-		return standardized + getSeparator() + getCheckDigit(standardized);
+		return standardized + computeCheckDigit(standardized);
 	}
 
 	/** 
@@ -122,12 +78,84 @@ public abstract class LuhnModNIdentifierValidator implements IdentifierValidator
 	public boolean isValid(String identifier) throws UnallowedIdentifierException {
 		try {
 			identifier = standardizeValidIdentifier(identifier);
-			int decLength = (getSeparator() == null ? 0 : getSeparator().length()) + 1;
-			String undecoratedIdentifier = identifier.substring(0, identifier.length() - decLength);
+			String undecoratedIdentifier = identifier.substring(0, identifier.length()-1);
 			return identifier.equals(getValidIdentifier(undecoratedIdentifier));
 		}
 		catch (Exception e) {
 			throw new UnallowedIdentifierException("Invalid identifier specified for validator", e);
 		}
+	}
+	
+	/**
+	 * Computes the check digit for the passed undecorated identifier
+	 * @should compute a valid check digit
+	 */
+	public char computeCheckDigit(String undecoratedIdentifier) {
+		int factor = 2;
+		int sum = 0;
+		char[] inputChars = standardizeValidIdentifier(undecoratedIdentifier).toCharArray();
+		char[] baseChars = getBaseCharacters().toCharArray();
+		int mod = baseChars.length;
+	 
+		// Starting from the right and working leftwards is easier since the initial "factor" will always be "2" 
+		for (int i = inputChars.length - 1; i >= 0; i--) {
+			int codePoint = -1;
+			for (int j=0; j<baseChars.length; j++) {
+				if (baseChars[j] == inputChars[i]) {
+					codePoint = j;
+				}
+			}
+			if (codePoint == -1) {
+				throw new UnallowedIdentifierException("Invalid character specified for validator");
+			}
+			int addend = factor * codePoint;
+	 
+			// Alternate the "factor" that each "codePoint" is multiplied by
+			factor = (factor == 2) ? 1 : 2;
+	 
+			// Sum the digits as expressed in base "n"
+			addend = (addend / mod) + (addend % mod);
+			sum += addend;
+		}
+	 
+		// Calculate the number that must be added to the "sum" to make it divisible by "n"
+		int remainder = sum % mod;
+		int checkCodePoint = mod - remainder;
+		checkCodePoint %= mod;
+		
+		return baseChars[checkCodePoint];
+	}
+	
+	/**
+	 * Validates the check digit for the passed identifier
+	 * @should validate a correct check digit
+	 */
+	public boolean validateCheckDigit(String identifier) {
+		int factor = 1;
+		int sum = 0;
+		char[] inputChars = standardizeValidIdentifier(identifier).toCharArray();
+		char[] baseChars = getBaseCharacters().toCharArray();
+		int mod = baseChars.length;
+
+		for (int i = inputChars.length-1; i >= 0; i--) {
+			int codePoint = -1;
+			for (int j=0; j<baseChars.length; j++) {
+				if (baseChars[j] == inputChars[i]) {
+					codePoint = j;
+				}
+			}
+			if (codePoint == -1) {
+				throw new UnallowedIdentifierException("Invalid character specified for validator");
+			}
+			int addend = factor * codePoint;
+			// Alternate the "factor" that each "codePoint" is multiplied by
+			factor = (factor == 2) ? 1 : 2;
+		 
+			// Sum the digits as expressed in base "n"
+			addend = (addend / mod) + (addend % mod);
+			sum += addend;
+		}
+		int remainder = sum % mod;
+		return (remainder == 0);
 	}
 }
