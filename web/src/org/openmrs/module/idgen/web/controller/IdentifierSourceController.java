@@ -1,5 +1,6 @@
 package org.openmrs.module.idgen.web.controller;
 
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,8 +11,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVStrategy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PatientIdentifierType;
@@ -180,15 +179,16 @@ public class IdentifierSourceController {
     	
     	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
     	
-		response.setHeader("Content-Disposition", "attachment; filename=identifiers.csv");
+		response.setHeader("Content-Disposition", "attachment; filename=identifiers.txt");
 		response.setHeader("Pragma", "no-cache");
     	response.setContentType("text/plain");
     	ServletOutputStream out = response.getOutputStream();
+    	String separator = System.getProperty("line.separator");
     	
     	List<String> batch = iss.generateIdentifiers(source, numberToGenerate);
     	for (Iterator<String> i = batch.iterator(); i.hasNext();) {
     		String identifier = i.next();
-    		out.print("\"" + identifier + "\"" + (i.hasNext() ? "," : ""));
+    		out.print(identifier + (i.hasNext() ? separator : ""));
     	}
     }
     
@@ -201,14 +201,19 @@ public class IdentifierSourceController {
     							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
     	
     	IdentifierPool pool = (IdentifierPool)source;
-    	InputStreamReader r = new InputStreamReader(inputFile.getInputStream());
-		String[][] exportData = (new CSVParser(r, new CSVStrategy(',','"','#'))).getAllValues();
-		List<String> ids = new ArrayList<String>();
-		for (int i=0; i<exportData.length; i++) {
-			for (int j=0; j<exportData[i].length; j++) {
-				ids.add(exportData[i][j]);
-			}
-		}
+    	List<String> ids = new ArrayList<String>();
+    	BufferedReader r = null;
+    	try {
+    		r = new BufferedReader(new InputStreamReader(inputFile.getInputStream()));
+    		for (String s = r.readLine(); s != null; s = r.readLine()) {
+    			ids.add(s);
+    		}
+    	}
+    	finally {
+    		if (r != null) {
+    			r.close();
+    		}
+    	}
 		Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }

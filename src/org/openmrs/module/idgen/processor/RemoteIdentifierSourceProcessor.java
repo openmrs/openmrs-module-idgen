@@ -13,7 +13,8 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import org.openmrs.module.idgen.IdentifierSource;
@@ -34,11 +35,22 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 		RemoteIdentifierSource remote = (RemoteIdentifierSource)source;
 		String url = remote.getUrl();
 		url = url.replace("{batchSize}", Integer.toString(batchSize));
-		String contents = IdgenUtil.getContentsFromUrl(url);
-		List<String> r = new ArrayList<String>();
-		for (String identifier : contents.split(",")) {
-			r.add(identifier.replace("\"", ""));
+		InputStream is = null;
+		try {
+			is = (new URL(url)).openStream();
+			return IdgenUtil.getIdsFromStream(is);
 		}
-		return r;
+		catch (Exception e) {
+			throw new RuntimeException("Error retrieving IDs from Remote Source", e);
+		}
+		finally {
+			if (is != null) {
+				try {
+					is.close();
+				}
+				catch (Exception e) {
+				}
+			}
+		}
 	}
 }

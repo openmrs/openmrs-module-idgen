@@ -14,8 +14,10 @@
 package org.openmrs.module.idgen;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,18 +71,17 @@ public class IdgenUtil {
 	/**
 	 * @return the contents from the supplied URL as a String
 	 */
-	public static String getContentsFromUrl(String url) {
-		StringBuilder contents = new StringBuilder();
+	public static List<String> getIdsFromStream(InputStream stream) {
+		List<String> contents = new ArrayList<String>();
 		BufferedReader r = null;
 		try {
-			URL u = new URL(url);
-			r = new BufferedReader(new InputStreamReader(u.openStream()));
+			r = new BufferedReader(new InputStreamReader(stream));
 			for (String line = r.readLine(); line != null; line = r.readLine()) {
-				contents.append(line);
+				contents.add(line);
 			}
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Unable to connect to url: " + url, e);
+			throw new RuntimeException("Error retrieving IDs from stream", e);
 		}
 		finally {
 			if (r != null) {
@@ -92,6 +93,6 @@ public class IdgenUtil {
 				}
 			}
 		}
-		return contents.toString();
+		return contents;
 	}
 }
