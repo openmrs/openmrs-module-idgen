@@ -49,6 +49,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceService#getIdentifierSource(Integer)
 	 */
+	@Transactional(readOnly=true)
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException {
 		return (IdentifierSource) sessionFactory.getCurrentSession().get(IdentifierSource.class, id);
 	}
@@ -57,6 +58,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceDAO#getAllIdentifierSources(boolean)
 	 */
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
 		if (!includeRetired) {
@@ -78,6 +80,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceService#purgeIdentifierSource(IdentifierSource)
 	 */
+	@Transactional
 	public void purgeIdentifierSource(IdentifierSource identifierSource) {
 		sessionFactory.getCurrentSession().delete(identifierSource);
 	}
@@ -123,7 +126,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	}
 	
 	/** 
-	 * @see IdentifierSourceDAO#getAutoGenerationOption(oPatientIdentifierType)
+	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
 	 */
 	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
@@ -135,6 +138,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceDAO#saveAutoGenerationOption(AutoGenerationOption)
 	 */
+	@Transactional
 	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		sessionFactory.getCurrentSession().saveOrUpdate(option);
 		return option;
@@ -143,6 +147,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceDAO#purgeAutoGenerationOption(AutoGenerationOption)
 	 */
+	@Transactional
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		sessionFactory.getCurrentSession().delete(option);
 	}

@@ -30,7 +30,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	/** 
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
 	 */
-	public List<String> getIdentifiers(IdentifierSource source, int batchSize) {
+	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator)source;
 		long sequenceValue = seq.getNextSequenceValue();

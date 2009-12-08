@@ -129,6 +129,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#purgeIdentifierSource(IdentifierSource)
 	 */
+	@Transactional
 	public void purgeIdentifierSource(IdentifierSource identifierSource) {
 		dao.purgeIdentifierSource(identifierSource);
 	}
@@ -137,6 +138,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * 
 	 * @see IdentifierSourceService#getProcessor(IdentifierSource)
 	 */
+	@Transactional(readOnly=true)
 	public IdentifierSourceProcessor getProcessor(IdentifierSource source) {
 		return getProcessors().get(source.getClass());
 	}
@@ -151,7 +153,8 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer)
 	 */
-	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException {
+	@Transactional
+	public synchronized List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException {
 		IdentifierSourceProcessor processor = getProcessor(source);
 		if (processor == null) {
 			throw new APIException("No registered processor found for source: " + source);
@@ -162,7 +165,8 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource)
 	 */
-	public String generateIdentifier(IdentifierSource source) throws APIException {
+	@Transactional
+	public synchronized String generateIdentifier(IdentifierSource source) throws APIException {
 		List<String> l = generateIdentifiers(source, 1);
 		if (l == null || l.size() != 1) {
 			throw new RuntimeException("Generate identifier method did not return only one identifier");
@@ -173,6 +177,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getAvailableIdentifiers(IdentifierPool, int)
 	 */
+	@Transactional(readOnly=true)
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException {
 		return dao.getAvailableIdentifiers(pool, quantity);
 	}
@@ -180,6 +185,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getQuantityInPool(IdentifierPool, boolean, boolean)
 	 */
+	@Transactional(readOnly=true)
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException {
 		return dao.getQuantityInPool(pool, availableOnly, usedOnly);
 	}
@@ -187,6 +193,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#addIdentifiersToPool(IdentifierPool, List)
 	 */
+	@Transactional
 	public void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException {
 		for (String identifier : identifiers) {
 			pool.addIdentifierToPool(identifier);
@@ -197,6 +204,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#addIdentifiersToPool(IdentifierPool, Integer)
 	 */
+	@Transactional
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException {
 		List<String> identifiers = generateIdentifiers(pool.getSource(), batchSize);
 		addIdentifiersToPool(pool, identifiers);
@@ -205,6 +213,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType)
 	 */
+	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
 		return dao.getAutoGenerationOption(type);
 	}
@@ -212,6 +221,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#saveAutoGenerationOption(AutoGenerationOption)
 	 */
+	@Transactional
 	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		return dao.saveAutoGenerationOption(option);
 	}
@@ -219,6 +229,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see .IdentifierSourceService#purgeAutoGenerationOption(AutoGenerationOption)
 	 */
+	@Transactional
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		dao.purgeAutoGenerationOption(option);
 		

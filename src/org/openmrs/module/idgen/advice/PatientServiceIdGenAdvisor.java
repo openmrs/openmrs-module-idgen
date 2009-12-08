@@ -14,7 +14,9 @@
 package org.openmrs.module.idgen.advice;
 
 import java.lang.reflect.Method;
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -22,7 +24,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
-import org.openmrs.User;
 import org.openmrs.api.PatientIdentifierException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleException;
@@ -56,33 +57,20 @@ public class PatientServiceIdGenAdvisor extends StaticMethodMatcherPointcutAdvis
 						
 				Object[] obj = invocation.getArguments();
 				Patient patient = (Patient)obj[0];
-				
-				IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
-				User currentUser = Context.getAuthenticatedUser();
-				Date currentTime = new Date();
-				
-				for (PatientIdentifier pi : patient.getIdentifiers()) {
-					
-					// This shouldn't be necessary, but Hibernate flushing is making me do this
-					if (pi.getDateCreated() == null) {
-						pi.setDateCreated(currentTime);
-					}
-					if (pi.getCreator() == null) {
-						pi.setCreator(currentUser);
-					}
-					if (pi.getPatient() == null) {
-						pi.setPatient(patient);
-					}
-					if (pi.isVoided()) {
-						if (pi.getVoidedBy() == null) {
-							pi.setVoidedBy(currentUser);
-						}
-						if (pi.getDateVoided() == null) {
-							pi.setDateVoided(currentTime);
-						}
-					}
 
-					// This is the actual purpose of this method
+				// This seems to be necessary due to various hibernate oddities
+				Set<PatientIdentifier> identifiers = new HashSet<PatientIdentifier>();
+				for (Iterator<PatientIdentifier> iter = patient.getIdentifiers().iterator(); iter.hasNext();) {
+					PatientIdentifier pi = iter.next();
+					iter.remove();
+					Context.evictFromSession(pi);
+					identifiers.add(pi);
+				}
+
+				IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
+				
+				for (PatientIdentifier pi : identifiers) {
+					
 					AutoGenerationOption option = iss.getAutoGenerationOption(pi.getIdentifierType());
 					
 					if (pi.getIdentifier().contains("TEMPID_WILL_BE_REPLACED")) {
@@ -103,6 +91,7 @@ public class PatientServiceIdGenAdvisor extends StaticMethodMatcherPointcutAdvis
 							}
 						}
 					}
+					patient.addIdentifier(pi);
 				}
 				
 				try {
