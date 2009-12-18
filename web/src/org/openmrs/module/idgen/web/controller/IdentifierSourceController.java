@@ -170,6 +170,15 @@ public class IdentifierSourceController {
     }
     
     /**
+     * Generate and Output a Single new Identifier
+     */
+    @RequestMapping("/module/idgen/generateIdentifier")
+    public void generateIdentifier(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+    							   @RequestParam(required=true, value="source") IdentifierSource source) throws Exception {
+    	exportIdentifiers(model, request, response, source, 1);
+    }
+    
+    /**
      * Export Identifiers To File
      */
     @RequestMapping("/module/idgen/exportIdentifiers")

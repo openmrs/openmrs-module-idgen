@@ -5,7 +5,7 @@
 	
 	<id>idgen</id>
 	<name>ID Generation</name>
-	<version>1.4.0</version>
+	<version>1.4.0.1</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Partners In Health</author>
 	<description>Provides ID Generation</description>
