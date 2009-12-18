@@ -17,13 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.IdgenConstants;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
+import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -77,6 +80,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should save an identifier pool for later retrieval
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
@@ -85,6 +89,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should delete an IdentifierSource from the system
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
 	public void purgeIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
@@ -92,6 +97,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
+	@Authorized( OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS )
 	public String generateIdentifier(IdentifierSource source) throws APIException;
 	
 	/**
@@ -99,6 +105,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_GENERATE_BATCH_OF_IDENTIFIERS )
 	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException;
 	
 	/**
@@ -135,6 +142,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
 	public void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException;
 	
 	/**
@@ -142,6 +150,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
 	
 	/**
@@ -157,6 +166,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @return the AutoGenerationOption that was passed in
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_MANAGE_AUTOGENERATION_OPTIONS )
 	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException;
 	
 	/**
@@ -165,5 +175,6 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should delete an AutoGenerationOption from the system
 	 */
 	@Transactional
+	@Authorized( IdgenConstants.PRIV_MANAGE_AUTOGENERATION_OPTIONS )
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException;
 }

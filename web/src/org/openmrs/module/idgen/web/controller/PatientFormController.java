@@ -83,7 +83,7 @@ public class PatientFormController extends NewPatientFormController {
 		Map<PatientIdentifierType, AutoGenerationOption> autogen = new HashMap<PatientIdentifierType, AutoGenerationOption>();
  		for (PatientIdentifierType pit : Context.getPatientService().getAllPatientIdentifierTypes()) {
  			AutoGenerationOption option = iss.getAutoGenerationOption(pit);
- 			if (option != null) {
+ 			if (option != null && option.isAutomaticGenerationEnabled()) {
  				autogen.put(pit, option);
  			}
  		}

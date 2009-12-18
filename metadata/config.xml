@@ -17,23 +17,30 @@
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
 	<extension>
-		<point>newPatientForm.identifierHeader</point>
-		<class>@MODULE_PACKAGE@.extension.html.CreatePatientIdGenCheckBoxHeader</class>
-	</extension>
-	<extension>
-		<point>newPatientForm.identifierBody</point>
-		<class>@MODULE_PACKAGE@.extension.html.CreatePatientIdGenCheckBoxBody</class>
-	</extension>
-	
-	<extension>
 		<point>org.openmrs.admin.patients.localHeader</point>
 		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
 	</extension>
 	
-	<advice>
-		<point>org.openmrs.api.PatientService</point>
-		<class>@MODULE_PACKAGE@.advice.PatientServiceIdGenAdvisor</class>
-	</advice>
+	<!-- Required Privileges -->
+	<privilege>
+		<name>Manage Identifier Sources</name>
+		<description>Allows user add, edit, and remove identifier sources</description>
+	</privilege>
+	
+	<privilege>
+		<name>Manage Auto Generation Options</name>
+		<description>Allows user add, edit, and remove auto-generation options</description>
+	</privilege>
+	
+	<privilege>
+		<name>Generate Batch of Identifiers</name>
+		<description>Allows user to generate a batch of identifiers to a file for offline use</description>
+	</privilege>
+	
+	<privilege>
+		<name>Upload Batch of Identifiers</name>
+		<description>Allows user to upload a batch of identifiers</description>
+	</privilege>
 
 	<messages>
 		<lang>en</lang>

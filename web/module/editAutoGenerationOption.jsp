@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 <%@ taglib prefix="form" uri="resources/spring-form.tld"%>
 
-<openmrs:require privilege="Manage Identifier Sources" otherwise="/login.htm" redirect="/module/idgen/manageAutoGenerationOptions.form" />
+<openmrs:require privilege="Manage Auto Generation Options" otherwise="/login.htm" redirect="/module/idgen/manageAutoGenerationOptions.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>

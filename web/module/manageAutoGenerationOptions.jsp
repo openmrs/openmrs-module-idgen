@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
-<openmrs:require privilege="Manage Identifier Sources" otherwise="/login.htm" redirect="/module/idgen/manageautoGenerationOptions.form" />
+<openmrs:require privilege="Manage Auto Generation Options" otherwise="/login.htm" redirect="/module/idgen/manageautoGenerationOptions.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>

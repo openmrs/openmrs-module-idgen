@@ -28,6 +28,7 @@
 					<c:if test="${!empty autoGenerationOptions}">
 						var autoGenOption = getElementsByClass(newrow, 'autoGenerationOption', 'input');
 						var autoGenHidden = getElementsByClass(newrow, 'autoGenerationHidden', 'span');
+						var idInputField = getElementsByClass(newrow, 'identifierInput', 'input');
 						
 						<c:set var="source" value="${autoGenerationOptions[record].source}"/>
 						if ('${source}' == '' || oldIdentifier) {
@@ -39,6 +40,10 @@
 							$(autoGenOption).val("${source.id}");
 							$(autoGenHidden).hide();
 						}
+						if ('${autoGenerationOptions[record].manualEntryEnabled}' == 'false') {
+							$(idInputField).attr("readOnly", "true");
+							$(idInputField).addClass("readOnlyInput");
+						}
 					</c:if>
 				}
 			</openmrs:forEachRecord>
@@ -49,10 +54,6 @@
 				for (var i in inputs) {
 					if (inputs[i] && inputs[i].name == "identifier") {
 						inputs[i].value = id;
-						if (oldIdentifier && 1 == 0) {
-							inputs[i].parentNode.appendChild(document.createTextNode(id));
-							inputs[i].parentNode.removeChild(inputs[i]);
-						}
 					}
 				}	
 			}
@@ -189,7 +190,7 @@
 		}
 		else {
 			txtNode.style.color = 'black';
-			txtNode.readOnly = false;
+			txtNode.readOnly = $(txtNode).hasClass("readOnlyInput");
 			txtNode.value = '';
 		}
 	}
@@ -235,6 +236,9 @@
 		}
 	.lastCell {
 		border-bottom: 1px lightgray solid;
+	}
+	.readOnlyInput {
+		color: blue; background-color:lightgray;
 	}
 </style>
 
