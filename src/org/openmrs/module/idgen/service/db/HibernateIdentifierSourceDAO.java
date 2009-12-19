@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -21,13 +23,16 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.transaction.annotation.Transactional;
@@ -151,6 +156,56 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		sessionFactory.getCurrentSession().delete(option);
 	}
+
+	/** 
+	 * @see IdentifierSourceDAO#getLogEntries(IdentifierSource, Date, Date, String, User)
+	 */
+	@SuppressWarnings("unchecked")
+	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
+										String identifier, User generatedBy, String comment) throws DAOException {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(LogEntry.class);
+		if (source != null) {
+			criteria.add(Expression.eq("source", source));
+		}
+		if (fromDate != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(fromDate);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+			criteria.add(Expression.ge("dateGenerated", fromDate));
+		}
+		if (toDate != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(toDate);
+			c.add(Calendar.DATE, 1);
+			c.set(Calendar.HOUR_OF_DAY, 0);
+			c.set(Calendar.MINUTE, 0);
+			c.set(Calendar.SECOND, 0);
+			c.set(Calendar.MILLISECOND, 0);
+			criteria.add(Expression.lt("dateGenerated", c.getTime()));
+		}
+		if (identifier != null) {
+			criteria.add(Expression.like("identifier", identifier, MatchMode.ANYWHERE));
+		}	
+		if (generatedBy != null) {
+			criteria.add(Expression.eq("generatedBy", generatedBy));
+		}
+		if (comment != null) {
+			criteria.add(Expression.like("comment", comment, MatchMode.ANYWHERE));
+		}	
+		criteria.addOrder(Order.desc("dateGenerated"));
+		return (List<LogEntry>) criteria.list();
+	}
+
+	/** 
+	 * @see org.openmrs.module.idgen.service.db.IdentifierSourceDAO#saveLogEntry(LogEntry)
+	 */
+	public LogEntry saveLogEntry(LogEntry logEntry) throws DAOException {
+		sessionFactory.getCurrentSession().saveOrUpdate(logEntry);
+		return logEntry;
+	}	
 	
 	//***** PROPERTY ACCESS *****
 

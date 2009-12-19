@@ -16,6 +16,13 @@
 			</a>
 		</li>
 	</openmrs:hasPrivilege>	
+	<openmrs:hasPrivilege privilege="Manage Identifier Sources">
+		<li <c:if test='<%= request.getRequestURI().contains("viewLogEntries") %>'>class="active"</c:if>>
+			<a href="${pageContext.request.contextPath}/module/idgen/viewLogEntries.list">
+				<spring:message code="idgen.viewLogEntries"/>
+			</a>
+		</li>
+	</openmrs:hasPrivilege>
 	<openmrs:hasPrivilege privilege="Manage Identifier Types">
 		<li <c:if test='<%= request.getRequestURI().contains("patientIdentifierType") %>'>class="active"</c:if>>
 			<a href="${pageContext.request.contextPath}/admin/patients/patientIdentifierType.list">

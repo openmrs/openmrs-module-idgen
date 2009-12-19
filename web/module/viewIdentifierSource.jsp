@@ -121,8 +121,16 @@
 	<br/>
 	<c:if test="${available == 't'}">
 		<input type="hidden" name="source" value="${source.id}"/>
-		<spring:message code="idgen.numberToGenerate" />
-		<input type="text" name="numberToGenerate" value=""/>
+		<table>
+			<tr>
+				<td><spring:message code="idgen.numberToGenerate" /></td>
+				<td><input type="text" name="numberToGenerate" value=""/></td>
+			</tr>
+			<tr>
+				<td><spring:message code="idgen.comment" /></td>
+				<td><textarea name="comment" rows="3" cols="20"/></textarea></td>
+			</tr>
+		</table>
 		<input type="submit" value="<spring:message code="idgen.export" />"/>	
 	</c:if>
 </form>

@@ -11,6 +11,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PatientIdentifierType;
@@ -174,8 +175,9 @@ public class IdentifierSourceController {
      */
     @RequestMapping("/module/idgen/generateIdentifier")
     public void generateIdentifier(ModelMap model, HttpServletRequest request, HttpServletResponse response,
-    							   @RequestParam(required=true, value="source") IdentifierSource source) throws Exception {
-    	exportIdentifiers(model, request, response, source, 1);
+    							   @RequestParam(required=true, value="source") IdentifierSource source,
+    							   @RequestParam(required=false, value="comment") String comment) throws Exception {
+    	exportIdentifiers(model, request, response, source, 1, comment);
     }
     
     /**
@@ -184,7 +186,8 @@ public class IdentifierSourceController {
     @RequestMapping("/module/idgen/exportIdentifiers")
     public void exportIdentifiers(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
-    							   @RequestParam(required=true, value="numberToGenerate") Integer numberToGenerate) throws Exception {
+    							   @RequestParam(required=true, value="numberToGenerate") Integer numberToGenerate,
+    							   @RequestParam(required=false, value="comment") String comment) throws Exception {
     	
     	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
     	
@@ -194,7 +197,11 @@ public class IdentifierSourceController {
     	ServletOutputStream out = response.getOutputStream();
     	String separator = System.getProperty("line.separator");
     	
-    	List<String> batch = iss.generateIdentifiers(source, numberToGenerate);
+    	if (StringUtils.isEmpty(comment)) {
+    		comment = "Batch Export of " + numberToGenerate + " to file";
+    	}
+    	
+    	List<String> batch = iss.generateIdentifiers(source, numberToGenerate, comment);
     	for (Iterator<String> i = batch.iterator(); i.hasNext();) {
     		String identifier = i.next();
     		out.print(identifier + (i.hasNext() ? separator : ""));

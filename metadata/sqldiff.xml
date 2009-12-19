@@ -93,4 +93,29 @@
 
 		</sql>
 	</diff>
+	
+	<diff>
+		<version>1.1</version>
+		<author>Partners In Health</author>
+		<date>18 December 2009</date>
+		<description>
+			Add table to log identifier generation
+		</description>
+		<sql>
+			CREATE TABLE `idgen_log_entry` (
+			  `id` int(11) NOT NULL auto_increment,
+			  `source` int(11) NOT NULL,
+			  `identifier` varchar(50) NOT NULL,
+			  `date_generated` datetime NOT NULL default '0000-00-00 00:00:00',
+			  `generated_by` int(11) NOT NULL,
+  			  `comment` varchar(255) default NULL,
+			  PRIMARY KEY  (`id`),
+			  KEY `id for idgen_log` (`id`),
+			  KEY `source for idgen_log` (`source`),
+			  KEY `generated_by for idgen_log` (`generated_by`),
+			  CONSTRAINT `source for idgen_log` FOREIGN KEY (`source`) REFERENCES `idgen_identifier_source` (`id`),
+			  CONSTRAINT `generated_by for idgen_log` FOREIGN KEY (`generated_by`) REFERENCES `users` (`user_id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>
+	</diff>
 </sqldiff>

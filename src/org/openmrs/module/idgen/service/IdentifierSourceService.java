@@ -13,10 +13,12 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
@@ -24,6 +26,7 @@ import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenConstants;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
@@ -98,7 +101,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional
 	@Authorized( OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS )
-	public String generateIdentifier(IdentifierSource source) throws APIException;
+	public String generateIdentifier(IdentifierSource source, String comment) throws APIException;
 	
 	/**
 	 * Generates a List of Identifiers from the given source in the given quantity
@@ -106,7 +109,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_GENERATE_BATCH_OF_IDENTIFIERS )
-	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException;
+	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException;
 	
 	/**
 	 * Returns an appropriate IdentifierSourceProcessor for the given IdentifierSource
@@ -177,4 +180,12 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_AUTOGENERATION_OPTIONS )
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException;
+	
+	/**
+	 * Retrieves the Log Entries that match the supplied parameters.  All parameters are optional.
+	 * The identifier and comment parameters do a "like" match, the date parameters ignore time
+	 */
+	@Transactional(readOnly=true)
+	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
+										String identifier, User generatedBy, String comment) throws APIException;
 }

@@ -31,6 +31,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -151,23 +152,33 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	}
 	
 	/** 
-	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer)
+	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)
 	 */
 	@Transactional
-	public synchronized List<String> generateIdentifiers(IdentifierSource source, Integer batchSize) throws APIException {
+	public synchronized List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException {
 		IdentifierSourceProcessor processor = getProcessor(source);
 		if (processor == null) {
 			throw new APIException("No registered processor found for source: " + source);
 		}
-		return processor.getIdentifiers(source, batchSize);
+		List<String> identifiers = processor.getIdentifiers(source, batchSize);
+		
+		Date now = new Date();
+		User currentUser = Context.getAuthenticatedUser();
+		
+		for (String s : identifiers) {
+			LogEntry logEntry = new LogEntry(source, s, now, currentUser, comment);
+			dao.saveLogEntry(logEntry);
+		}
+		
+		return identifiers;
 	}
 
 	/** 
-	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource)
+	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource, String)
 	 */
 	@Transactional
-	public synchronized String generateIdentifier(IdentifierSource source) throws APIException {
-		List<String> l = generateIdentifiers(source, 1);
+	public synchronized String generateIdentifier(IdentifierSource source, String comment) throws APIException {
+		List<String> l = generateIdentifiers(source, 1, comment);
 		if (l == null || l.size() != 1) {
 			throw new RuntimeException("Generate identifier method did not return only one identifier");
 		}
@@ -206,7 +217,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 */
 	@Transactional
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException {
-		List<String> identifiers = generateIdentifiers(pool.getSource(), batchSize);
+		List<String> identifiers = generateIdentifiers(pool.getSource(), batchSize, "Generating identifier for pool " + pool.getName());
 		addIdentifiersToPool(pool, identifiers);
 	}
 	
@@ -271,5 +282,13 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 				registerProcessor(entry.getKey(), entry.getValue());
 			}
 		}
+	}
+
+	/** 
+	 * @see IdentifierSourceService#getLogEntries(IdentifierSource, Date, Date, String, User)
+	 */
+	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
+										String identifier, User generatedBy, String comment) throws APIException {
+		return dao.getLogEntries(source, fromDate, toDate, identifier, generatedBy, comment);
 	}
 }

@@ -13,13 +13,16 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,4 +96,19 @@ public interface IdentifierSourceDAO {
 	 */
 	@Transactional
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws DAOException;
+	
+	/**
+	 * Saves a new Log Entry
+	 * @throws DAOException
+	 */
+	public LogEntry saveLogEntry(LogEntry logEntry) throws DAOException;
+	
+	/**
+	 * Retrieves the Log Entries that match the supplied parameters.  All parameters are optional.
+	 * @throws DAOException
+	 */
+	@Transactional(readOnly=true)
+	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
+										String identifier, User generatedBy, String comment) throws DAOException;
+
 }

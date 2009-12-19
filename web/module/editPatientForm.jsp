@@ -184,7 +184,9 @@
 			txtNode.style.color = 'blue';
 			txtNode.readOnly = true;
 			var sourceId = $(element).val();
-			$.get("${pageContext.request.contextPath}/module/idgen/generateIdentifier.form?source="+sourceId, function(data){
+			var pId = '${patient.patientId}';
+			var comment = '${patient.patientId == null ? "New Patient" : "Edit Patient "}' + pId;
+			$.get("${pageContext.request.contextPath}/module/idgen/generateIdentifier.form?source="+sourceId+"&comment="+comment, function(data){
 				$(txtNode).val(data);
 			});
 		}
