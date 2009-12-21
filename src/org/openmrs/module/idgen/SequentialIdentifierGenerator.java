@@ -47,7 +47,8 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     public String getIdentifierForSeed(long seed) {
     	
     	// Convert the next sequence integer into a String with the appropriate Base characters
-    	String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray());
+    	int minLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
+    	String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), minLength);
     	
     	// Add optional prefix and suffix
     	identifier = (prefix == null ? identifier : prefix + identifier);

@@ -33,13 +33,16 @@ public class IdgenUtil {
 	 * Converts a long to a String given the passed base characters
 	 * @should convert from long to string in base character set
 	 */
-	public static String convertToBase(long n, char[] baseCharacters) {
+	public static String convertToBase(long n, char[] baseCharacters, int padToLength) {
     	StringBuilder base = new StringBuilder();
     	long numInBase = (long)baseCharacters.length;
     	while (n > 0) {
     		int index = (int)(n % numInBase);
     		base.insert(0, baseCharacters[index]);
     		n = (long)(n / numInBase);
+    	}
+    	while (base.length() < padToLength) {
+    		base.insert(0, baseCharacters[0]);
     	}
     	return base.toString();
 	}

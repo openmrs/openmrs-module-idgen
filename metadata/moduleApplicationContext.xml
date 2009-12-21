@@ -55,6 +55,10 @@
 					<key><value>org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator</value></key>
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
 				</entry>
+				<entry>
+					<key><value>org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator</value></key>
+					<bean class="org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator"/>
+				</entry>
 			</map>
 		</property>
 	</bean>
