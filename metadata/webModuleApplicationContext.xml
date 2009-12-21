@@ -13,7 +13,7 @@
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<context:component-scan base-package="org.openmrs.module.idgen" />
     
-    <bean id="MdrtbMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+    <bean id="idgenMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     	<property name="order"><value>60</value></property>
     	<property name="mappings">
             <props>
