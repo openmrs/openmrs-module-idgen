@@ -108,6 +108,9 @@
 					<span class="requiredField">*</span>
 					<spring:message code="idgen.url" />:
 				</th>
+				<td>
+					<form:input path="url" size="50" /><form:errors path="url" cssClass="error" />
+				</td>
 			</tr>
 		</c:if>
 		<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">

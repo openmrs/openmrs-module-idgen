@@ -65,6 +65,5 @@
 	<classpathentry kind="lib" path="lib-common/openmrs-api-1.4.5.00.11137.jar" sourcepath="/openmrs-1.4.x"/>
 	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.4.5.00.11137.jar"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.4.5.00.11137.jar" sourcepath="/openmrs-1.4.x"/>
-	<classpathentry kind="lib" path="lib/commons-csv-20070730.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
