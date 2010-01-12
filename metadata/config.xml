@@ -8,7 +8,10 @@
 	<version>1.4.0.2</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Partners In Health</author>
-	<description>Provides ID Generation</description>
+	<description>
+		Identifier auto-generation and allocation functionality.  
+		See <a href="http://openmrs.org/wiki/Idgen_Module">http://openmrs.org/wiki/Idgen_Module</a> for more information
+	</description>
 	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>	
 	<require_version>1.4.0</require_version>
 	
