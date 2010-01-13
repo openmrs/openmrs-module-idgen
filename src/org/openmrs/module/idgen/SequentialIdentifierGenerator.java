@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.patient.IdentifierValidator;
 
@@ -55,7 +56,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     	identifier = (suffix == null ? identifier : identifier + suffix);
     	
     	// Add check-digit, if required
-    	if (getIdentifierType().getValidator() != null) {
+    	if (StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
     		try {
 	    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
 	    		IdentifierValidator v = (IdentifierValidator)c.newInstance();
