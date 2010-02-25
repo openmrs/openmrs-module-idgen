@@ -21,7 +21,7 @@ import org.openmrs.User;
 /**
  * An base implementation which provides all common property access
  */
-public abstract class BaseIdentifierSource implements IdentifierSource {
+public abstract class BaseIdentifierSource extends IdentifierSource {
 	
 	//***** PROPERTIES *****
 	

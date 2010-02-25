@@ -21,137 +21,137 @@ import org.openmrs.User;
 /**
  * An IdentifierSource is a construct which can supply identifiers of a particular type
  */
-public interface IdentifierSource {
+public abstract class IdentifierSource {
     
     //****** PROPERTY ACCESS ******
     
 	/**
 	 * @return id - The unique Identifier for the object
 	 */
-	public Integer getId();
+	public abstract Integer getId();
 	
 	/**
 	 * @param id - The unique Identifier for the object
 	 */
-	public void setId(Integer id);
+	public abstract void setId(Integer id);
 	
 	/**
 	 * @return the universally unique id for this object
 	 */
-	public String getUuid();
+	public abstract String getUuid();
 	
 	/**
 	 * @param uuid a universally unique id for this object
 	 */
-	public void setUuid(String uuid);
+	public abstract void setUuid(String uuid);
     
 	/**
 	 * @return the name
 	 */
-	public String getName();
+	public abstract String getName();
 	
 	/**
 	 * @param name the name to set
 	 */
-	public void setName(String name);
+	public abstract void setName(String name);
 	
 	/**
 	 * @return the description
 	 */
-	public String getDescription();
+	public abstract String getDescription();
 	
 	/**
 	 * @param description the description to set
 	 */
-	public void setDescription(String description);
+	public abstract void setDescription(String description);
 	
 	/**
 	 * @return the PatientIdentifierType that this source supplies
 	 */
-	public PatientIdentifierType getIdentifierType();
+	public abstract PatientIdentifierType getIdentifierType();
 	
 	/**
 	 * @param the PatientIdentifierType that this source supplies
 	 */
-	public void setIdentifierType(PatientIdentifierType type);
+	public abstract void setIdentifierType(PatientIdentifierType type);
 
 	/**
 	 * @return User - the user who created the object
 	 */
-	public User getCreator();
+	public abstract User getCreator();
 	
 	/**
 	 * @param creator - the user who created the object
 	 */
-	public void setCreator(User creator);
+	public abstract void setCreator(User creator);
 	
 	/**
 	 * @return Date - the date the object was created
 	 */
-	public Date getDateCreated();
+	public abstract Date getDateCreated();
 	
 	/**
 	 * @param dateCreated - the date the object was created
 	 */
-	public void setDateCreated(Date dateCreated);
+	public abstract void setDateCreated(Date dateCreated);
 	
 	/**
 	 * @return User - the user who last changed the object
 	 */
-	public User getChangedBy();
+	public abstract User getChangedBy();
 	
 	/**
 	 * @param changedBy - the user who last changed the object
 	 */
-	public void setChangedBy(User changedBy);
+	public abstract void setChangedBy(User changedBy);
 	
 	/**
 	 * @return Date - the date the object was last changed
 	 */
-	public Date getDateChanged();
+	public abstract Date getDateChanged();
 	
 	/**
 	 * @param dateChanged - the date the object was last changed
 	 */
-	public void setDateChanged(Date dateChanged);
+	public abstract void setDateChanged(Date dateChanged);
 	
 	/**
 	 * @return Boolean - whether of not this object is retired
 	 */
-	public Boolean isRetired();
+	public abstract Boolean isRetired();
 	
 	/**
 	 * @param retired - whether of not this object is retired
 	 */
-	public void setRetired(Boolean retired);
+	public abstract void setRetired(Boolean retired);
 	
 	/**
 	 * @return User - the user who retired the object
 	 */
-	public User getRetiredBy();
+	public abstract User getRetiredBy();
 	
 	/**
 	 * @param retiredBy - the user who retired the object
 	 */
-	public void setRetiredBy(User retiredBy);
+	public abstract void setRetiredBy(User retiredBy);
 	
 	/**
 	 * @return Date - the date the object was retired
 	 */
-	public Date getDateRetired();
+	public abstract Date getDateRetired();
 	
 	/**
 	 * @param dateRetired - the date the object was retired
 	 */
-	public void setDateRetired(Date dateRetired);
+	public abstract void setDateRetired(Date dateRetired);
 	
 	/**
 	 * @return String - the reason the object was retired
 	 */
-	public String getRetireReason();
+	public abstract String getRetireReason();
 	
 	/**
 	 * @param retireReason - the reason the object was retired
 	 */
-	public void setRetireReason(String retireReason);
+	public abstract void setRetireReason(String retireReason);
 }	
