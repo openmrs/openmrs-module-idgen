@@ -42,6 +42,8 @@ public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
 			pi.setDateUsed(now);
 		}
 		iss.saveIdentifierSource(source);
+		if (pool.isAutoGenerate())
+            iss.checkAndRefillIdentifierPool(pool);
 		return ret;
 	}
 }

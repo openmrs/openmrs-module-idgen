@@ -118,4 +118,15 @@
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>
 	</diff>
+	<diff>
+		<version>1.5</version>
+		<author>Partners In Health</author>
+		<date>March 10, 2010</date>
+		<description>
+			Add tinyint column auto_generate_pool to idgen_id_pool,
+		</description>
+		<sql>
+			ALTER TABLE `idgen_id_pool` ADD COLUMN `auto_generate` tinyint(1) NOT NULL default 0;
+		</sql>
+	</diff>
 </sqldiff>

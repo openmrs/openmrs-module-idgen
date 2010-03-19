@@ -15,6 +15,7 @@ package org.openmrs.module.idgen.service.db;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -78,7 +79,7 @@ public interface IdentifierSourceDAO {
 	 * @param id the id to retrieve for the given type
 	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
 	 */
-	@Transactional(readOnly = true)
+	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws DAOException;
 	
 	/**
@@ -110,5 +111,26 @@ public interface IdentifierSourceDAO {
 	@Transactional(readOnly=true)
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws DAOException;
+	
+	/**
+     * Retrieves a pooled identifier from a pool by identifier
+     * @throws DAOException
+     */
+	@Transactional(readOnly=true)
+	public PooledIdentifier getPooledIdentifierByIdentifier(IdentifierPool pool, String identifier) throws DAOException;
 
+	
+	/**
+     * Retrieves a LogEntry from an IdentifierSource by identifier
+     * @throws DAOException
+     */
+    @Transactional(readOnly=true)
+	public LogEntry getLogEntryByIdentifierAndSource(IdentifierSource source, String identifier) throws DAOException;
+    
+    /**
+     * Retrieves all existing patient identifiers of a given type as a list of Strings
+     * @throws DAOException
+     */
+    @Transactional(readOnly=true)
+    public Set<String> getPatientIdentifiersByIdentifierType(PatientIdentifierType pit) throws DAOException;
 }

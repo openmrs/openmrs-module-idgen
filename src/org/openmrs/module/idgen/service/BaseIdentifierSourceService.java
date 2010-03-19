@@ -14,11 +14,13 @@
 package org.openmrs.module.idgen.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
@@ -190,7 +192,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 */
 	@Transactional(readOnly=true)
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException {
-		return dao.getAvailableIdentifiers(pool, quantity);
+	    return dao.getAvailableIdentifiers(pool, quantity);
 	}
 
 	/** 
@@ -207,10 +209,27 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	@Transactional
 	public void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException {
 		for (String identifier : identifiers) {
-			pool.addIdentifierToPool(identifier);
+		    PooledIdentifier pi = new PooledIdentifier(pool, identifier, null, null);
+		    addPooledIdentifiersToPool(pool, Collections.singletonList(pi));
 		}
 		Context.getService(IdentifierSourceService.class).saveIdentifierSource(pool);
 	}
+	
+	/** 
+     * @see IdentifierSourceService#addIdentifiersToPool(IdentifierPool, List)
+     */
+    @Transactional
+    public void addPooledIdentifiersToPool(IdentifierPool pool, List<PooledIdentifier> identifiers) throws APIException {
+        for (PooledIdentifier identifier : identifiers) {
+            if (identifier.getPool() == null)
+                identifier.setPool(pool);
+            if (dao.getPooledIdentifierByIdentifier(pool, identifier.getIdentifier()) == null)
+                pool.addIdentifierToPool(identifier);
+            else
+                log.warn("Identifier " + identifier + " already exists in pool " + pool.getName());
+        }
+        Context.getService(IdentifierSourceService.class).saveIdentifierSource(pool);
+    }
 	
 	/** 
 	 * @see IdentifierSourceService#addIdentifiersToPool(IdentifierPool, Integer)
@@ -291,4 +310,42 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 										String identifier, User generatedBy, String comment) throws APIException {
 		return dao.getLogEntries(source, fromDate, toDate, identifier, generatedBy, comment);
 	}
+	
+	/** 
+     * @see saveLogEntry(LogEntry logEntry)
+     */
+	@Transactional
+	public LogEntry saveLogEntry(LogEntry logEntry) throws APIException {
+	    if (dao.getLogEntryByIdentifierAndSource(logEntry.getSource(), logEntry.getIdentifier()) == null){
+	        return dao.saveLogEntry(logEntry);
+	    } else { 
+	        log.warn("LogEntry for " + logEntry.getIdentifier() + " already exists for source " + logEntry.getSource().getName());
+	        return null;
+	    }    
+	}
+	
+	/** 
+     * @see getPatientIdentifiersByIdentifierType(PatientIdentifierType)
+     */
+    @Transactional(readOnly=true)
+	public Set<String> getPatientIdentifiersByIdentifierType(PatientIdentifierType pit) throws APIException {
+        return dao.getPatientIdentifiersByIdentifierType(pit);
+    }
+    
+    
+    /**
+     * 
+     * Adds identifiers to a pool presumably from a pool's sequential source in batches of 100 until the min
+     * pool quantity of unused is reached.
+     * 
+     * @param pool
+     */
+    @Transactional
+    public void checkAndRefillIdentifierPool(IdentifierPool pool){
+        if (pool.getSource() != null && pool.getSource() instanceof SequentialIdentifierGenerator){
+            while (pool.getMinPoolSize() > getQuantityInPool(pool, true, false)){
+                addIdentifiersToPool(pool, Integer.valueOf(pool.getBatchSize()));
+            }
+        }
+    }
 }

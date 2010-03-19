@@ -19,6 +19,7 @@ import java.util.List;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
@@ -32,7 +33,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	 */
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
-		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator)source;
+		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
 		long sequenceValue = seq.getNextSequenceValue();
     	if (sequenceValue < 0) {
     		if (seq.getFirstIdentifierBase() != null) {
@@ -44,13 +45,22 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
     	}
 
     	List<String> identifiers = new ArrayList<String>();
-    	for (int i=0; i<batchSize; i++) {
-	    	identifiers.add(seq.getIdentifierForSeed(sequenceValue));
-	    	sequenceValue++;
-    	}
     	
-    	seq.setNextSequenceValue(sequenceValue);
-    	Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
+    	//don't return an ID that has already been loaded manually into the used log
+    	//this will slow down performance, but makes transitioning an implementation to idgen easier.
+    	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
+    	while (identifiers.size() < batchSize)
+        {
+    	    String st = seq.getIdentifierForSeed(sequenceValue);
+    	    List<LogEntry> list = iss.getLogEntries(source, null, null, st, null, null);
+    	    if ( !(list != null && list.size() > 0) ){
+    	        identifiers.add(st);
+    	    }   
+    	    sequenceValue++;
+    	    seq.setNextSequenceValue(sequenceValue);
+            Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
+        }
+
     	
     	return identifiers;
 	}

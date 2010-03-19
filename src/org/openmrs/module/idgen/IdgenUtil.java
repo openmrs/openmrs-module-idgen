@@ -17,10 +17,13 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
 
 /**
  * Useful utility methods
@@ -97,5 +100,22 @@ public class IdgenUtil {
 			}
 		}
 		return contents;
+	}
+	
+	/**
+	 * 
+	 * This saves a list of PooledIdentifiers to a pool, and then cascades the ids down to the 
+	 * logEntries of the underlying sequential generator source of the pool, if it exists
+	 * 
+	 * @param pool
+	 * @param ids
+	 */
+	public static void saveAndCascadeIdsToPoolandSequentialPoolSource(IdentifierPool pool, List<PooledIdentifier> ids){
+	    Context.getService(IdentifierSourceService.class).addPooledIdentifiersToPool(pool, ids);
+        IdentifierSource is = pool.getSource();
+        if (is != null && is instanceof SequentialIdentifierGenerator){
+            for (PooledIdentifier pi : ids)
+                Context.getService(IdentifierSourceService.class).saveLogEntry(new LogEntry(is, pi.getIdentifier(), new Date(), Context.getAuthenticatedUser(), null));
+        }    
 	}
 }

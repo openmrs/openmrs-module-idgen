@@ -59,6 +59,10 @@
 					<key><value>org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator</value></key>
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator"/>
 				</entry>
+				<entry>
+					<key><value>org.openmrs.module.idgen.validator.VerhoeffIdentifierValidatorRwanda</value></key>
+					<bean class="org.openmrs.module.idgen.validator.VerhoeffIdentifierValidatorRwanda"/>
+				</entry>
 			</map>
 		</property>
 	</bean>

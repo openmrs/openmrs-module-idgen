@@ -115,8 +115,8 @@
 	<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">
 		<c:if test="${fn:length(source.availableIdentifiers) == 0}">
 			<c:set var="available" value="f"/>
+			None available for export.
 		</c:if>
-		None available for export.
 	</c:if>
 	<br/>
 	<c:if test="${available == 't'}">
@@ -133,6 +133,15 @@
 		</table>
 		<input type="submit" value="<spring:message code="idgen.export" />"/>	
 	</c:if>
-</form>
+</form><br/>
+<hr/>
+<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool' || source.class.name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
+	<form action="blockPatientIdentifiers.form">
+		<input type="hidden" name="source" value="${source.id}"/>
+		<b>IdGen install: </b> To mark existing patient identifiers of this type as already used so that they will be excluded when generating future identifiers of this type, click here:
+		<input type="submit" value="<spring:message code="idgen.block" />"/>
+	</form>
+</c:if>
+<br/>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

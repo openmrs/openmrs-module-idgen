@@ -32,6 +32,8 @@ public class IdentifierPool extends BaseIdentifierSource {
     private int batchSize = 1000; // for requests to pool
     private int minPoolSize = 500; // request more when we go below this number
     private boolean sequential = false;
+    private boolean autoGenerate = false;
+    private int autoGenerateIncrement = 100;
     private Set<PooledIdentifier> identifiers;
 	
     //***** INSTANCE METHODS *****
@@ -82,6 +84,14 @@ public class IdentifierPool extends BaseIdentifierSource {
 	public synchronized void addIdentifierToPool(String identifier) {
 		getIdentifiers().add(new PooledIdentifier(this, identifier));
 	}
+	
+	/**
+     * Adds a new identifier to the pool 
+     * @param identifier the identifier to add
+     */
+    public synchronized void addIdentifierToPool(PooledIdentifier identifier) {
+        getIdentifiers().add(identifier);
+    }
 	
 	//***** PROPERTY ACCESS *****
 
@@ -157,4 +167,22 @@ public class IdentifierPool extends BaseIdentifierSource {
 	public void setIdentifiers(Set<PooledIdentifier> identifiers) {
 		this.identifiers = identifiers;
 	}
+
+    public boolean isAutoGenerate() {
+        return autoGenerate;
+    }
+
+    public void setAutoGenerate(boolean autoGenerate) {
+        this.autoGenerate = autoGenerate;
+    }
+
+    public int getAutoGenerateIncrement() {
+        return autoGenerateIncrement;
+    }
+
+    public void setAutoGenerateIncrement(int autoGenerateIncrement) {
+        this.autoGenerateIncrement = autoGenerateIncrement;
+    }
+	
+	
 }
