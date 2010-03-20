@@ -252,6 +252,7 @@ public class IdentifierSourceController {
     		}
     	}
 		IdgenUtil.saveAndCascadeIdsToPoolandSequentialPoolSource(pool, ids);
+		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
     
@@ -265,6 +266,7 @@ public class IdentifierSourceController {
     	
     	IdentifierPool pool = (IdentifierPool)source;
 		Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, batchSize);
+		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully imported.");
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
     
@@ -284,8 +286,7 @@ public class IdentifierSourceController {
             for (String pi : inUseIdentifiers)
                 Context.getService(IdentifierSourceService.class).saveLogEntry(new LogEntry(source, pi, new Date(), Context.getAuthenticatedUser(), null));
         }
-        HttpSession httpSession = request.getSession();
-        httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers marked as already used by idgen.");
+        request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers marked as already used by idgen.");
         return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
 }
