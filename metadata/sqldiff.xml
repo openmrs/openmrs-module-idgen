@@ -123,10 +123,21 @@
 		<author>Partners In Health</author>
 		<date>March 10, 2010</date>
 		<description>
-			Add tinyint column auto_generate_pool to idgen_id_pool,
+			Add tinyint column auto_generate_pool to idgen_id_pool.
 		</description>
 		<sql>
 			ALTER TABLE `idgen_id_pool` ADD COLUMN `auto_generate` tinyint(1) NOT NULL default 0;
+		</sql>
+	</diff>
+		<diff>
+		<version>1.5.1</version>
+		<author>Partners In Health</author>
+		<date>March 10, 2010</date>
+		<description>
+			Drop the auto_generate column. Always assumed true in the business logic.  So unneccessary.
+		</description>
+		<sql>
+			ALTER TABLE `idgen_id_pool` drop COLUMN `auto_generate`;
 		</sql>
 	</diff>
 </sqldiff>

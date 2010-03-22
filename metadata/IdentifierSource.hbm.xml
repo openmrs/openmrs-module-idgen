@@ -40,7 +40,6 @@
 			<property name="batchSize" type="int" column="batch_size" />
 			<property name="minPoolSize" type="int" column="min_pool_size" />
 			<property name="sequential" type="java.lang.Boolean" length="1" not-null="true"/>
-			<property name="autoGenerate" column="auto_generate" type="java.lang.Boolean" length="1" not-null="true"/>
 			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field">
 				<key column="pool_id" not-null="true" />
 				<one-to-many class="PooledIdentifier" />

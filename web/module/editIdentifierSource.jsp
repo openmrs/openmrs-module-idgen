@@ -138,13 +138,6 @@
 					<form:errors path="sequential" cssClass="error" /></td>
 			</tr>
 			<tr>
-				<th align="right"><spring:message code="idgen.autoGeneratePool" />:</th>
-				<td>
-					<form:radiobutton path="autoGenerate" value="${false}" /> <spring:message code="idgen.false" />
-					<form:radiobutton path="autoGenerate" value="${true}" /> <spring:message code="idgen.true" />
-					<form:errors path="autoGenerate" cssClass="error" /></td>
-			</tr>
-			<tr>
 				<th align="right"><spring:message code="idgen.batchSize" />:</th>
 				<td><form:input path="batchSize" size="50" /><form:errors path="batchSize" cssClass="error" /></td>
 			</tr>
