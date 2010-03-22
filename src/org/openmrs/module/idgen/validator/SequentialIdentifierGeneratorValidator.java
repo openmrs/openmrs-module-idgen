@@ -75,18 +75,6 @@ public class SequentialIdentifierGeneratorValidator extends IdentifierSourceVali
 					errors.reject("Invalid configuration. First identifier generated would be '" + firstId + "' which does not match length of " + source.getLength());
 				}
 			}
-			//NOTE:  this fails if prefixes, suffixes, or check-digit uses characters that aren't included in the base chars...
-//			for (char c : firstId.toCharArray()) {
-//				boolean found = false;
-//				for (char b : source.getBaseCharacterSet().toCharArray()) {
-//					if (c == b) {
-//						found = true;
-//					}
-//				}
-//				if (!found) {
-//					errors.reject("First identifier of '" + firstId + "' contains characters that are not in the base character set");
-//				}
-//			}
 		}
 	}
 }

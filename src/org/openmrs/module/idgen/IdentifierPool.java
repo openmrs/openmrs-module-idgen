@@ -32,7 +32,6 @@ public class IdentifierPool extends BaseIdentifierSource {
     private int batchSize = 1000; // for requests to pool
     private int minPoolSize = 500; // request more when we go below this number
     private boolean sequential = false;
-    private int autoGenerateIncrement = 100;
     private Set<PooledIdentifier> identifiers;
 	
     //***** INSTANCE METHODS *****
@@ -166,14 +165,4 @@ public class IdentifierPool extends BaseIdentifierSource {
 	public void setIdentifiers(Set<PooledIdentifier> identifiers) {
 		this.identifiers = identifiers;
 	}
-
-    public int getAutoGenerateIncrement() {
-        return autoGenerateIncrement;
-    }
-
-    public void setAutoGenerateIncrement(int autoGenerateIncrement) {
-        this.autoGenerateIncrement = autoGenerateIncrement;
-    }
-	
-	
 }
