@@ -83,14 +83,6 @@ public class IdentifierPool extends BaseIdentifierSource {
 		getIdentifiers().add(new PooledIdentifier(this, identifier));
 	}
 	
-	/**
-     * Adds a new identifier to the pool 
-     * @param identifier the identifier to add
-     */
-    public synchronized void addIdentifierToPool(PooledIdentifier identifier) {
-        getIdentifiers().add(identifier);
-    }
-	
 	//***** PROPERTY ACCESS *****
 
 	/**

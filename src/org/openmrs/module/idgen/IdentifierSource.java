@@ -14,6 +14,7 @@
 package org.openmrs.module.idgen;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -154,4 +155,19 @@ public abstract class IdentifierSource {
 	 * @param retireReason - the reason the object was retired
 	 */
 	public abstract void setRetireReason(String retireReason);
+	
+	/**
+	 * @return Set of reserved identifiers
+	 */
+	public abstract Set<String> getReservedIdentifiers();
+	
+	/**
+	 * @param - the reserved identifiers to set
+	 */
+	public abstract void setReservedIdentifiers(Set<String> reservedIdentifiers);
+	
+	/**
+	 * @param - the reserved identifier to add
+	 */
+	public abstract void addReservedIdentifier(String reservedIdentifier);
 }	

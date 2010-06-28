@@ -14,6 +14,8 @@
 package org.openmrs.module.idgen;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -38,12 +40,20 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 	private User retiredBy;
 	private Date dateRetired;
 	private String retireReason;
+	private Set<String> reservedIdentifiers;
 	
 	//***** CONSTRUCTORS *****
 	
 	public BaseIdentifierSource() {}
 	
 	//***** INSTANCE METHODS *****
+	
+	/**
+	 * Adds a reserved identifier
+	 */
+	public void addReservedIdentifier(String reservedIdentifier) {
+		getReservedIdentifiers().add(reservedIdentifier);
+	}
 	
 	/** @see Object#equals(Object) */
 	public boolean equals(Object obj) {
@@ -237,5 +247,20 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 	 */
 	public void setRetireReason(String retireReason) {
 		this.retireReason = retireReason;
+	}
+	/**
+	 * @return the reservedIdentifiers
+	 */
+	public Set<String> getReservedIdentifiers() {
+		if (reservedIdentifiers == null) {
+			reservedIdentifiers = new HashSet<String>();
+		}
+		return reservedIdentifiers;
+	}
+	/**
+	 * @param reservedIdentifiers the reservedIdentifiers to set
+	 */
+	public void setReservedIdentifiers(Set<String> reservedIdentifiers) {
+		this.reservedIdentifiers = reservedIdentifiers;
 	}
 }	

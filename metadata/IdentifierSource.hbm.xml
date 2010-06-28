@@ -19,6 +19,11 @@
 		<property name="dateRetired" type="java.util.Date" column="date_retired" />	
 		<property name="retireReason" type="string" column="retire_reason" />
 		
+		<set name="reservedIdentifiers" table="idgen_reserved_identifier" lazy="true" cascade="all-delete-orphan">
+			<key column="source" not-null="true" />
+			<element column="identifier" type="string"/>
+		</set>
+		
 		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
 			<key column="id"/>
 			<property name="nextSequenceValue" type="long" column="next_sequence_value" not-null="true"/>

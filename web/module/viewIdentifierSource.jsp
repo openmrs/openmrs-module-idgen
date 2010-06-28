@@ -1,5 +1,4 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
-<%@ taglib prefix="form" uri="resources/spring-form.tld"%>
 
 <openmrs:require privilege="Manage Identifier Sources" otherwise="/login.htm" redirect="/module/idgen/manageIdentifierSources.form" />
 
@@ -71,6 +70,20 @@
 			<th><spring:message code="idgen.length"/>:</th>
 			<td>${source.length}</td>
 		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<th><spring:message code="idgen.reservedIdentifiers"/>:</th>
+			<td>
+				<form action="reserveIdentifiersFromFile.form" method="post" enctype="multipart/form-data">
+					<a href="exportReservedIdentifiers.form?source=${source.id}">${fn:length(source.reservedIdentifiers)} <spring:message code="idgen.defined"/></a>
+					&nbsp;&nbsp;
+					<spring:message code="idgen.uploadReservedIdentifiers"/>: 
+					<input type="hidden" name="source" value="${source.id}"/>
+					<input type="file" name="inputFile"/>
+					<input type="submit" value="Upload"/>
+				</form>
+			</td>
+		</tr>
 	</table>
 </c:if>
 
@@ -133,15 +146,6 @@
 		</table>
 		<input type="submit" value="<spring:message code="idgen.export" />"/>	
 	</c:if>
-</form><br/>
-<hr/>
-<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool' || source.class.name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
-	<form action="blockPatientIdentifiers.form">
-		<input type="hidden" name="source" value="${source.id}"/>
-		<b>IdGen install: </b> To mark existing patient identifiers of this type as already used so that they will be excluded when generating future identifiers of this type, click here:
-		<input type="submit" value="<spring:message code="idgen.block" />"/>
-	</form>
-</c:if>
-<br/>
+</form>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

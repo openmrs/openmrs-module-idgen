@@ -16,8 +16,6 @@ package org.openmrs.module.idgen.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
@@ -130,7 +128,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException;
 
 	/**
-	 * Returns available identifiers from a pool.  In practice, use generateIdentifiers(IdentifierSource, Integer, String).
+	 * Returns available identifiers from a pool
 	 */
 	@Transactional(readOnly=true)
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException;
@@ -148,15 +146,6 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
 	public void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException;
-	
-	/**
-     * Adds a List of PooledIdentifiers to the given pool -- allows you to set dateUsed in advance
-     * @throws APIException
-     */
-    @Transactional
-    @Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
-	public void addPooledIdentifiersToPool(IdentifierPool pool, List<PooledIdentifier> identifiers) throws APIException ;
-	
 	
 	/**
 	 * Adds a batch of Identifiers to the given pool, from the attached source
@@ -198,26 +187,10 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional(readOnly=true)
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws APIException;
+
 	/**
-	 * 
-	 * Saves a LogEntry for a SequentialIdentifierGenerator
-	 */
-	@Transactional
-	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
-	public LogEntry saveLogEntry(LogEntry logEntry) throws APIException;
-	
-	/**
-	 * 
-	 * Convenience method that loads all PatientIdentifier identifiers of a given IdentifierType as a list of strings.
-	 */
-	@Transactional(readOnly=true)
-	public Set<String> getPatientIdentifiersByIdentifierType(PatientIdentifierType pit) throws APIException;
-	
-	/**
-	 * 
 	 * Convenience method that checks a pool's level and incrementally adds identifiers in batches of 100
 	 * until the min available size is reached.  Only does somthething if the pool's source is a sequentialIdentifierGenerator
-	 * 
 	 * @param pool
 	 */
 	@Transactional

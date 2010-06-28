@@ -51,8 +51,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     	int minLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
     	String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), minLength);
     	
-    	//TODO: location-based variable prefix
-    	// Add optional prefix and suffix -- will need this for mdrtb module eventually...
+    	// Add optional prefix and suffix
     	identifier = (prefix == null ? identifier : prefix + identifier);
     	identifier = (suffix == null ? identifier : identifier + suffix);
     	

@@ -118,4 +118,24 @@
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>
 	</diff>
+	
+	<diff>
+		<version>2.0</version>
+		<author>Partners In Health</author>
+		<date>28 June 2010</date>
+		<description>
+			Add table for reserved identifiers
+		</description>
+		<sql>
+			CREATE TABLE `idgen_reserved_identifier` (
+			  `id` int(11) NOT NULL auto_increment,
+			  `source` int(11) NOT NULL,
+			  `identifier` varchar(50) NOT NULL,
+			  PRIMARY KEY  (`id`),
+			  KEY `id for idgen_reserved_identifier` (`id`),
+			  KEY `source for idgen_reserved_identifier` (`source`),
+			  CONSTRAINT `source for idgen_reserved_identifier` FOREIGN KEY (`source`) REFERENCES `idgen_identifier_source` (`id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>	
+	</diff>
 </sqldiff>

@@ -15,11 +15,11 @@ package org.openmrs.module.idgen.processor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
-import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
@@ -44,22 +44,21 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
     		}
     	}
 
+    	Set<String> reservedIdentifiers = source.getReservedIdentifiers();
+    	
     	List<String> identifiers = new ArrayList<String>();
     	
-    	//don't return an ID that has already been loaded manually into the used log
-    	//this will slow down performance, but makes transitioning an implementation to idgen easier.
-    	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
-    	while (identifiers.size() < batchSize)
-        {
-    	    String st = seq.getIdentifierForSeed(sequenceValue);
-    	    List<LogEntry> list = iss.getLogEntries(source, null, null, st, null, null);
-    	    if ( !(list != null && list.size() > 0) ){
-    	        identifiers.add(st);
-    	    }   
-    	    sequenceValue++;
-    	    seq.setNextSequenceValue(sequenceValue);
-            Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
-        }
+    	for (int i=0; i<batchSize;) {
+    		String val = seq.getIdentifierForSeed(sequenceValue);
+    		if (!reservedIdentifiers.contains(val)) {
+    			identifiers.add(val);
+    			i++;
+    		}
+	    	sequenceValue++;
+    	}
+    	
+    	seq.setNextSequenceValue(sequenceValue);
+    	Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
 
     	
     	return identifiers;

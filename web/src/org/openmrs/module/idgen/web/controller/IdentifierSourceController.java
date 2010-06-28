@@ -2,18 +2,14 @@ package org.openmrs.module.idgen.web.controller;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -22,9 +18,6 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.IdgenUtil;
-import org.openmrs.module.idgen.LogEntry;
-import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.propertyeditor.IdentifierSourceEditor;
@@ -160,13 +153,8 @@ public class IdentifierSourceController {
 			return new ModelAndView("/module/idgen/editIdentifierSource");
 		}
 		
-		// add/update the flag
 		Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
-		
-		// clears the command object from the session
 		status.setComplete();
-		
-		// just display the edit page again
 		return new ModelAndView("redirect:/module/idgen/manageIdentifierSources.form");
 	}
     
@@ -225,25 +213,12 @@ public class IdentifierSourceController {
     							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
     	
     	IdentifierPool pool = (IdentifierPool)source;
-    	List<PooledIdentifier> ids = new ArrayList<PooledIdentifier>();
+    	List<String> ids = new ArrayList<String>();
     	BufferedReader r = null;
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     	try {
     		r = new BufferedReader(new InputStreamReader(inputFile.getInputStream()));
     		for (String s = r.readLine(); s != null; s = r.readLine()) {
-    		    //HACK: split the string and look for a date:  yyyy-MM-dd, with separator ','
-    		    String[] splitStr = s.split(",");
-    		    if (splitStr.length == 2){
-    		        try {
-    		            Date date = sdf.parse(splitStr[1]);
-    		            ids.add(new PooledIdentifier(pool, splitStr[0], date, null));
-    		        } catch (Exception ex) {
-    		            throw new RuntimeException("Unable to convert string " + splitStr[1] + " to date, using standard format yyyy-MM-dd ");
-    		        }
-    		    } else {
-    		        ids.add(new PooledIdentifier(pool, s, null, null));
-    		    }
-    		    
+    			ids.add(s);
     		}
     	}
     	finally {
@@ -251,7 +226,7 @@ public class IdentifierSourceController {
     			r.close();
     		}
     	}
-		IdgenUtil.saveAndCascadeIdsToPoolandSequentialPoolSource(pool, ids);
+		Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);
 		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
@@ -270,23 +245,49 @@ public class IdentifierSourceController {
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
     
-    @RequestMapping("/module/idgen/blockPatientIdentifiers")
-    public String addIdentifiersFromExistingPatients(ModelMap model, HttpServletRequest request, HttpServletResponse response,
-                                   @RequestParam(required=true, value="source") IdentifierSource source) throws Exception {
-        
-        Set<String> inUseIdentifiers = Context.getService(IdentifierSourceService.class).getPatientIdentifiersByIdentifierType(source.getIdentifierType());
-        if (source instanceof IdentifierPool){
-            IdentifierPool pool = (IdentifierPool) source;
-            List<PooledIdentifier> piList = new ArrayList<PooledIdentifier>();
-            for (String st : inUseIdentifiers){
-                piList.add(new PooledIdentifier(pool, st, new Date(), null));
-            }
-            IdgenUtil.saveAndCascadeIdsToPoolandSequentialPoolSource(pool, piList);
-        } else if (source instanceof SequentialIdentifierGenerator){
-            for (String pi : inUseIdentifiers)
-                Context.getService(IdentifierSourceService.class).saveLogEntry(new LogEntry(source, pi, new Date(), Context.getAuthenticatedUser(), null));
-        }
-        request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers marked as already used by idgen.");
-        return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
+    /**
+     * Reserve Identifiers From File
+     */
+    @RequestMapping("/module/idgen/reserveIdentifiersFromFile")
+    public String reserveIdentifiersFromFile(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+    							   @RequestParam(required=true, value="source") IdentifierSource source,
+    							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
+    	
+    	BufferedReader r = null;
+    	try {
+    		r = new BufferedReader(new InputStreamReader(inputFile.getInputStream()));
+    		for (String s = r.readLine(); s != null; s = r.readLine()) {
+    			if (StringUtils.isNotBlank(s)) {
+    				source.addReservedIdentifier(s);
+    			}
+    		}
+    	}
+    	finally {
+    		if (r != null) {
+    			r.close();
+    		}
+    	}
+		Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
+		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
+		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
+    }
+    
+    /**
+     * Export Identifiers To File
+     */
+    @RequestMapping("/module/idgen/exportReservedIdentifiers")
+    public void exportReservedIdentifiers(ModelMap model, HttpServletRequest request, HttpServletResponse response,
+    							   @RequestParam(required=true, value="source") IdentifierSource source) throws Exception {
+
+		response.setHeader("Content-Disposition", "attachment; filename=reservedIdentifiers.txt");
+		response.setHeader("Pragma", "no-cache");
+    	response.setContentType("text/plain");
+    	ServletOutputStream out = response.getOutputStream();
+    	String separator = System.getProperty("line.separator");
+    	
+    	for (Iterator<String> i = source.getReservedIdentifiers().iterator(); i.hasNext();) {
+    		String identifier = i.next();
+    		out.print(identifier + (i.hasNext() ? separator : ""));
+    	}
     }
 }
