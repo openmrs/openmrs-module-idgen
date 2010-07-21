@@ -148,7 +148,8 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#registerProcessor(Class, IdentifierSourceProcessor)
 	 */
 	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException {
-		getProcessors().put(type, processorToRegister);
+	    if (!getProcessors().containsKey(type))
+	        getProcessors().put(type, processorToRegister);
 	}
 	
 	/** 
