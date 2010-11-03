@@ -178,6 +178,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/**
 	 * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, java.lang.String)
 	 */
+	@Transactional
 	public String generateIdentifier(PatientIdentifierType type, String comment) {
 		AutoGenerationOption option = getAutoGenerationOption(type);
 	
