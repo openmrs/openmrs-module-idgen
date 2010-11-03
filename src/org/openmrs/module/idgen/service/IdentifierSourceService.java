@@ -16,6 +16,8 @@ package org.openmrs.module.idgen.service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
@@ -93,6 +95,14 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
 	public void purgeIdentifierSource(IdentifierSource identifierSource) throws APIException;
+	
+	/**
+	 * Given a PatientIdentifierType, generates an identifier using the proper IdentifierSource for this server
+	 * Returns null if this PatientIdentifierType is not set to be auto-generated
+	 */
+	@Transactional
+	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	public String generateIdentifier(PatientIdentifierType type, String comment);
 	
 	/**
 	 * Generates a Single Identifiers from the given source
@@ -195,4 +205,11 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional
 	public void checkAndRefillIdentifierPool(IdentifierPool pool);
+	
+	/**
+	 * Convenience method that returns the set of Patient Identifier Types that match certain AutoGeneration parameters
+	 */
+	@Transactional(readOnly=true)
+	public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled);
+	
 }

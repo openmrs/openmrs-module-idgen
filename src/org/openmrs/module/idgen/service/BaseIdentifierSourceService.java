@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -174,6 +175,20 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 		return identifiers;
 	}
 
+	/**
+	 * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, java.lang.String)
+	 */
+	public String generateIdentifier(PatientIdentifierType type, String comment) {
+		AutoGenerationOption option = getAutoGenerationOption(type);
+	
+		if (option != null && option.isAutomaticGenerationEnabled()) {
+			return generateIdentifier(option.getSource(), comment);
+		}
+		else {
+			return null;
+		}
+	}
+	
 	/** 
 	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource, String)
 	 */
@@ -306,4 +321,20 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
             }
         }
     }
+    
+    /**
+     * @see org.openmrs.module.idgen.service.IdentifierSourceService#getPatientIdentifierTypesByAutoGenerationOption(java.lang.Boolean, java.lang.Boolean)
+     */
+    public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled) {
+    	
+    	List<PatientIdentifierType> identifierTypes = new ArrayList<PatientIdentifierType>();
+    	
+    	for (PatientIdentifierType type : Context.getPatientService().getAllPatientIdentifierTypes()) {
+    		AutoGenerationOption option = getAutoGenerationOption(type);
+    		if (option != null && option.isManualEntryEnabled() == manualEntryEnabled.booleanValue() && option.isAutomaticGenerationEnabled() == autoGenerationEnabled.booleanValue()) {
+    			identifierTypes.add(type);
+    		}
+    	}
+    	return identifierTypes;
+   }	
 }
