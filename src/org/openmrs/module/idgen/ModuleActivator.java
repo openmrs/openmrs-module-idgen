@@ -15,24 +15,28 @@ package org.openmrs.module.idgen;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.Activator;
 
 /**
- * This class contains the logic that is run every time this module is either started or shutdown
+ * This class contains the logic that is run every time this module
+ * is either started or shutdown
  */
-public class ModuleActivator extends BaseModuleActivator {
-	
-	private static final Log log = LogFactory.getLog(BaseModuleActivator.class);
-	
-	@Override
-	public void willStart() {
+public class ModuleActivator implements Activator {
+
+	private Log log = LogFactory.getLog(this.getClass());
+
+	/**
+	 * @see org.openmrs.module.Activator#startup()
+	 */
+	public void startup() {
 		log.info("Starting idgen Module");
-		super.willStart();
 	}
 	
-	@Override
-	public void willStop() {
+	/**
+	 *  @see org.openmrs.module.Activator#shutdown()
+	 */
+	public void shutdown() {
 		log.info("Shutting down idgen Module");
-		super.willStop();
 	}
+	
 }

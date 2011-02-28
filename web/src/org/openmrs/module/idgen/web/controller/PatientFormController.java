@@ -13,10 +13,11 @@
  */
 package org.openmrs.module.idgen.web.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -24,115 +25,70 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.PersonAddress;
-import org.openmrs.PersonName;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.openmrs.util.LocationUtility;
 import org.openmrs.util.OpenmrsConstants;
-import org.openmrs.web.controller.patient.ShortPatientFormController;
-import org.openmrs.web.controller.patient.ShortPatientModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.util.CollectionUtils;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.context.request.WebRequest;
+import org.openmrs.web.controller.patient.NewPatientFormController;
+import org.springframework.web.servlet.mvc.SimpleFormController;
 
 /**
- * This controller is here to override the core create/edit patient form, it delegates to methods in
- * the core controller and plugs in support for auto generated patientIds
- * 
- * @see org.openmrs.web.controller.patient.ShortPatientFormController
+ * This controller is here to override the core create/edit patient form
+ * @see org.openmrs.web.controller.patient.NewPatientFormController
  */
-@Controller
-@SessionAttributes({ "patientModel", "relationshipsMap", "identifierTypes", "locations", "personNameCache",
-        "personAddressCache" })
-public class PatientFormController {
+public class PatientFormController extends NewPatientFormController {
 	
 	/** Logger for this class and subclasses */
-	private static final Log log = LogFactory.getLog(PatientFormController.class);
+	protected final Log log = LogFactory.getLog(getClass());
 	
-	private static final String IDGEN_FORM_VIEW_PAGE = "module/idgen/editPatientForm";
-	
-	@Autowired
-	ShortPatientFormController shortPatientFormController;
-	
-	@RequestMapping(method = RequestMethod.GET)
-	public String showForm(@RequestParam(value = "patientId", required = false) Integer patientId, ModelMap model,
-	                       WebRequest request) {
+	/**
+	 * @see SimpleFormController#referenceData(HttpServletRequest)
+	 */
+	@SuppressWarnings("unchecked")
+	protected Map<String, Object> referenceData(HttpServletRequest request) throws Exception {
+		Map<String, Object> map = super.referenceData(request);
 		
-		//delegate to the core controller so that the session data is added
-		shortPatientFormController.showForm(patientId, model, request);
+		Location defaultLocation = Context.getLocationService().getDefaultLocation();
+		if (defaultLocation == null) {
+			defaultLocation = Context.getLocationService().getAllLocations().get(0);
+		}
 		
-		ShortPatientModel patientModel = ((ShortPatientModel) model.get("patientModel"));
-		List<PatientIdentifier> identifiers = patientModel.getIdentifiers();
-		
-		String idTypes = Context.getAdministrationService().getGlobalProperty(
-		    OpenmrsConstants.GLOBAL_PROPERTY_PATIENT_IDENTIFIER_IMPORTANT_TYPES);
-		//if this patient already has some identifiers, donot add the new empty one
-		if (CollectionUtils.isEmpty(identifiers) && StringUtils.isNotEmpty(idTypes)) {
+		Set<PatientIdentifier> identifiers = (Set<PatientIdentifier>)map.get("identifiers");
+		String idTypes = Context.getAdministrationService().getGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_PATIENT_IDENTIFIER_IMPORTANT_TYPES);
+		if (StringUtils.isNotEmpty(idTypes)) {
 			for (String split : idTypes.split(",")) {
 				String[] typeAndLoc = split.split(":");
 				boolean found = false;
 				if (identifiers != null) {
 					for (PatientIdentifier pi : identifiers) {
-						if (typeAndLoc[0].trim().equalsIgnoreCase(pi.getIdentifierType().getName())) {
+						if (typeAndLoc[0].equalsIgnoreCase(pi.getIdentifierType().getName())) {
 							found = true;
 						}
 					}
 				}
 				if (!found) {
-					PatientIdentifierType idType = Context.getPatientService().getPatientIdentifierTypeByName(
-					    typeAndLoc[0].trim());
-					Location idLoc = (LocationUtility.getUserDefaultLocation() != null) ? LocationUtility
-					        .getUserDefaultLocation() : LocationUtility.getDefaultLocation();
-					
-					if (identifiers == null)
-						identifiers = new ArrayList<PatientIdentifier>();
+					PatientIdentifierType idType = Context.getPatientService().getPatientIdentifierTypeByName(typeAndLoc[0]);
+					Location idLoc = defaultLocation;
+					if (typeAndLoc.length == 2 && StringUtils.isNotEmpty(typeAndLoc[1])) {
+						idLoc = Context.getLocationService().getLocation(typeAndLoc[1]);
+					}
 					identifiers.add(new PatientIdentifier("", idType, idLoc));
 				}
 			}
-			
-			patientModel.setIdentifiers(identifiers);
+			map.put("identifiers", identifiers);
 		}
 		
 		// Identifier Generation
 		IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
 		Map<PatientIdentifierType, AutoGenerationOption> autogen = new HashMap<PatientIdentifierType, AutoGenerationOption>();
-		for (PatientIdentifierType pit : Context.getPatientService().getAllPatientIdentifierTypes()) {
-			AutoGenerationOption option = iss.getAutoGenerationOption(pit);
-			if (option != null && option.isAutomaticGenerationEnabled()) {
-				autogen.put(pit, option);
-			}
-		}
-		
-		model.put("autoGenerationOptions", autogen);
-		
-		return IDGEN_FORM_VIEW_PAGE;
+ 		for (PatientIdentifierType pit : Context.getPatientService().getAllPatientIdentifierTypes()) {
+ 			AutoGenerationOption option = iss.getAutoGenerationOption(pit);
+ 			if (option != null && option.isAutomaticGenerationEnabled()) {
+ 				autogen.put(pit, option);
+ 			}
+ 		}
+ 		map.put("autoGenerationOptions", autogen);
+
+		return map;
 	}
-	
-	@RequestMapping(method = RequestMethod.POST)
-	public String saveShortPatient(WebRequest request, @ModelAttribute("personNameCache") PersonName personNameCache,
-	                               @ModelAttribute("personAddressCache") PersonAddress personAddressCache,
-	                               @ModelAttribute("patientModel") ShortPatientModel patientModel, BindingResult result,
-	                               SessionStatus status) {
-		
-		String redirectFromCoreController = shortPatientFormController.saveShortPatient(request, personNameCache,
-		    personAddressCache, patientModel, result, status);
-		
-		if (result.hasErrors())
-			return IDGEN_FORM_VIEW_PAGE;
-		
-		//This is always expected to be the patientDashboard url
-		return redirectFromCoreController;
-	}
-	
 }
