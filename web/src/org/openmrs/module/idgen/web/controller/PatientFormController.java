@@ -61,7 +61,7 @@ public class PatientFormController extends NewPatientFormController {
 				boolean found = false;
 				if (identifiers != null) {
 					for (PatientIdentifier pi : identifiers) {
-						if (typeAndLoc[0].equalsIgnoreCase(pi.getIdentifierType().getName())) {
+						if (pi.getIdentifierType() != null && typeAndLoc[0].equalsIgnoreCase(pi.getIdentifierType().getName())) {
 							found = true;
 						}
 					}
