@@ -65,5 +65,8 @@
 	<classpathentry kind="lib" path="lib-common/openmrs-api-1.4.5.00.11137.jar" sourcepath="/openmrs-1.4.x"/>
 	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.4.5.00.11137.jar"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.4.5.00.11137.jar" sourcepath="/openmrs-1.4.x"/>
+	<classpathentry kind="lib" path="lib-common/ant-contrib-1.0b2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-asl-1.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.5.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

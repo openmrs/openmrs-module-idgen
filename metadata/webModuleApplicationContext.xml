@@ -12,22 +12,5 @@
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<context:component-scan base-package="org.openmrs.module.idgen" />
-    
-    <bean id="idgenMappings" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-    	<property name="order"><value>60</value></property>
-    	<property name="mappings">
-            <props>
-            	<prop key="module/@MODULE_ID@/editPatientForm.form">idgenPatientFormController</prop>
-            	<prop key="admin/patients/newPatient.form">idgenPatientFormController</prop>
-	    	</props>
-		</property>
-    </bean>
-    
-    <bean id="idgenPatientFormController" class="org.openmrs.module.idgen.web.controller.PatientFormController">
-		<property name="commandName"><value>patient</value></property>
-		<property name="commandClass"><value>org.openmrs.web.controller.patient.ShortPatientModel</value></property>
-		<property name="formView"><value>module/@MODULE_ID@/editPatientForm</value></property>
-		<property name="successView"><value>../../patientDashboard.form</value></property>
-	</bean>
 
 </beans>

@@ -5,7 +5,7 @@
 	
 	<id>idgen</id>
 	<name>ID Generation</name>
-	<version>2.0.2</version>
+	<version>2.1-DEV</version>
 	<package>org.openmrs.module.@MODULE_ID@</package>
 	<author>Partners In Health</author>
 	<description>
@@ -17,11 +17,15 @@
 	
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+		<class>@MODULE_PACKAGE@.web.extension.AdminList</class>
 	</extension>
 	<extension>
 		<point>org.openmrs.admin.patients.localHeader</point>
-		<class>@MODULE_PACKAGE@.extension.html.AdminList</class>
+		<class>@MODULE_PACKAGE@.web.extension.AdminList</class>
+	</extension>
+	<extension>
+		<point>newPatientForm.identifierHeader</point>
+		<class>@MODULE_PACKAGE@.web.extension.IdentifierTableHeaderExtension</class>
 	</extension>
 	
 	<!-- Required Privileges -->
