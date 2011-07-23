@@ -62,7 +62,7 @@
 			<fileset dir="lib">
 				<include name="**/*.jar"/>
 			</fileset>
-			<fileset dir="../openmrs-1.4.x/lib">
+			<fileset dir="../openmrs-1.6.x/lib">
 				<include name="**/*.jar"/>
 			</fileset>
 			<fileset dir="lib-common">
