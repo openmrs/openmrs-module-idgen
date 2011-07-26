@@ -57,9 +57,14 @@ public class IdentifierTableHeaderExtension extends Extension {
  	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.7") < 0) {
  	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n");
  	 		}
- 	 		sb.append("<link href=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/editPatientIdentifiers.css\" type=\"text/css\" rel=\"stylesheet\"\n/>");
-	 		sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/editPatientIdentifiers.js\" type=\"text/javascript\"></script>\n"); 		
-	 		sb.append("<td id=\"idgenColumnHeader\">" + Context.getMessageSourceService().getMessage("idgen.autoGenerate") + "</td>");
+ 	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.8") < 0) {
+ 	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/newPatientFormExtensions.js\" type=\"text/javascript\"></script>\n"); 		
+ 	 		}
+ 	 		else {
+ 	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/shortPatientFormExtensions.js\" type=\"text/javascript\"></script>\n");			
+ 	 		}
+	 		sb.append("<link href=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/editPatientIdentifiers.css\" type=\"text/css\" rel=\"stylesheet\"\n/>");
+ 	 		sb.append("<td id=\"idgenColumnHeader\">" + Context.getMessageSourceService().getMessage("idgen.autoGenerate") + "</td>");
  		}
 
  		return sb.toString();
