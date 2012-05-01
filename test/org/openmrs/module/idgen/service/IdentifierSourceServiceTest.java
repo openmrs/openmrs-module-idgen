@@ -14,6 +14,7 @@
 package org.openmrs.module.idgen.service;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -39,6 +40,30 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 		authenticate();
 		iss = Context.getService(IdentifierSourceService.class);
+	}
+	
+	
+	
+	/**
+	 * @see {@link IdentifierSourceService#generateIdentifiers(IdentifierSource, integer, String)}
+	 */
+	@Test
+	@Verifies(value = "should return batch of ID of correct size", method = "generateIdentifiers(IdentifierSource, integer, String)")
+	public void generateIdentifiers_shouldReturnIdentifiersOfCorrectSize() throws Exception {
+		IdentifierSource is = iss.getIdentifierSource(1);
+		List<String>  sig = iss.generateIdentifiers(is, 7, "hello");
+		Assert.assertTrue(sig.toString().equals("[G-0, H-8, I-5, J-3, K-1, L-9, M-7]"));
+	}
+	
+	
+	/**
+	 * @see {@link IdentifierSourceService#getAllIdentifierSources(Boolean)}
+	 */
+	@Test
+	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
+	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
+		List<IdentifierSource>  sig = iss.getAllIdentifierSources(false);
+		Assert.assertTrue(sig.size() == 3);
 	}
 	
 
@@ -74,8 +99,8 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		IdentifierPool idpool = (IdentifierPool)iss.getIdentifierSource(3);
 		Assert.assertEquals(idpool.getName(), "Test Identifier Pool");
 		Assert.assertEquals(idpool.getBatchSize(), 1000);
-		Assert.assertEquals(idpool.getAvailableIdentifiers().size(), 3);
-		Assert.assertEquals(idpool.getUsedIdentifiers().size(), 2);
+		Assert.assertEquals(5, idpool.getAvailableIdentifiers().size());
+		Assert.assertEquals(idpool.getUsedIdentifiers().size(), 0);
 	}
 
 	/**
@@ -104,6 +129,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		SequentialIdentifierGenerator sig = new SequentialIdentifierGenerator();
 		sig.setName(name);
 		sig.setBaseCharacterSet(baseChars);
+		sig.setFirstIdentifierBase("1");
 		sig.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
 		IdentifierSource source = iss.saveIdentifierSource(sig);
 		
@@ -161,7 +187,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		
 		IdentifierSource source = iss.saveIdentifierSource(pool);
 		
-		Assert.assertNotNull(source.getId());
+		Assert.assertNotNull(source.getId()); 
 		IdentifierPool s = (IdentifierPool)iss.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getName(), name);
 		Assert.assertEquals(s.getBatchSize(), batchSize);
