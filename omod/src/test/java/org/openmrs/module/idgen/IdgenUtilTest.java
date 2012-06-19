@@ -15,16 +15,10 @@ package org.openmrs.module.idgen;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 
-public class IdgenUtilTest extends BaseModuleContextSensitiveTest {
+public class IdgenUtilTest {
 	
-    @Override
-    public Boolean useInMemoryDatabase(){
-        return false;
-    }
-    
 	/**
 	 * @see {@link IdgenUtil#convertFromBase(String,char[])}
 	 */
@@ -39,20 +33,6 @@ public class IdgenUtilTest extends BaseModuleContextSensitiveTest {
 		long back = IdgenUtil.convertFromBase(hexValue, hexChars);
 		Assert.assertEquals(numericValue, back);	
 	}
-	
-	//build to run against live db...
-//	@Test
-//    public void testStuff() throws Exception {
-//	    IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
-//	    IdentifierSource is = iss.getIdentifierSource(6);
-//	    Assert.assertNotNull(is);
-//	    Assert.assertTrue(is instanceof SequentialIdentifierGenerator);
-//	    Assert.assertFalse(is instanceof IdentifierPool);
-//	    
-//	    SequentialIdentifierGenerator sig = (SequentialIdentifierGenerator) is;
-//	    System.out.println(sig.getLength());
-//    }
-	
 
 }
 
