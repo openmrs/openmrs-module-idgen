@@ -29,7 +29,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 public class IdgenUtilTestInMemory extends BaseModuleContextSensitiveTest {
 	
 	@Override
-    public Boolean useInMemoryDatabase(){
+    public Boolean useInMemoryDatabase() {
         return false;
     }
 	
