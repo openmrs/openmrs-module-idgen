@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen</artifactId>
-	<version>2.2</version>
+	<version>2.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
@@ -11,9 +11,9 @@
 	<url>http://openmrs.org</url>
 
 	<scm>
-		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/tags/2.2</connection>
-		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/tags/2.2</developerConnection>
-		<url>http://svn.openmrs.org/openmrs-modules/idgen/tags/2.2</url>
+		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/trunk/</connection>
+		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/trunk/</developerConnection>
+		<url>http://svn.openmrs.org/openmrs-modules/idgen/trunk/</url>
 	</scm>
 
 	<modules>
