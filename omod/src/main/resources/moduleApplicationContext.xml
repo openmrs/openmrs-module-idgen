@@ -52,12 +52,16 @@
 		<property name="identifierValidators">
 			<map>
 				<entry>
-					<key><value>org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator</value></key>
-					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
+					<key><value>org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator</value></key>
+					<bean class="org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator"/>
 				</entry>
 				<entry>
 					<key><value>org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator</value></key>
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator"/>
+				</entry>
+				<entry>
+					<key><value>org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator</value></key>
+					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
 				</entry>
 			</map>
 		</property>
