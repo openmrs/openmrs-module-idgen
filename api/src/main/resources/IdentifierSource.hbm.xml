@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+
+<hibernate-mapping package="org.openmrs.module.idgen" >
+
+	<class name="IdentifierSource" table="idgen_identifier_source" abstract="true">
+	
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<property name="uuid" type="string" length="38" not-null="true" />
+		<property name="name" type="string" not-null="true" />
+		<property name="description" type="string" />
+		<many-to-one name="identifierType" class="org.openmrs.PatientIdentifierType" column="identifier_type" not-null="true" />
+		<many-to-one name="creator" class="org.openmrs.User" not-null="true" />
+		<property name="dateCreated" type="java.util.Date" column="date_created" not-null="true" />
+		<many-to-one name="changedBy" class="org.openmrs.User" column="changed_by" />
+		<property name="dateChanged" type="java.util.Date" column="date_changed" />		
+		<property name="retired" type="java.lang.Boolean" length="1" not-null="true"/>
+		<many-to-one name="retiredBy" class="org.openmrs.User" column="retired_by" />
+		<property name="dateRetired" type="java.util.Date" column="date_retired" />	
+		<property name="retireReason" type="string" column="retire_reason" />
+		
+		<set name="reservedIdentifiers" table="idgen_reserved_identifier" lazy="true" cascade="all-delete-orphan">
+			<key column="source" not-null="true" />
+			<element column="identifier" type="string"/>
+		</set>
+		
+		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
+			<key column="id"/>
+			<property name="nextSequenceValue" type="long" column="next_sequence_value" not-null="true"/>
+			<property name="baseCharacterSet" type="string" column="base_character_set" not-null="true" />
+			<property name="firstIdentifierBase" type="string" column="first_identifier_base" not-null="true" />
+			<property name="prefix" type="string" />
+			<property name="suffix" type="string" />
+			<property name="length" type="int" column="length" />
+		</joined-subclass>
+
+		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
+			<key column="id"/>
+			<property name="url" type="string" not-null="true" />
+		</joined-subclass>
+
+		<joined-subclass name="IdentifierPool" table="idgen_id_pool">
+			<key column="id"/>
+			<many-to-one name="source" class="IdentifierSource" lazy="false" />
+			<property name="batchSize" type="int" column="batch_size" />
+			<property name="minPoolSize" type="int" column="min_pool_size" />
+			<property name="sequential" type="java.lang.Boolean" length="1" not-null="true"/>
+			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field">
+				<key column="pool_id" not-null="true" />
+				<one-to-many class="PooledIdentifier" />
+			</set>
+		</joined-subclass>
+		
+	</class>
+	
+	<class name="PooledIdentifier" table="idgen_pooled_identifier">
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<property name="uuid" type="string" length="38" not-null="true" />
+		<many-to-one name="pool" class="IdentifierPool" column="pool_id" not-null="true" />
+		<property name="identifier" type="string" not-null="true" />
+		<property name="dateUsed" type="java.util.Date" column="date_used" />
+		<property name="comment" type="string"/>
+	</class>
+	
+	<class name="AutoGenerationOption" table="idgen_auto_generation_option">
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<many-to-one name="identifierType" class="org.openmrs.PatientIdentifierType" column="identifier_type" not-null="true" lazy="false" />
+		<many-to-one name="source" class="IdentifierSource" column="source" not-null="true" lazy="false" />
+		<property name="manualEntryEnabled" type="boolean" column="manual_entry_enabled" />
+		<property name="automaticGenerationEnabled" type="boolean" column="automatic_generation_enabled" />
+	</class>
+	
+	<class name="LogEntry" table="idgen_log_entry">
+		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<many-to-one name="source" class="IdentifierSource" column="source" not-null="true" lazy="false" />
+		<property name="identifier" type="string" not-null="true" />
+		<property name="dateGenerated" type="java.util.Date" column="date_generated" />
+		<many-to-one name="generatedBy" class="org.openmrs.User" column="generated_by" />
+		<property name="comment" type="string"/>
+	</class>
+
+</hibernate-mapping>
