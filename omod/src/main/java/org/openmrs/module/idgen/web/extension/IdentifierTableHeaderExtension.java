@@ -23,6 +23,7 @@ import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.web.WebConstants;
+import org.springframework.util.StringUtils;
 
 /**
  * Provides additional Header Columns to the edit identifier table
@@ -54,16 +55,24 @@ public class IdentifierTableHeaderExtension extends Extension {
 
  		StringBuilder sb = new StringBuilder();
  		if (!autogen.isEmpty()) {
+ 			
+ 			// solving IDGEN-11: when webapp_name is empty, double slashes cause wrong url
+ 			// in 1.10+, use WebUtil.getContextPath(); See TRUNK-
+ 			String contextPath = "";
+ 			if (StringUtils.hasLength(WebConstants.WEBAPP_NAME)) {
+ 				contextPath += "/" + WebConstants.WEBAPP_NAME;
+ 			}
+ 			
  	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.7") < 0) {
- 	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n");
+ 	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n");
  	 		}
  	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.8") < 0) {
- 	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/newPatientFormExtensions.js\" type=\"text/javascript\"></script>\n"); 		
+ 	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/newPatientFormExtensions.js\" type=\"text/javascript\"></script>\n"); 		
  	 		}
  	 		else {
- 	 			sb.append("<script src=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/shortPatientFormExtensions.js\" type=\"text/javascript\"></script>\n");			
+ 	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/shortPatientFormExtensions.js\" type=\"text/javascript\"></script>\n");			
  	 		}
-	 		sb.append("<link href=\"/" + WebConstants.WEBAPP_NAME + "/moduleResources/idgen/editPatientIdentifiers.css\" type=\"text/css\" rel=\"stylesheet\"\n/>");
+	 		sb.append("<link href=\"" + contextPath + "/moduleResources/idgen/editPatientIdentifiers.css\" type=\"text/css\" rel=\"stylesheet\"\n/>");
  	 		sb.append("<td id=\"idgenColumnHeader\">" + Context.getMessageSourceService().getMessage("idgen.autoGenerate") + "</td>");
  		}
 
