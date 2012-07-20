@@ -55,7 +55,7 @@
 	</messages>
 
 	<mappingFiles>
-		${omodHbmConfig}
+		IdentifierSource.hbm.xml
 	</mappingFiles>
 	
 </module>
