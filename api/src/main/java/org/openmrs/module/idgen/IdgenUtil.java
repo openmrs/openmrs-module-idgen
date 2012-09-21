@@ -80,7 +80,7 @@ public class IdgenUtil {
 		try {
 			r = new BufferedReader(new InputStreamReader(stream));
 			for (String line = r.readLine(); line != null; line = r.readLine()) {
-				contents.add(line);
+				contents.add(line.trim());
 			}
 		}
 		catch (Exception e) {

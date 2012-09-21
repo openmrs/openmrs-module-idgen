@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -37,7 +38,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 		url = url.replace("{batchSize}", Integer.toString(batchSize));
 		InputStream is = null;
 		try {
-			is = (new URL(url)).openStream();
+			is = getInputStreamFrom(url);
 			return IdgenUtil.getIdsFromStream(is);
 		}
 		catch (Exception e) {
@@ -53,4 +54,8 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 			}
 		}
 	}
+
+    protected InputStream getInputStreamFrom(String url) throws IOException {
+        return (new URL(url)).openStream();
+    }
 }
