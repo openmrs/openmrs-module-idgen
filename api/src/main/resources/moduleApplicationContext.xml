@@ -4,6 +4,30 @@
 <!-- Beans to add to the current Application context definition -->
 
 <beans>
+	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
+		<property name="dao">
+			<bean class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
+				<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
+			</bean>
+		</property>
+		<property name="processors">
+			<map>
+				<entry>
+					<key><value>org.openmrs.module.idgen.SequentialIdentifierGenerator</value></key>
+					<bean class="org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor"/>
+				</entry>
+				<entry>
+					<key><value>org.openmrs.module.idgen.RemoteIdentifierSource</value></key>
+					<bean class="org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor"/>
+				</entry>
+				<entry>
+					<key><value>org.openmrs.module.idgen.IdentifierPool</value></key>
+					<bean class="org.openmrs.module.idgen.processor.IdentifierPoolProcessor"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 	<!--  Configure the Service -->
    	<bean parent="serviceContext" id="identifierSourceService">
 		<property name="moduleService">
@@ -12,29 +36,7 @@
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<bean class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
-							<property name="dao">
-								<bean class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
-									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
-								</bean>
-							</property>
-							<property name="processors">
-								<map>
-									<entry>
-										<key><value>org.openmrs.module.idgen.SequentialIdentifierGenerator</value></key>
-										<bean class="org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor"/>
-									</entry>
-									<entry>
-										<key><value>org.openmrs.module.idgen.RemoteIdentifierSource</value></key>
-										<bean class="org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor"/>
-									</entry>
-									<entry>
-										<key><value>org.openmrs.module.idgen.IdentifierPool</value></key>
-										<bean class="org.openmrs.module.idgen.processor.IdentifierPoolProcessor"/>
-									</entry>
-								</map>
-							</property>
-						</bean>
+						<ref local="baseIdentifierSourceService"/>
 					</property>
 					<property name="preInterceptors">
 						<list>

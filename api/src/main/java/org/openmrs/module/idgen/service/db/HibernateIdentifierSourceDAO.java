@@ -30,6 +30,7 @@ import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.idgen.AutoGenerationOption;
+import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.LogEntry;
@@ -109,7 +110,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 		}
 		List<PooledIdentifier> results = (List<PooledIdentifier>) criteria.list();
 		if (results.size() < quantity) {
-			throw new RuntimeException("Unable to retrieve " + quantity + " available identifiers from Pool " + pool + ".  Maybe you need to add more identifiers to your pool first.");
+			throw new EmptyIdentifierPoolException("Unable to retrieve " + quantity + " available identifiers from Pool " + pool + ".  Maybe you need to add more identifiers to your pool first.");
 		}
 		return results;
 	}

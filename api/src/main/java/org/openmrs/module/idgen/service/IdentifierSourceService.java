@@ -200,7 +200,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 
 	/**
 	 * Convenience method that checks a pool's level and incrementally adds identifiers in batches of 100
-	 * until the min available size is reached.  Only does somthething if the pool's source is a sequentialIdentifierGenerator
+	 * until the min available size is reached.  Only does something if the pool's source is a remote or sequential generator.
 	 * @param pool
 	 */
 	@Transactional

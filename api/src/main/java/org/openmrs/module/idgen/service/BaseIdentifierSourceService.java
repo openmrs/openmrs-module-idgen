@@ -149,8 +149,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#registerProcessor(Class, IdentifierSourceProcessor)
 	 */
 	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException {
-	    if (!getProcessors().containsKey(type))
-	        getProcessors().put(type, processorToRegister);
+		getProcessors().put(type, processorToRegister);
 	}
 	
 	/** 
@@ -316,7 +315,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      */
     @Transactional
     public void checkAndRefillIdentifierPool(IdentifierPool pool){
-        if (pool.getSource() != null && pool.getSource() instanceof SequentialIdentifierGenerator){
+        if (pool.getSource() != null && (pool.getSource() instanceof SequentialIdentifierGenerator || pool.getSource() instanceof RemoteIdentifierSource)) {
             while (pool.getMinPoolSize() > getQuantityInPool(pool, true, false)){
                 addIdentifiersToPool(pool, Integer.valueOf(pool.getBatchSize()));
             }
