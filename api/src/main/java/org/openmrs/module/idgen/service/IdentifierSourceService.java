@@ -211,5 +211,11 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 */
 	@Transactional(readOnly=true)
 	public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled);
-	
+
+    /**
+     * @param uuid
+     * @return the identifier source with the given uuid
+     */
+    @Transactional(readOnly=true)
+    IdentifierSource getIdentifierSourceByUuid(String uuid);
 }

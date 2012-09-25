@@ -336,5 +336,13 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     		}
     	}
     	return identifierTypes;
-   }	
+   }
+
+    /**
+     * @see IdentifierSourceService#getIdentifierSourceByUuid(String)
+     */
+    @Override
+    public IdentifierSource getIdentifierSourceByUuid(String uuid) {
+        return dao.getIdentifierSourceByUuid(uuid);
+    }
 }

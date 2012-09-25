@@ -110,5 +110,10 @@ public interface IdentifierSourceDAO {
 	@Transactional(readOnly=true)
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws DAOException;
-	
+
+    /**
+     * @param uuid
+     * @return the IdentifierSource with the given uuid
+     */
+    IdentifierSource getIdentifierSourceByUuid(String uuid);
 }

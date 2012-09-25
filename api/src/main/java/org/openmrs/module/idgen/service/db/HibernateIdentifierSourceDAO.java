@@ -25,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -199,8 +200,18 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 		criteria.addOrder(Order.desc("dateGenerated"));
 		return (List<LogEntry>) criteria.list();
 	}
-	
-	/** 
+
+    /**
+     * @see IdentifierSourceDAO#getIdentifierSourceByUuid(String)
+     */
+    @Override
+    public IdentifierSource getIdentifierSourceByUuid(String uuid) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
+        criteria.add(Restrictions.eq("uuid", uuid));
+        return (IdentifierSource) criteria.uniqueResult();
+    }
+
+    /**
 	 * @see org.openmrs.module.idgen.service.db.IdentifierSourceDAO#saveLogEntry(LogEntry)
 	 */
 	public LogEntry saveLogEntry(LogEntry logEntry) throws DAOException {

@@ -160,7 +160,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		IdentifierSource s = iss.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getClass(), RemoteIdentifierSource.class);
 		Assert.assertEquals(s.getName(), name);
-		Assert.assertEquals(((RemoteIdentifierSource)s).getUrl(), url);
+		Assert.assertEquals(((RemoteIdentifierSource) s).getUrl(), url);
 	}
 
 	/**
@@ -193,4 +193,10 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		Assert.assertEquals(s.getBatchSize(), batchSize);
 		Assert.assertEquals(4, s.getAvailableIdentifiers().size());
 	}
+
+    @Test
+    public void getIdentifierSourceByUuid_shouldGetSource() {
+        IdentifierSource identifierSource = iss.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
+        Assert.assertEquals(3, identifierSource.getId().intValue());
+    }
 }
