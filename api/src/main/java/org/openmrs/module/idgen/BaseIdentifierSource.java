@@ -62,22 +62,21 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 			if (this.getId() != null) {
 				return (this.getId().equals(that.getId()));
 			}
+            if (this.getUuid() != null) {
+                return (this.getUuid().equals(that.getUuid()));
+            }
 		}
 		return this == obj;
 	}
-	
-	/**
-	 * @see Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		if (getId() != null) {
-			return 31 * getId().hashCode();
-		}
-		return super.hashCode();
-	}
-	
-	/** 
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (uuid != null ? uuid.hashCode() : 0);
+        return result;
+    }
+
+    /**
 	 * @see Object#toString()
 	 */
 	@Override
