@@ -186,18 +186,18 @@ public class IdentifierSourceController {
     							   @RequestParam(required=false, value="comment") String comment) throws Exception {
     	
     	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
-    	
-		response.setHeader("Content-Disposition", "attachment; filename=identifiers.txt");
-		response.setHeader("Pragma", "no-cache");
-    	response.setContentType("text/plain");
-    	ServletOutputStream out = response.getOutputStream();
-    	String separator = System.getProperty("line.separator");
-    	
-    	if (StringUtils.isEmpty(comment)) {
-    		comment = "Batch Export of " + numberToGenerate + " to file";
-    	}
-    	
-    	List<String> batch = iss.generateIdentifiers(source, numberToGenerate, comment);
+
+        if (StringUtils.isEmpty(comment)) {
+            comment = "Batch Export of " + numberToGenerate + " to file";
+        }
+        List<String> batch = iss.generateIdentifiers(source, numberToGenerate, comment);
+
+        response.setHeader("Content-Disposition", "attachment; filename=identifiers.txt");
+        response.setHeader("Pragma", "no-cache");
+        response.setContentType("text/plain");
+        ServletOutputStream out = response.getOutputStream();
+        String separator = System.getProperty("line.separator");
+
     	for (Iterator<String> i = batch.iterator(); i.hasNext();) {
     		String identifier = i.next();
     		out.print(identifier + (i.hasNext() ? separator : ""));
