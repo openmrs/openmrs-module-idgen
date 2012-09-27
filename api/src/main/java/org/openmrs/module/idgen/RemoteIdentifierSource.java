@@ -21,8 +21,10 @@ public class RemoteIdentifierSource extends BaseIdentifierSource {
 	//***** PROPERTIES *****
 	
     private String url; // The URL to connect to
+    private String user;
+    private String password;
 
-	//***** PROPERTY ACCESS *****
+    //***** PROPERTY ACCESS *****
 
 	/**
 	 * @return the url
@@ -37,4 +39,36 @@ public class RemoteIdentifierSource extends BaseIdentifierSource {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+    /**
+     *
+     * @param user to connect in the remote source
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     *
+     * @param password to connect in the remote source
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     *
+     * @return the user of the remote source
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     *
+     * @return the password of the remote source
+     */
+    public String getPassword() {
+        return password;
+    }
 }
