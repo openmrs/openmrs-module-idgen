@@ -44,7 +44,8 @@
 			<many-to-one name="source" class="IdentifierSource" lazy="false" />
 			<property name="batchSize" type="int" column="batch_size" />
 			<property name="minPoolSize" type="int" column="min_pool_size" />
-			<property name="sequential" type="java.lang.Boolean" length="1" not-null="true"/>
+            <property name="refillWithScheduledTask" type="java.lang.Boolean" column="refill_with_scheduled_task" length="1" not-null="true"/>
+            <property name="sequential" type="java.lang.Boolean" length="1" not-null="true"/>
 			<set name="identifiers" lazy="true" cascade="all-delete-orphan" inverse="true" access="field">
 				<key column="pool_id" not-null="true" />
 				<one-to-many class="PooledIdentifier" />

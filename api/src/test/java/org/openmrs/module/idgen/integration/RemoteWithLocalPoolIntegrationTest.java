@@ -65,6 +65,7 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
 		pool.setMinPoolSize(4);
 		pool.setBatchSize(3);
 		pool.setSequential(true);
+        pool.setRefillWithScheduledTask(false);
 		service.saveIdentifierSource(pool);
 		
 		// set up auto generation from the local pool (not the remote source)

@@ -33,7 +33,8 @@ public class IdentifierPool extends BaseIdentifierSource {
     private int minPoolSize = 500; // request more when we go below this number
     private boolean sequential = false;
     private Set<PooledIdentifier> identifiers;
-	
+    private boolean refillWithScheduledTask = true; // if true, refill with a scheduled task, otherwise refill on demands for ids
+
     //***** INSTANCE METHODS *****
    
     /**
@@ -157,4 +158,19 @@ public class IdentifierPool extends BaseIdentifierSource {
 	public void setIdentifiers(Set<PooledIdentifier> identifiers) {
 		this.identifiers = identifiers;
 	}
+
+    /**
+     * @return the refillWithScheduledTask
+     */
+    public boolean isRefillWithScheduledTask() {
+        return refillWithScheduledTask;
+    }
+
+    /**
+     * @param refillWithScheduledTask the refillWithScheduledTask to set
+     */
+    public void setRefillWithScheduledTask(boolean refillWithScheduledTask) {
+        this.refillWithScheduledTask = refillWithScheduledTask;
+    }
+
 }

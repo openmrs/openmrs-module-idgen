@@ -25,5 +25,19 @@
 		</property>
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>
+
+    <bean id="idgenTestTimerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean">
+        <property name="scheduledTimerTasks">
+            <list>
+                <bean id="refillIdentifierPools" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+                    <property name="delay" value="5000" />
+                    <property name="period" value="5000" />
+                    <property name="timerTask">
+                        <bean class="org.openmrs.module.idgen.task.TestTask"/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
 	
 </beans>

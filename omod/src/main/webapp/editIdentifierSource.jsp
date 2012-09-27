@@ -137,7 +137,14 @@
 					<frm:radiobutton path="sequential" value="${true}" /> <spring:message code="idgen.sequential" />
 					<frm:errors path="sequential" cssClass="error" /></td>
 			</tr>
-			<tr>
+            <tr>
+                <th align="right"><spring:message code="idgen.scheduledFill" />:</th>
+                <td>
+                    <frm:radiobutton path="refillWithScheduledTask" value="${true}" /> <spring:message code="idgen.scheduledFill.scheduled" />
+                    <frm:radiobutton path="refillWithScheduledTask" value="${false}" /> <spring:message code="idgen.scheduledFill.onDemand" />
+                    <frm:errors path="refillWithScheduledTask" cssClass="error" /></td>
+            </tr>
+            <tr>
 				<th align="right"><spring:message code="idgen.batchSize" />:</th>
 				<td><frm:input path="batchSize" size="50" /><frm:errors path="batchSize" cssClass="error" /></td>
 			</tr>

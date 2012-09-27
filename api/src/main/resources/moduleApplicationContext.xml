@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
-<!-- Beans to add to the current Application context definition -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-<beans>
 	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
 		<property name="dao">
 			<bean class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
@@ -68,4 +75,19 @@
 			</map>
 		</property>
 	</bean>
+
+    <bean id="idgenTimerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean">
+        <property name="scheduledTimerTasks">
+            <list>
+                <bean id="refillIdentifierPools" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+                    <property name="delay" value="10000" /> <!-- delay 10 seconds -->
+                    <property name="period" value="300000" /> <!-- run every 5 minutes -->
+                    <property name="timerTask">
+                        <bean class="org.openmrs.module.idgen.task.RefillIdentifierPoolsTask"/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
 </beans>

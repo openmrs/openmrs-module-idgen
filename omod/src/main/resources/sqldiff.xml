@@ -122,9 +122,9 @@
 	<diff>
 		<version>2.0</version>
 		<author>Partners In Health</author>
-		<date>28 June 2010</date>
+		<date>27 Sept 2012</date>
 		<description>
-			Add table for reserved identifiers
+			Add column for pools to indicate whether they're scheduled or not
 		</description>
 		<sql>
 			CREATE TABLE `idgen_reserved_identifier` (
@@ -138,4 +138,16 @@
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>	
 	</diff>
+
+    <diff>
+        <version>2.4</version>
+        <author>Partners In Health</author>
+        <date>28 June 2010</date>
+        <description>
+            Add table for reserved identifiers
+        </description>
+        <sql>
+            ALTER TABLE `idgen_id_pool` ADD COLUMN `refill_with_scheduled_task` tinyint(1) NOT NULL default 1;
+        </sql>
+    </diff>
 </sqldiff>
