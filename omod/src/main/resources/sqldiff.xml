@@ -142,12 +142,25 @@
     <diff>
         <version>2.4</version>
         <author>Partners In Health</author>
-        <date>28 June 2010</date>
+        <date>27 September 2012</date>
         <description>
             Add table for reserved identifiers
         </description>
         <sql>
             ALTER TABLE `idgen_id_pool` ADD COLUMN `refill_with_scheduled_task` tinyint(1) NOT NULL default 1;
+        </sql>
+    </diff>
+
+    <diff>
+        <version>2.4</version>
+        <author>Partners In Health</author>
+        <date>28 September 2012</date>
+        <description>
+            Add column to add user and password
+        </description>
+        <sql>
+            ALTER TABLE `idgen_remote_source` ADD COLUMN `user` varchar(50) ;
+            ALTER TABLE `idgen_remote_source` ADD COLUMN `password` varchar(20) ;
         </sql>
     </diff>
 </sqldiff>

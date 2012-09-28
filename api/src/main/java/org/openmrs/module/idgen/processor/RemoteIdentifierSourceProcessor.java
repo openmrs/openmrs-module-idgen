@@ -13,14 +13,21 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Evaluates a RemoteIdentifierSource
@@ -29,33 +36,81 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
  */
 public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcessor {
 
-	/** 
-	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
-	 */
-	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
-		RemoteIdentifierSource remote = (RemoteIdentifierSource)source;
-		String url = remote.getUrl();
-		url = url.replace("{batchSize}", Integer.toString(batchSize));
-		InputStream is = null;
-		try {
-			is = getInputStreamFrom(url);
-			return IdgenUtil.getIdsFromStream(is);
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Error retrieving IDs from Remote Source", e);
-		}
-		finally {
-			if (is != null) {
-				try {
-					is.close();
-				}
-				catch (Exception e) {
-				}
-			}
-		}
-	}
+    private static Log log = LogFactory.getLog(RemoteIdentifierSourceProcessor.class);
+    /**
+     * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
+     */
+    @Override
+    public List<String> getIdentifiers(IdentifierSource source, int batchSize) {
+        RemoteIdentifierSource remoteIdentifierSource = (RemoteIdentifierSource) source;
 
-    protected InputStream getInputStreamFrom(String url) throws IOException {
-        return (new URL(url)).openStream();
+        String urlFromRemoteSource = buildUrl(remoteIdentifierSource);
+        String urlParameters = buildParameters(remoteIdentifierSource, batchSize);
+        List<String>  idsList = new ArrayList<String>();
+
+        BufferedReader bufferedReader = null;
+        DataOutputStream outputStream = null;
+        HttpsURLConnection connection = null;
+
+        try {
+            URL url = new URL(urlFromRemoteSource);
+            connection = generateConnection(urlParameters, url);
+
+            outputStream = createOutputStream(urlParameters, connection);
+
+            bufferedReader = new BufferedReader(getInputStreamReaderFrom(connection));
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null){
+                idsList.add(line.trim());
+            }
+
+        } catch (IOException e) {
+           log.error("Exception when trying to connect in the remote server to get more ids", e);
+        } finally {
+            try {
+                bufferedReader.close();
+                outputStream.close();
+                connection.disconnect();
+            } catch (IOException e) {
+                log.error("Exception when trying to connect in the remote server to get more ids", e);
+            }
+
+        }
+
+        return Collections.unmodifiableList(idsList);
     }
+
+    protected DataOutputStream createOutputStream(String urlParameters, HttpsURLConnection connection) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+        outputStream.writeBytes(urlParameters);
+        outputStream.flush();
+        return outputStream;
+    }
+
+    protected InputStreamReader getInputStreamReaderFrom(HttpsURLConnection connection) throws IOException {
+        return new InputStreamReader(connection.getInputStream());
+    }
+
+    protected HttpsURLConnection generateConnection(String urlParameters, URL url) throws IOException {
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        connection.setRequestProperty("charset", "utf-8");
+        connection.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
+        connection.setUseCaches (false);
+        return connection;
+    }
+
+    private String buildUrl(RemoteIdentifierSource remoteSource) {
+        return remoteSource.getUrl();
+    }
+
+    private String buildParameters(RemoteIdentifierSource remoteSource, Integer batchSize) {
+        return "username=" + remoteSource.getUser() + "&password=" + remoteSource.getPassword() + "&numberToGenerate=" + batchSize;
+    }
+
+
 }

@@ -112,6 +112,14 @@
 					<frm:input path="url" size="50" /><frm:errors path="url" cssClass="error" />
 				</td>
 			</tr>
+            <tr>
+                <th align="right"><spring:message code="idgen.user" />:</th>
+                <td><frm:input path="user" size="50" /><frm:errors path="user" cssClass="error" /></td>
+            </tr>
+            <tr>
+                <th align="right"><spring:message code="idgen.password" />:</th>
+                <td><frm:password path="password" size="20" /><frm:errors path="password" cssClass="error" /></td>
+            </tr>
 		</c:if>
 		<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">
 			<tr>

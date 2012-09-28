@@ -172,8 +172,10 @@ public class IdentifierSourceController {
     @RequestMapping("/module/idgen/generateIdentifier")
     public void generateIdentifier(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
-    							   @RequestParam(required=false, value="comment") String comment) throws Exception {
-    	exportIdentifiers(model, request, response, source, 1, comment);
+    							   @RequestParam(required=false, value="comment") String comment,
+                                   @RequestParam(required=false, value="username") String username,
+                                   @RequestParam(required=false, value="password") String password) throws Exception {
+    	exportIdentifiers(model, request, response, source, 1, comment, username, password);
     }
     
     /**
@@ -183,7 +185,13 @@ public class IdentifierSourceController {
     public void exportIdentifiers(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
     							   @RequestParam(required=true, value="numberToGenerate") Integer numberToGenerate,
-    							   @RequestParam(required=false, value="comment") String comment) throws Exception {
+    							   @RequestParam(required=false, value="comment") String comment,
+                                   @RequestParam(required=false, value="username") String username,
+                                   @RequestParam(required=false, value="password") String password) throws Exception {
+
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            Context.authenticate(username, password);
+        }
     	
     	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
 

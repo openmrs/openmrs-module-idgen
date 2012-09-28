@@ -37,6 +37,8 @@
 		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
 			<key column="id"/>
 			<property name="url" type="string" not-null="true" />
+            <property name="user" type="string" not-null="false" />
+            <property name="password" type="string" not-null="false" />
 		</joined-subclass>
 
 		<joined-subclass name="IdentifierPool" table="idgen_id_pool">

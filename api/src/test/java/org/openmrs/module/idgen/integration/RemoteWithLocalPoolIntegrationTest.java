@@ -13,13 +13,6 @@
  */
 package org.openmrs.module.idgen.integration;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
@@ -30,6 +23,17 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Stack;
+
+import static org.mockito.Mockito.mock;
 
 
 /**
@@ -42,28 +46,32 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
     @Test
 	public void testConfigurePoolFilledFromRemoteSource() throws Exception {
 
-		IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
-		
-		// register a stub RemoteIdentifierSourceProcessor that won't really go to the internet
-		RemoteIdentifierSourceProcessorStub remoteProcessorStub = new RemoteIdentifierSourceProcessorStub();
-		service.registerProcessor(RemoteIdentifierSource.class, remoteProcessorStub);
-		
-		PatientIdentifierType socialSecurityNumber = Context.getPatientService().getPatientIdentifierType(SOCIAL_SECURITY_NUMBER_PATIENT_IDENTIFIER_TYPE);
-		
-		// configure a remote source
-		RemoteIdentifierSource remoteSource = new RemoteIdentifierSource();
-		remoteSource.setName("Remote source to fetch from");
-		remoteSource.setUrl("http://urlforremotesource/openmrs/idgen?batchSize={batchSize}");
-		remoteSource.setIdentifierType(socialSecurityNumber);
-		service.saveIdentifierSource(remoteSource);
-		
-		// configure a local pool (that is fed by that remote source)
-		IdentifierPool pool = new IdentifierPool();
-		pool.setName("Local pool to assign from");
-		pool.setSource(remoteSource);
-		pool.setIdentifierType(socialSecurityNumber);
-		pool.setMinPoolSize(4);
-		pool.setBatchSize(3);
+        int batchSize = 3;
+
+        IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
+
+        // register a stub RemoteIdentifierSourceProcessor that won't really go to the internet
+        RemoteIdentifierSourceProcessorStub remoteProcessorStub = new RemoteIdentifierSourceProcessorStub();
+        remoteProcessorStub.setBatchSize(batchSize);
+
+        service.registerProcessor(RemoteIdentifierSource.class, remoteProcessorStub);
+
+        PatientIdentifierType socialSecurityNumber = Context.getPatientService().getPatientIdentifierType(SOCIAL_SECURITY_NUMBER_PATIENT_IDENTIFIER_TYPE);
+
+        // configure a remote source
+        RemoteIdentifierSource remoteSource = new RemoteIdentifierSource();
+        remoteSource.setName("Remote source to fetch from");
+        remoteSource.setUrl("http://urlforremotesource/openmrs/idgen/exportIdentifiers.form?source=1&comment=Mirebalais");
+        remoteSource.setIdentifierType(socialSecurityNumber);
+        service.saveIdentifierSource(remoteSource);
+
+        // configure a local pool (that is fed by that remote source)
+        IdentifierPool pool = new IdentifierPool();
+        pool.setName("Local pool to assign from");
+        pool.setSource(remoteSource);
+        pool.setIdentifierType(socialSecurityNumber);
+        pool.setMinPoolSize(4);
+        pool.setBatchSize(batchSize);
 		pool.setSequential(true);
         pool.setRefillWithScheduledTask(false);
 		service.saveIdentifierSource(pool);
@@ -106,23 +114,44 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
 		
 		Stack<String> identifiers;
 		int timesCalled = 0;
-		
-		public RemoteIdentifierSourceProcessorStub() {
+        private Integer batchSize;
+
+        public RemoteIdentifierSourceProcessorStub() {
 			identifiers = new Stack<String>();
 			for (int i = 10; i > 0; --i) {
 				identifiers.add("" + i);
 			}
 		}
 
-		/**
-		 * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamFrom(java.lang.String)
-		 */
-		@Override
-		protected InputStream getInputStreamFrom(String url) throws IOException {
+        public void setBatchSize(Integer batchSize){
+            this.batchSize = batchSize;
+        }
+
+        @Override
+        protected DataOutputStream createOutputStream(String urlParameters, HttpsURLConnection connection) throws IOException {
+            return mock(DataOutputStream.class);
+        }
+
+        /**
+         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(javax.net.ssl.HttpsURLConnection)
+         */
+        @Override
+        protected InputStreamReader getInputStreamReaderFrom(HttpsURLConnection connection) throws IOException {
+            return new InputStreamReader(getInputStreamFromBatchSize());
+        }
+
+        /**
+         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#generateConnection(String, java.net.URL)
+         */
+        @Override
+        protected HttpsURLConnection generateConnection(String urlParameters, URL url) throws IOException {
+            HttpsURLConnection connection = mock(HttpsURLConnection.class);
+            return connection;
+        }
+
+
+		private InputStream getInputStreamFromBatchSize() throws IOException {
 			++timesCalled;
-		    Matcher matcher = Pattern.compile("batchSize=(\\d+)").matcher(url);
-		    matcher.find();
-		    Integer batchSize = Integer.valueOf(matcher.group(1));
 		    String ret = "";
 		    for (int i = 0; i < batchSize; ++i) {
 		    	if (i > 0) {
@@ -134,7 +163,7 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
 		}
 		
 		/**
-		 * @return how many times {@link #getInputStreamFrom(String)} has been called
+		 * @return how many times {@link #getInputStreamReaderFrom(javax.net.ssl.HttpsURLConnection)} has been called
 		 */
 		public int getTimesCalled() {
 			return timesCalled;
