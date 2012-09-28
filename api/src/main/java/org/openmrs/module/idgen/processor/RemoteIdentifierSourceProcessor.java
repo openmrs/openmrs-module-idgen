@@ -13,21 +13,21 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 
-import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Evaluates a RemoteIdentifierSource
@@ -50,7 +50,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 
         BufferedReader bufferedReader = null;
         DataOutputStream outputStream = null;
-        HttpsURLConnection connection = null;
+        HttpURLConnection connection = null;
 
         try {
             URL url = new URL(urlFromRemoteSource);
@@ -66,34 +66,33 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
             }
 
         } catch (IOException e) {
-           log.error("Exception when trying to connect in the remote server to get more ids", e);
+            throw new RuntimeException(e);
         } finally {
+            IOUtils.closeQuietly(bufferedReader);
+            IOUtils.closeQuietly(outputStream);
             try {
-                bufferedReader.close();
-                outputStream.close();
                 connection.disconnect();
-            } catch (IOException e) {
-                log.error("Exception when trying to connect in the remote server to get more ids", e);
+            } catch (Exception ex) {
+                // pass
             }
-
         }
 
         return Collections.unmodifiableList(idsList);
     }
 
-    protected DataOutputStream createOutputStream(String urlParameters, HttpsURLConnection connection) throws IOException {
+    protected DataOutputStream createOutputStream(String urlParameters, HttpURLConnection connection) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
         outputStream.writeBytes(urlParameters);
         outputStream.flush();
         return outputStream;
     }
 
-    protected InputStreamReader getInputStreamReaderFrom(HttpsURLConnection connection) throws IOException {
+    protected InputStreamReader getInputStreamReaderFrom(HttpURLConnection connection) throws IOException {
         return new InputStreamReader(connection.getInputStream());
     }
 
-    protected HttpsURLConnection generateConnection(String urlParameters, URL url) throws IOException {
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+    protected HttpURLConnection generateConnection(String urlParameters, URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");

@@ -24,12 +24,12 @@ import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Stack;
 
@@ -128,15 +128,15 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
         }
 
         @Override
-        protected DataOutputStream createOutputStream(String urlParameters, HttpsURLConnection connection) throws IOException {
+        protected DataOutputStream createOutputStream(String urlParameters, HttpURLConnection connection) throws IOException {
             return mock(DataOutputStream.class);
         }
 
         /**
-         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(javax.net.ssl.HttpsURLConnection)
+         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(java.net.HttpURLConnection)
          */
         @Override
-        protected InputStreamReader getInputStreamReaderFrom(HttpsURLConnection connection) throws IOException {
+        protected InputStreamReader getInputStreamReaderFrom(HttpURLConnection connection) throws IOException {
             return new InputStreamReader(getInputStreamFromBatchSize());
         }
 
@@ -144,8 +144,8 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
          * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#generateConnection(String, java.net.URL)
          */
         @Override
-        protected HttpsURLConnection generateConnection(String urlParameters, URL url) throws IOException {
-            HttpsURLConnection connection = mock(HttpsURLConnection.class);
+        protected HttpURLConnection generateConnection(String urlParameters, URL url) throws IOException {
+            HttpURLConnection connection = mock(HttpURLConnection.class);
             return connection;
         }
 
@@ -163,7 +163,7 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
 		}
 		
 		/**
-		 * @return how many times {@link #getInputStreamReaderFrom(javax.net.ssl.HttpsURLConnection)} has been called
+		 * @return how many times {@link org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(java.net.HttpURLConnection)} has been called
 		 */
 		public int getTimesCalled() {
 			return timesCalled;
