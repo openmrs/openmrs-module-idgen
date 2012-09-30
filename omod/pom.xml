@@ -11,6 +11,13 @@
 	<name>ID Generation OMOD</name>
 	<description>OpenMRS module project for ID Generation</description>
 
+    <properties>
+        <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
+        <MODULE_NAME>${project.parent.name}</MODULE_NAME>
+        <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
+        <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
+    </properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>

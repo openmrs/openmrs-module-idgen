@@ -13,13 +13,20 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Evaluates a RemoteIdentifierSource
@@ -43,73 +51,38 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
     @Override
     public List<String> getIdentifiers(IdentifierSource source, int batchSize) {
         RemoteIdentifierSource remoteIdentifierSource = (RemoteIdentifierSource) source;
-
-        String urlFromRemoteSource = buildUrl(remoteIdentifierSource);
-        String urlParameters = buildParameters(remoteIdentifierSource, batchSize);
-        List<String>  idsList = new ArrayList<String>();
-
-        BufferedReader bufferedReader = null;
-        DataOutputStream outputStream = null;
-        HttpURLConnection connection = null;
-
+        String response;
         try {
-            URL url = new URL(urlFromRemoteSource);
-            connection = generateConnection(urlParameters, url);
+            response = doHttpPost(remoteIdentifierSource, batchSize);
+        }
+        catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        List<String> ret = new ArrayList<String>();
+        for (StringTokenizer st = new StringTokenizer(response); st.hasMoreTokens(); ) {
+            ret.add(st.nextToken().trim());
+        }
+        return Collections.unmodifiableList(ret);
+    }
 
-            outputStream = createOutputStream(urlParameters, connection);
-
-            bufferedReader = new BufferedReader(getInputStreamReaderFrom(connection));
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null){
-                idsList.add(line.trim());
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(bufferedReader);
-            IOUtils.closeQuietly(outputStream);
-            try {
-                connection.disconnect();
-            } catch (Exception ex) {
-                // pass
-            }
+    protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        nameValuePairs.add(new BasicNameValuePair("numberToGenerate", Integer.toString(batchSize)));
+        if (StringUtils.isNotBlank(source.getUser())) {
+            nameValuePairs.add(new BasicNameValuePair("username", source.getUser()));
+            nameValuePairs.add(new BasicNameValuePair("password", source.getPassword()));
         }
 
-        return Collections.unmodifiableList(idsList);
-    }
+        HttpPost post = new HttpPost(source.getUrl());
+        post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
-    protected DataOutputStream createOutputStream(String urlParameters, HttpURLConnection connection) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        outputStream.writeBytes(urlParameters);
-        outputStream.flush();
-        return outputStream;
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse httpResponse = client.execute(post);
+        String responseText = EntityUtils.toString(httpResponse.getEntity());
+        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+            throw new IOException("Unexpected response: " + httpResponse.getStatusLine().getStatusCode() + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
+        }
+        return responseText;
     }
-
-    protected InputStreamReader getInputStreamReaderFrom(HttpURLConnection connection) throws IOException {
-        return new InputStreamReader(connection.getInputStream());
-    }
-
-    protected HttpURLConnection generateConnection(String urlParameters, URL url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
-        connection.setUseCaches (false);
-        return connection;
-    }
-
-    private String buildUrl(RemoteIdentifierSource remoteSource) {
-        return remoteSource.getUrl();
-    }
-
-    private String buildParameters(RemoteIdentifierSource remoteSource, Integer batchSize) {
-        return "username=" + remoteSource.getUser() + "&password=" + remoteSource.getPassword() + "&numberToGenerate=" + batchSize;
-    }
-
 
 }

@@ -23,6 +23,7 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
@@ -31,6 +32,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import static org.mockito.Mockito.mock;
@@ -128,43 +131,15 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
         }
 
         @Override
-        protected DataOutputStream createOutputStream(String urlParameters, HttpURLConnection connection) throws IOException {
-            return mock(DataOutputStream.class);
+        protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
+            ++timesCalled;
+            List<String> list = new ArrayList<String>();
+            for (int i = 0; i < batchSize; ++i) {
+                list.add(identifiers.pop());
+            }
+            return OpenmrsUtil.join(list, "\n");
         }
 
-        /**
-         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(java.net.HttpURLConnection)
-         */
-        @Override
-        protected InputStreamReader getInputStreamReaderFrom(HttpURLConnection connection) throws IOException {
-            return new InputStreamReader(getInputStreamFromBatchSize());
-        }
-
-        /**
-         * @see org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#generateConnection(String, java.net.URL)
-         */
-        @Override
-        protected HttpURLConnection generateConnection(String urlParameters, URL url) throws IOException {
-            HttpURLConnection connection = mock(HttpURLConnection.class);
-            return connection;
-        }
-
-
-		private InputStream getInputStreamFromBatchSize() throws IOException {
-			++timesCalled;
-		    String ret = "";
-		    for (int i = 0; i < batchSize; ++i) {
-		    	if (i > 0) {
-		    		ret += "\n";
-		    	}
-		    	ret += identifiers.pop();
-		    }
-		    return new ByteArrayInputStream(ret.getBytes());
-		}
-		
-		/**
-		 * @return how many times {@link org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor#getInputStreamReaderFrom(java.net.HttpURLConnection)} has been called
-		 */
 		public int getTimesCalled() {
 			return timesCalled;
 		}

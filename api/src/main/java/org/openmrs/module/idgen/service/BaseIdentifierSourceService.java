@@ -156,22 +156,27 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)
 	 */
 	@Transactional
-	public synchronized List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException {
+	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException {
 		IdentifierSourceProcessor processor = getProcessor(source);
 		if (processor == null) {
 			throw new APIException("No registered processor found for source: " + source);
 		}
-		List<String> identifiers = processor.getIdentifiers(source, batchSize);
-		
-		Date now = new Date();
-		User currentUser = Context.getAuthenticatedUser();
-		
-		for (String s : identifiers) {
-			LogEntry logEntry = new LogEntry(source, s, now, currentUser, comment);
-			dao.saveLogEntry(logEntry);
-		}
-		
-		return identifiers;
+
+        if (log.isDebugEnabled()) {
+            log.debug("About to enter synchronized block for " + source.getName());
+        }
+        synchronized (processor) {
+		    List<String> identifiers = processor.getIdentifiers(source, batchSize);
+
+            Date now = new Date();
+            User currentUser = Context.getAuthenticatedUser();
+
+            for (String s : identifiers) {
+                LogEntry logEntry = new LogEntry(source, s, now, currentUser, comment);
+                dao.saveLogEntry(logEntry);
+            }
+            return identifiers;
+        }
 	}
 
 	/**
@@ -193,7 +198,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource, String)
 	 */
 	@Transactional
-	public synchronized String generateIdentifier(IdentifierSource source, String comment) throws APIException {
+	public String generateIdentifier(IdentifierSource source, String comment) throws APIException {
 		List<String> l = generateIdentifiers(source, 1, comment);
 		if (l == null || l.size() != 1) {
 			throw new RuntimeException("Generate identifier method did not return only one identifier");
