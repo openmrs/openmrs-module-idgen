@@ -13,6 +13,12 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,18 +30,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Evaluates a RemoteIdentifierSource
@@ -58,11 +55,17 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        List<String> ret = new ArrayList<String>();
-        for (StringTokenizer st = new StringTokenizer(response); st.hasMoreTokens(); ) {
-            ret.add(st.nextToken().trim());
+        
+        try {
+	        ObjectMapper mapper = new ObjectMapper();
+	        HashMap<String, List<String>> identifiers = mapper.readValue(response, HashMap.class);
+	        List<String> list = new ArrayList<String>();
+	        list.addAll(identifiers.values().iterator().next());
+	        return Collections.unmodifiableList(list);
         }
-        return Collections.unmodifiableList(ret);
+        catch (IOException ex) {
+        	throw new RuntimeException("Unexpected response: " + response, ex);
+        }
     }
 
     protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {

@@ -13,6 +13,14 @@
  */
 package org.openmrs.module.idgen.integration;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
@@ -23,20 +31,6 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.util.OpenmrsUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-
-import static org.mockito.Mockito.mock;
 
 
 /**
@@ -133,11 +127,17 @@ public class RemoteWithLocalPoolIntegrationTest extends BaseModuleContextSensiti
         @Override
         protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
             ++timesCalled;
+            
             List<String> list = new ArrayList<String>();
-            for (int i = 0; i < batchSize; ++i) {
-                list.add(identifiers.pop());
-            }
-            return OpenmrsUtil.join(list, "\n");
+            for (int i = 0; i<batchSize; i++)
+            	list.add(identifiers.pop());
+            
+            StringWriter writer = new StringWriter();
+            ObjectMapper mapper = new ObjectMapper();
+            HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+            map.put("generatedIdentifiers", list);
+            mapper.writeValue(writer, map);
+            return writer.toString();
         }
 
 		public int getTimesCalled() {

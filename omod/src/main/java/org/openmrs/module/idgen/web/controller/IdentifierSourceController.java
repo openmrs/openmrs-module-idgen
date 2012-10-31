@@ -3,6 +3,7 @@ package org.openmrs.module.idgen.web.controller;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -28,6 +30,7 @@ import org.openmrs.module.idgen.validator.SequentialIdentifierGeneratorValidator
 import org.openmrs.propertyeditor.PatientIdentifierTypeEditor;
 import org.openmrs.util.OpenmrsClassLoader;
 import org.openmrs.web.WebConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -47,6 +50,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class IdentifierSourceController {
 
 	protected static Log log = LogFactory.getLog(IdentifierSourceController.class);
+
+	@Autowired
+	private IdentifierSourceService iss;
 	
 	//***** CONSTRUCTORS *****
 	
@@ -193,7 +199,6 @@ public class IdentifierSourceController {
             Context.authenticate(username, password);
         }
     	
-    	IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
 
         if (StringUtils.isEmpty(comment)) {
             comment = "Batch Export of " + numberToGenerate + " to file";
@@ -202,14 +207,13 @@ public class IdentifierSourceController {
 
         response.setHeader("Content-Disposition", "attachment; filename=identifiers.txt");
         response.setHeader("Pragma", "no-cache");
-        response.setContentType("text/plain");
+        response.setContentType("application/json");
         ServletOutputStream out = response.getOutputStream();
-        String separator = System.getProperty("line.separator");
 
-    	for (Iterator<String> i = batch.iterator(); i.hasNext();) {
-    		String identifier = i.next();
-    		out.print(identifier + (i.hasNext() ? separator : ""));
-    	}
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+        map.put("generatedIdentifiers", batch);
+        mapper.writeValue(out, map);
     }
     
     /**
