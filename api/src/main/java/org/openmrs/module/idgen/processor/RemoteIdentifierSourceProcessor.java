@@ -15,8 +15,6 @@ package org.openmrs.module.idgen.processor;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
+import org.openmrs.module.idgen.RemoteIdentifiersMessage;
 
 /**
  * Evaluates a RemoteIdentifierSource
@@ -57,11 +56,9 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
         
         try {
-	        ObjectMapper mapper = new ObjectMapper();
-	        HashMap<String, List<String>> identifiers = mapper.readValue(response, HashMap.class);
-	        List<String> list = new ArrayList<String>();
-	        list.addAll(identifiers.values().iterator().next());
-	        return Collections.unmodifiableList(list);
+        	ObjectMapper mapper = new ObjectMapper();
+        	RemoteIdentifiersMessage message = mapper.readValue(response, RemoteIdentifiersMessage.class);
+        	return message.getIdentifiers();
         }
         catch (IOException ex) {
         	throw new RuntimeException("Unexpected response: " + response, ex);

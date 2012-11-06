@@ -61,6 +61,6 @@ public class IdentifierSourceControllerTest {
 		
 		controller.exportIdentifiers(null, mockRequest, mockResponse, generator, 3, "Mirebalais", null, null);
 
-		Assert.assertEquals("{\"generatedIdentifiers\":[\"1\",\"2\",\"3\"]}", mockResponse.getContentAsString());
+		Assert.assertEquals("{\"identifiers\":[\"1\",\"2\",\"3\"]}", mockResponse.getContentAsString());
 	}
 }

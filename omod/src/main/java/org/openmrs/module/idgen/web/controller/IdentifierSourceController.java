@@ -3,7 +3,6 @@ package org.openmrs.module.idgen.web.controller;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
+import org.openmrs.module.idgen.RemoteIdentifiersMessage;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.propertyeditor.IdentifierSourceEditor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
@@ -209,11 +209,8 @@ public class IdentifierSourceController {
         response.setHeader("Pragma", "no-cache");
         response.setContentType("application/json");
         ServletOutputStream out = response.getOutputStream();
-
-        ObjectMapper mapper = new ObjectMapper();
-        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
-        map.put("generatedIdentifiers", batch);
-        mapper.writeValue(out, map);
+        
+        new ObjectMapper().writeValue(out, new RemoteIdentifiersMessage(batch));
     }
     
     /**
