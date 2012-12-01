@@ -11,9 +11,9 @@
 	<url>https://wiki.openmrs.org/display/docs/Idgen+Module</url>
 
 	<scm>
-		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/trunk/</connection>
-		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/idgen/trunk/</developerConnection>
-		<url>http://svn.openmrs.org/openmrs-modules/idgen/trunk/</url>
+		<connection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</connection>
+		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</developerConnection>
+		<url>https://github.com/openmrs/openmrs-module-idgen/</url>
 	</scm>
 
 	<modules>
