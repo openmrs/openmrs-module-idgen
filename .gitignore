@@ -1,1 +1,10 @@
 target/
+
+# IntelliJ-specific
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# OSX-specific
+.DS_Store
