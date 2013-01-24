@@ -13,10 +13,6 @@
  */
 package org.openmrs.module.idgen.service.db;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -36,8 +32,13 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
+import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  *  Hibernate Implementation of the IdentifierSourceDAO Interface
@@ -94,7 +95,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	
 	/**
 	 * 
-	 * @see IdentifierSourceDAO#getAvailableIdentifiers(IdentifierPool, boolean, boolean)
+	 * @see IdentifierSourceDAO#getAvailableIdentifiers(IdentifierPool, int)
 	 */
 	@Transactional(readOnly=true)
 	@SuppressWarnings("unchecked")
@@ -160,7 +161,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	}
 
 	/** 
-	 * @see IdentifierSourceDAO#getLogEntries(IdentifierSource, Date, Date, String, User)
+	 * @see IdentifierSourceDAO#getLogEntries(IdentifierSource, Date, Date, String, User, String)
 	 */
 	@SuppressWarnings("unchecked")
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
@@ -217,8 +218,35 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	public LogEntry saveLogEntry(LogEntry logEntry) throws DAOException {
 		sessionFactory.getCurrentSession().saveOrUpdate(logEntry);
 		return logEntry;
-	}	
-	
+	}
+
+    /**
+     * @see IdentifierSourceDAO#saveSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator, long)
+     */
+    @Override
+    public void saveSequenceValue(SequentialIdentifierGenerator generator, long sequenceValue) {
+        int updated = sessionFactory.getCurrentSession()
+                .createSQLQuery("update idgen_seq_id_gen set next_sequence_value = :val where id = :id")
+                .setParameter("val", sequenceValue)
+                .setParameter("id", generator.getId())
+                .executeUpdate();
+        if (updated != 1) {
+            throw new APIException("Expected to update 1 row but updated " + updated + " rows instead!");
+        }
+    }
+
+    /**
+     * @see IdentifierSourceDAO#getSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator)
+     */
+    @Override
+    public Long getSequenceValue(SequentialIdentifierGenerator generator) {
+        Number val = (Number) sessionFactory.getCurrentSession()
+                .createSQLQuery("select next_sequence_value from idgen_seq_id_gen where id = :id")
+                .setParameter("id", generator.getId())
+                .uniqueResult();
+        return val == null ? null : val.longValue();
+	}
+
 	//***** PROPERTY ACCESS *****
 
 	/**

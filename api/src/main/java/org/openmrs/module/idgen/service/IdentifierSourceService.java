@@ -13,11 +13,6 @@
  */
 package org.openmrs.module.idgen.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
@@ -29,9 +24,14 @@ import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenConstants;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
+import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for IdentifierSource Service Methods
@@ -218,4 +218,19 @@ public interface IdentifierSourceService extends OpenmrsService {
      */
     @Transactional(readOnly=true)
     IdentifierSource getIdentifierSourceByUuid(String uuid);
+
+    /**
+     * Updates sequenceValue of seq directly to the database via SQL, bypassing hibernate's caching
+     * @param seq
+     * @param sequenceValue
+     */
+    void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue);
+
+    /**
+     * Queries the database directly via SQL, bypassing hibernate's caching
+     * @param seq
+     * @return the sequence value from seq
+     */
+    Long getSequenceValue(SequentialIdentifierGenerator seq);
+
 }

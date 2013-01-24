@@ -21,7 +21,6 @@ import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.springframework.test.annotation.NotTransactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,10 +31,11 @@ import java.util.List;
  */
 public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveTest {
 
+    public static final int NUM_THREADS = 500;
+    public static final int NUM_PER_THREAD = 10;
+
     @Test
-    @NotTransactional
     public void testThatWeDoNotGenerateTheSameIdentifierTwiceUnderHeavyLoad() throws Exception {
-        int NUM_THREADS = 500;
         final IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
 
         SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
@@ -63,7 +63,7 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
                     try {
                         authenticate();
                         IdentifierSource generator = service.getIdentifierSource(generatorId);
-                        generated.add(service.generateIdentifier(generator, "thread"));
+                        generated.addAll(service.generateIdentifiers(generator, NUM_PER_THREAD, "thread"));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     } finally {
@@ -83,8 +83,11 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
             }
         }
 
-        Assert.assertEquals(NUM_THREADS, generated.size());
-        Assert.assertEquals(NUM_THREADS, new HashSet<String>(generated).size());
+        // make sure we generated the right number of ids
+        Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, generated.size());
+
+        // make sure each id is distinct
+        Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, new HashSet<String>(generated).size());
     }
 
 }

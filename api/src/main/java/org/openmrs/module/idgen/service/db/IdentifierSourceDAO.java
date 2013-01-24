@@ -13,9 +13,6 @@
  */
 package org.openmrs.module.idgen.service.db;
 
-import java.util.Date;
-import java.util.List;
-
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
@@ -24,7 +21,11 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
+import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Interface for IdentifierSource Service Methods
@@ -75,7 +76,7 @@ public interface IdentifierSourceDAO {
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws DAOException;
 	
 	/**
-	 * @param id the id to retrieve for the given type
+	 * @param type
 	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
 	 */
 	@Transactional(readOnly=true)
@@ -116,4 +117,18 @@ public interface IdentifierSourceDAO {
      * @return the IdentifierSource with the given uuid
      */
     IdentifierSource getIdentifierSourceByUuid(String uuid);
+
+    /**
+     * Updates generator's sequenceValue in the database via SQL, bypassing Hibernate caches
+     * @param generator
+     * @param sequenceValue
+     */
+    void saveSequenceValue(SequentialIdentifierGenerator generator, long sequenceValue);
+
+    /**
+     * Gets generator's sequenceValue from the database via SQL, bypassing Hibernate caches
+     * @param generator
+     * @return
+     */
+    Long getSequenceValue(SequentialIdentifierGenerator generator);
 }

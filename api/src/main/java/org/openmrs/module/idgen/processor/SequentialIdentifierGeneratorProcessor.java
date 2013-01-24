@@ -13,15 +13,15 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Evaluates a SequentialIdentifierSource
@@ -34,7 +34,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
-		long sequenceValue = seq.getNextSequenceValue();
+        long sequenceValue = Context.getService(IdentifierSourceService.class).getSequenceValue(seq);
     	if (sequenceValue < 0) {
     		if (seq.getFirstIdentifierBase() != null) {
     			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
@@ -56,11 +56,9 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
     		}
 	    	sequenceValue++;
     	}
-    	
-    	seq.setNextSequenceValue(sequenceValue);
-    	Context.getService(IdentifierSourceService.class).saveIdentifierSource(source);
 
-    	
+        Context.getService(IdentifierSourceService.class).saveSequenceValue(seq, sequenceValue);
+
     	return identifiers;
 	}
 }
