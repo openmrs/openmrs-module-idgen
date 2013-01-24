@@ -17,9 +17,7 @@ package org.openmrs.module.idgen.service;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.test.annotation.NotTransactional;
 
@@ -38,21 +36,11 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
     @NotTransactional
     @Test
     public void testThatWeDoNotGenerateTheSameIdentifierTwiceUnderHeavyLoad() throws Exception {
+        executeDataSet("org/openmrs/module/idgen/include/TestDataForLoadTest.xml");
+
         final IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
 
-        SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
-        generator.setName("Generator");
-        generator.setIdentifierType(Context.getPatientService().getPatientIdentifierType(2));
-        generator.setBaseCharacterSet("1234567890");
-        generator.setFirstIdentifierBase("1");
-        service.saveIdentifierSource(generator);
-        final Integer generatorId = generator.getId();
-
-        AutoGenerationOption opts = new AutoGenerationOption();
-        opts.setIdentifierType(Context.getPatientService().getPatientIdentifierType(2));
-        opts.setSource(generator);
-        opts.setAutomaticGenerationEnabled(true);
-        service.saveAutoGenerationOption(opts);
+        final Integer generatorId = 999;
 
         final List<String> generated = new ArrayList<String>();
 
@@ -90,10 +78,6 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
 
         // make sure each id is distinct
         Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, new HashSet<String>(generated).size());
-
-        // we need to mark this test as @NotTransactional to properly test threading, so clean up after ourselves...
-        service.purgeIdentifierSource(generator);
-        service.purgeAutoGenerationOption(opts);
     }
 
 }
