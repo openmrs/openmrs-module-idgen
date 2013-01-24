@@ -21,6 +21,7 @@ import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.test.annotation.NotTransactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
     public static final int NUM_THREADS = 500;
     public static final int NUM_PER_THREAD = 10;
 
+    @NotTransactional
     @Test
     public void testThatWeDoNotGenerateTheSameIdentifierTwiceUnderHeavyLoad() throws Exception {
         final IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
@@ -88,6 +90,10 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
 
         // make sure each id is distinct
         Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, new HashSet<String>(generated).size());
+
+        // we need to mark this test as @NotTransactional to properly test threading, so clean up after ourselves...
+        service.purgeIdentifierSource(generator);
+        service.purgeAutoGenerationOption(opts);
     }
 
 }
