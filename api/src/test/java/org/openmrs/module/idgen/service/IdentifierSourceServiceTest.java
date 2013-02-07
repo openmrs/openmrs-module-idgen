@@ -13,8 +13,10 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -27,22 +29,37 @@ import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
+import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
+import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest {
 	
-	private IdentifierSourceService iss;
+	private BaseIdentifierSourceService iss;
 
-	@Before
-	public void initTestData() throws Exception {
-		initializeInMemoryDatabase();
-		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-		authenticate();
-		iss = Context.getService(IdentifierSourceService.class);
-	}
-	
-	
+    @Autowired
+    IdentifierSourceDAO dao;
+
+    @Before
+    public void beforeEachTest() throws Exception {
+
+        initializeInMemoryDatabase();
+        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+        authenticate();
+
+        iss = new BaseIdentifierSourceServiceStub();
+        iss.setDao(dao);
+
+        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
+        processor.setIdentifierSourceService(iss);
+
+        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
+        processors.put(SequentialIdentifierGenerator.class, processor);
+        iss.setProcessors(processors);
+    }
 	
 	/**
 	 * @see {@link IdentifierSourceService#generateIdentifiers(IdentifierSource, integer, String)}
@@ -52,7 +69,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 	public void generateIdentifiers_shouldReturnIdentifiersOfCorrectSize() throws Exception {
 		IdentifierSource is = iss.getIdentifierSource(1);
 		List<String>  sig = iss.generateIdentifiers(is, 7, "hello");
-		Assert.assertTrue(sig.toString().equals("[G-0, H-8, I-5, J-3, K-1, L-9, M-7]"));
+		Assert.assertEquals(sig.toString(), "[G-0, H-8, I-5, J-3, K-1, L-9, M-7]");
 	}
 	
 	
@@ -198,5 +215,24 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
     public void getIdentifierSourceByUuid_shouldGetSource() {
         IdentifierSource identifierSource = iss.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
         Assert.assertEquals(3, identifierSource.getId().intValue());
+    }
+
+    private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
+
+        // we need to override the functionality to get and set sequential values since we are now
+        // bypassing Hibernate and going directly to the DB to do this
+
+        private long sequenceValue = 6;
+
+        @Override
+        public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
+            this.sequenceValue = sequenceValue;
+        }
+
+        @Override
+        public Long getSequenceValue(SequentialIdentifierGenerator seq) {
+            return sequenceValue;
+        }
+
     }
 }

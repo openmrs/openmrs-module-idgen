@@ -18,6 +18,7 @@ import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +29,23 @@ import java.util.Set;
  */
 public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceProcessor {
 
-	/** 
+    @Autowired
+    private IdentifierSourceService identifierSourceService;
+
+    /**
+     * @param identifierSourceService
+     */
+    public void setIdentifierSourceService(IdentifierSourceService identifierSourceService) {
+        this.identifierSourceService = identifierSourceService;
+    }
+
+    /**
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
 	 */
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
-        long sequenceValue = Context.getService(IdentifierSourceService.class).getSequenceValue(seq);
+        long sequenceValue = identifierSourceService.getSequenceValue(seq);
     	if (sequenceValue < 0) {
     		if (seq.getFirstIdentifierBase() != null) {
     			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
@@ -57,7 +68,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	    	sequenceValue++;
     	}
 
-        Context.getService(IdentifierSourceService.class).saveSequenceValue(seq, sequenceValue);
+        identifierSourceService.saveSequenceValue(seq, sequenceValue);
 
     	return identifiers;
 	}

@@ -23,8 +23,7 @@ import org.openmrs.patient.IdentifierValidator;
 public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 
 	//***** PROPERTIES *****
-	
-	private long nextSequenceValue = -1;
+
     private String prefix; // Optional prefix
     private String suffix; // Optional suffix
     private String firstIdentifierBase; // First identifier to start at
@@ -32,14 +31,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     private String baseCharacterSet; // Enables configuration in appropriate Base
 	
     //***** INSTANCE METHODS *****
-    
-    /**
-     * Returns a boolean indicating whether this generator has already started producing identifiers
-     */
-    public boolean isInitialized() {
-    	return nextSequenceValue > 0;
-    }
-    
+
     /**
      * Returns a new identifier for the given seed.  This does not change the state of the source
      * @param seed the seed to use for generation of the identifier
@@ -76,20 +68,6 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     }
     
     //***** PROPERTY ACCESS *****
-
-	/**
-	 * @return the nextSequenceValue
-	 */
-	public long getNextSequenceValue() {
-		return nextSequenceValue;
-	}
-
-	/**
-	 * @param nextSequenceValue the nextSequenceValue to set
-	 */
-	public void setNextSequenceValue(long nextSequenceValue) {
-		this.nextSequenceValue = nextSequenceValue;
-	}
 
 	/**
 	 * @return the prefix

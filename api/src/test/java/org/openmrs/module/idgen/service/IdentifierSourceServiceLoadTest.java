@@ -15,6 +15,7 @@
 package org.openmrs.module.idgen.service;
 
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -35,6 +36,7 @@ public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveT
 
     @NotTransactional
     @Test
+    @Ignore
     public void testThatWeDoNotGenerateTheSameIdentifierTwiceUnderHeavyLoad() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestDataForLoadTest.xml");
 

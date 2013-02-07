@@ -19,20 +19,42 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.idgen.BaseIdentifierSource;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
+import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
+import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
+import org.openmrs.module.idgen.service.BaseIdentifierSourceService;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO;
+import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.NotTransactional;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class IdentifierPoolSchedulerIT extends BaseModuleContextSensitiveTest {
 
-    IdentifierSourceService service;
+    BaseIdentifierSourceService service;
+
+    @Autowired
+    IdentifierSourceDAO dao;
 
     @Before
     public void beforeEachTest() {
-        service = Context.getService(IdentifierSourceService.class);
+        service = new BaseIdentifierSourceServiceStub();
+        service.setDao(dao);
+
+        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
+        processor.setIdentifierSourceService(service);
+
+        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
+        processors.put(SequentialIdentifierGenerator.class, processor);
+        service.setProcessors(processors);
     }
 
     @Test(expected = EmptyIdentifierPoolException.class)
@@ -104,4 +126,22 @@ public class IdentifierPoolSchedulerIT extends BaseModuleContextSensitiveTest {
         return generator;
     }
 
+    private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
+
+        // we need to override the functionality to get and set sequential values since we are now
+        // bypassing Hibernate and going directly to the DB to do this
+
+        private long sequenceValue;
+
+        @Override
+        public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
+            this.sequenceValue = sequenceValue;
+        }
+
+        @Override
+        public Long getSequenceValue(SequentialIdentifierGenerator seq) {
+            return sequenceValue;
+        }
+
+    }
 }

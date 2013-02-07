@@ -11,11 +11,13 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
+    <bean id="IdentifierSourceDAO" class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
+        <property name="sessionFactory"><ref bean="sessionFactory"/></property>
+    </bean>
+
 	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
 		<property name="dao">
-			<bean class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
-				<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
-			</bean>
+			<ref local="IdentifierSourceDAO" />
 		</property>
 		<property name="processors">
 			<map>
