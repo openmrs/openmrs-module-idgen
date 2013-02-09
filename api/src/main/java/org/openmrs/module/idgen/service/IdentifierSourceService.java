@@ -119,7 +119,9 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_GENERATE_BATCH_OF_IDENTIFIERS )
 	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException;
-	
+
+    List<String> generateIdentifiersInternal(IdentifierSource source, Integer batchSize, String comment, IdentifierSourceProcessor processor);
+
 	/**
 	 * Returns an appropriate IdentifierSourceProcessor for the given IdentifierSource
 	 * @param source

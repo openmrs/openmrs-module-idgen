@@ -172,7 +172,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
         }
         Object syncLock = getSyncLock(source.getId());
         synchronized (syncLock) {
-            return generateIdentifiersInternal(source, batchSize, comment, processor);
+            return Context.getService(IdentifierSourceService.class).generateIdentifiersInternal(source, batchSize, comment, processor);
         }
 	}
 
@@ -185,7 +185,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private List<String> generateIdentifiersInternal(IdentifierSource source, Integer batchSize, String comment, IdentifierSourceProcessor processor) {
+    public List<String> generateIdentifiersInternal(IdentifierSource source, Integer batchSize, String comment, IdentifierSourceProcessor processor) {
         List<String> identifiers = processor.getIdentifiers(source, batchSize);
 
         Date now = new Date();
