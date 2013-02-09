@@ -48,7 +48,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     	identifier = (suffix == null ? identifier : identifier + suffix);
     	
     	// Add check-digit, if required
-    	if (StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
+    	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
     		try {
 	    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
 	    		IdentifierValidator v = (IdentifierValidator)c.newInstance();
