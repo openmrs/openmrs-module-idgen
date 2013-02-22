@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen</artifactId>
-	<version>2.4</version>
+	<version>2.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
@@ -14,8 +14,7 @@
 		<connection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</connection>
 		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-idgen/</url>
-	  <tag>2.4</tag>
-  </scm>
+	</scm>
 
 	<modules>
 		<module>api</module>
