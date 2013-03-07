@@ -42,7 +42,7 @@ public class IdgenUtilTestInMemory extends BaseModuleContextSensitiveTest {
 		Assert.assertFalse(is instanceof IdentifierPool);
 		
 		SequentialIdentifierGenerator sig = (SequentialIdentifierGenerator) is;
-		System.out.println(sig.getLength());
+		System.out.println(sig.getMinLength());
 	}
 	
 }

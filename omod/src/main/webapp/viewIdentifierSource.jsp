@@ -67,10 +67,14 @@
 			<td>${source.suffix}</td>
 		</tr>
 		<tr>
-			<th><spring:message code="idgen.length"/>:</th>
-			<td>${source.length}</td>
+			<th><spring:message code="idgen.minLength"/>:</th>
+			<td>${source.minLength}</td>
 		</tr>
-		<tr><td colspan="2">&nbsp;</td></tr>
+        <tr>
+            <th><spring:message code="idgen.maxLength"/>:</th>
+            <td>${source.maxLength}</td>
+        </tr>
+        <tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
 			<th><spring:message code="idgen.reservedIdentifiers"/>:</th>
 			<td>

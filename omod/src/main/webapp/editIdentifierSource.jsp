@@ -98,10 +98,14 @@
 				<td><frm:input path="suffix" size="10" /><frm:errors path="suffix" cssClass="error" /></td>
 			</tr>
 			<tr>
-				<th align="right"><spring:message code="idgen.length" />:</th>
-				<td><frm:input path="length" size="10" /><frm:errors path="length" cssClass="error" /></td>
+				<th align="right"><spring:message code="idgen.minLength" />:</th>
+				<td><frm:input path="minLength" size="10" /><frm:errors path="minLength" cssClass="error" /></td>
 			</tr>
-		</c:if>
+            <tr>
+                <th align="right"><spring:message code="idgen.maxLength" />:</th>
+                <td><frm:input path="maxLength" size="10" /><frm:errors path="maxLength" cssClass="error" /></td>
+            </tr>
+        </c:if>
 		<c:if test="${source.class.name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
 			<tr>
 				<th align="right">

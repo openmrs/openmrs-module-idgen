@@ -5,7 +5,7 @@
 	<IDGEN_IDENTIFIER_SOURCE ID="2" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a902" NAME="Test Remote Source" IDENTIFIER_TYPE="2" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
 	<IDGEN_IDENTIFIER_SOURCE ID="3" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a903" NAME="Test Identifier Pool" IDENTIFIER_TYPE="1" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
 	
-	<IDGEN_SEQ_ID_GEN ID="1" first_identifier_base="1" base_character_set="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" PREFIX="" LENGTH="0"/>
+	<IDGEN_SEQ_ID_GEN ID="1" first_identifier_base="1" base_character_set="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" PREFIX="" min_length="0" max_length="0"/>
 	
 	<IDGEN_REMOTE_SOURCE ID="2" URL="http://localhost:8080/openmrs/module/idgen/getIdentifier"/>
 	
