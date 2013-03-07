@@ -13,11 +13,13 @@
  */
 package org.openmrs.module.idgen.task;
 
+import org.junit.Ignore;
 import org.openmrs.api.context.Context;
 
 /**
  * Just to test that we're using the spring scheduler right
  */
+@Ignore
 public class TestTask extends AuthenticatedTask {
 
     static boolean hasRun = false;

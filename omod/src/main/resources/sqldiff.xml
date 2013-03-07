@@ -163,4 +163,19 @@
             ALTER TABLE `idgen_remote_source` ADD COLUMN `password` varchar(20) ;
         </sql>
     </diff>
+
+    <diff>
+        <version>2.4.2</version>
+        <author>Jeremy Keiper</author>
+        <date>7 March 2013</date>
+        <description>
+            Change idgen_seq_id_gen length to minLength and add maxLength with values of minLength
+        </description>
+        <sql>
+            ALTER TABLE `idgen_seq_id_gen` CHANGE COLUMN `length` `min_length` int(11);
+            ALTER TABLE `idgen_seq_id_gen` ADD COLUMN `max_ength` int(11);
+            UPDATE `idgen_seq_id_gen` SET `max_length` = `min_length`;
+        </sql>
+    </diff>
+
 </sqldiff>
