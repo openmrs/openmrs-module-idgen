@@ -15,6 +15,7 @@ package org.openmrs.module.idgen;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.patient.IdentifierValidator;
 
 /**
@@ -31,6 +32,14 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     private String baseCharacterSet; // Enables configuration in appropriate Base
 	
     //***** INSTANCE METHODS *****
+
+    /**
+     * Returns a boolean indicating whether this generator has already started producing identifiers
+     */
+    public boolean isInitialized() {
+        Long nextSequenceValue = Context.getService(IdentifierSourceService.class).getSequenceValue(this);
+        return nextSequenceValue != null && nextSequenceValue > 0;
+    }
 
     /**
      * Returns a new identifier for the given seed.  This does not change the state of the source
