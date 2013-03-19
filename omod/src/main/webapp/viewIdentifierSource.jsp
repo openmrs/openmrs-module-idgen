@@ -45,7 +45,7 @@
 </table>
 <br/>
 
-<c:if test="${source.class.name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
+<c:if test="${source['class'].name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
 
 	This Identifier Source generates sequential identifiers with the following configuration:<br/><br/>
 	
@@ -87,12 +87,12 @@
 	</table>
 </c:if>
 
-<c:if test="${source.class.name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
+<c:if test="${source['class'].name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
 	This Identifier Source connects to the following remote URL to retrieve new identifiers:<br/>
 	${source.url}
 </c:if>
 
-<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">
+<c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 
 	This Identifier Source manages a pool of pre-generated identifiers.<br/><br/>
 	
@@ -125,7 +125,7 @@
 <form action="exportIdentifiers.form">
 	<b>Export Identifiers: </b>
 	<c:set var="available" value="t"/>
-	<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">
+	<c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 		<c:if test="${fn:length(source.availableIdentifiers) == 0}">
 			<c:set var="available" value="f"/>
 			None available for export.

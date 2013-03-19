@@ -34,7 +34,7 @@
 						<tr class="${entryStatus.index % 2 == 0 ? 'evenRow' : 'oddRow'} ${status.last ? 'underlineRow' : '' }">
 						
 							<td>${entry.key.name}</td>
-							<td><spring:message code="idgen.${source.class.name}"/></td>
+							<td><spring:message code="idgen.${source['class'].name}"/></td>
 							<td>${source.name}</td>
 							<td>
 								<button style="height:20px; font-size:8pt; vertical-align:middle;" onclick="document.location.href='editIdentifierSource.form?source=${source.id}';">

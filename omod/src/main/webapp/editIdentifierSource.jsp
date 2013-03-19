@@ -13,7 +13,7 @@
 <h3>
 	<c:choose>
 		<c:when test="${empty source.id}">
-			<spring:message code="general.new" />: <spring:message code="idgen.${source.class.name}" />
+			<spring:message code="general.new" />: <spring:message code="idgen.${source['class'].name}" />
 		</c:when>
 		<c:otherwise>
 			<spring:message code="general.edit" />: ${source.name}
@@ -63,7 +63,7 @@
 			</td>
 		</tr>		
 		
-		<c:if test="${source.class.name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
+		<c:if test="${source['class'].name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
 			<tr>
 				<th align="right">
 					<span class="requiredField">*</span>
@@ -102,7 +102,7 @@
 				<td><frm:input path="length" size="10" /><frm:errors path="length" cssClass="error" /></td>
 			</tr>
 		</c:if>
-		<c:if test="${source.class.name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
+		<c:if test="${source['class'].name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
 			<tr>
 				<th align="right">
 					<span class="requiredField">*</span>
@@ -121,7 +121,7 @@
                 <td><frm:password path="password" size="20" /><frm:errors path="password" cssClass="error" /></td>
             </tr>
 		</c:if>
-		<c:if test="${source.class.name == 'org.openmrs.module.idgen.IdentifierPool'}">
+		<c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 			<tr>
 				<th align="right"><spring:message code="idgen.poolSource" />:</th>
 				<td>
