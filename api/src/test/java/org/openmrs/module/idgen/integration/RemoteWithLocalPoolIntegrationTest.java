@@ -21,6 +21,7 @@ import java.util.Stack;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
@@ -36,6 +37,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
  * Tests setting up a local pool, that pulls from a remote pool, and generates
  * for an identifier type
  */
+@Ignore
 public class RemoteWithLocalPoolIntegrationTest extends
 		BaseModuleContextSensitiveTest {
 

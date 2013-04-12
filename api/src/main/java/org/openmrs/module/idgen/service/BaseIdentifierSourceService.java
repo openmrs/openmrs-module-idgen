@@ -29,8 +29,11 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
-import org.springframework.transaction.annotation.Propagation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -157,7 +160,10 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException {
 		getProcessors().put(type, processorToRegister);
 	}
-	
+
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
 	/** 
 	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)
 	 */
@@ -172,7 +178,16 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
         }
         Object syncLock = getSyncLock(source.getId());
         synchronized (syncLock) {
-            return generateIdentifiersInternal(source, batchSize, comment, processor);
+            TransactionStatus txStatus = transactionManager.getTransaction(new DefaultTransactionDefinition(DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW));
+            List<String> generated;
+            try {
+                generated = generateIdentifiersInternal(source, batchSize, comment, processor);
+            } catch (Exception ex) {
+                transactionManager.rollback(txStatus);
+                throw new RuntimeException(ex);
+            }
+            transactionManager.commit(txStatus);
+            return generated;
         }
 	}
 
@@ -184,7 +199,6 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @param processor
      * @return
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private List<String> generateIdentifiersInternal(IdentifierSource source, Integer batchSize, String comment, IdentifierSourceProcessor processor) {
         List<String> identifiers = processor.getIdentifiers(source, batchSize);
 

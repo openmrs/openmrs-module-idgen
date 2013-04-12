@@ -17,16 +17,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Evaluates a RemoteIdentifierSource
  */
 public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
+
+    @Autowired
+    SessionFactory sessionFactory;
 
 	/** 
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
@@ -43,8 +48,9 @@ public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
 		for (PooledIdentifier pi : available) {
 			ret.add(pi.getIdentifier());
 			pi.setDateUsed(now);
+            sessionFactory.getCurrentSession().update(pi);
 		}
-		iss.saveIdentifierSource(source);
+		//iss.saveIdentifierSource(source);
 		return ret;
 	}
 }

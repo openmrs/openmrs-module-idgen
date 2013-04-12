@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * Can't run this in the same test as the other IdentifierSourceService tests
  */
+@Ignore
 public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveTest {
 
     public static final int NUM_THREADS = 500;

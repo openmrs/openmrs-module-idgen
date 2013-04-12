@@ -35,6 +35,7 @@ import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -42,6 +43,9 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 
     @Autowired
     IdentifierSourceDAO dao;
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Before
     public void beforeEachTest() throws Exception {
@@ -52,6 +56,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 
         iss = new BaseIdentifierSourceServiceStub();
         iss.setDao(dao);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(iss);
 
         SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
         processor.setIdentifierSourceService(iss);
