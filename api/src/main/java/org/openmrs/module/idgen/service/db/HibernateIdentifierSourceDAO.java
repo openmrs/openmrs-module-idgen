@@ -247,6 +247,12 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
         return val == null ? null : val.longValue();
 	}
 
+
+    public void refreshIdentifierSource(IdentifierSource source) {
+        sessionFactory.getCurrentSession().refresh(source);
+    }
+
+
 	//***** PROPERTY ACCESS *****
 
 	/**

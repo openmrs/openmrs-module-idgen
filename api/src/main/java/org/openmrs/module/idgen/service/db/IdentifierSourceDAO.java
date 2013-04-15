@@ -131,4 +131,10 @@ public interface IdentifierSourceDAO {
      * @return
      */
     Long getSequenceValue(SequentialIdentifierGenerator generator);
+
+    /**
+     * Refresh an identifier source
+     * @param source
+     */
+    void refreshIdentifierSource(IdentifierSource source);
 }

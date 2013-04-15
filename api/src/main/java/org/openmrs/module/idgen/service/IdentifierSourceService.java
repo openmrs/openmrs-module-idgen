@@ -233,4 +233,11 @@ public interface IdentifierSourceService extends OpenmrsService {
      */
     Long getSequenceValue(SequentialIdentifierGenerator seq);
 
+    /**
+     * Internal method for generating identifiers; this should never be called directly--exposing it here is a
+     * hack, but because evidently the @Transactional annotation will only be picked up by service methods and we need this
+     * method to be transactional
+     */
+    List<String> generateIdentifiersInternal(Integer sourceId, Integer batchSize, String comment);
+
 }

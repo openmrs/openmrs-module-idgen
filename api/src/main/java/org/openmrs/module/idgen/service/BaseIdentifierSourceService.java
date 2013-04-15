@@ -162,17 +162,20 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)
 	 */
 	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException {
-		IdentifierSourceProcessor processor = getProcessor(source);
-		if (processor == null) {
-			throw new APIException("No registered processor found for source: " + source);
-		}
 
         if (log.isDebugEnabled()) {
             log.debug("About to enter synchronized block for " + source.getName());
         }
         Object syncLock = getSyncLock(source.getId());
         synchronized (syncLock) {
-            return generateIdentifiersInternal(source, batchSize, comment, processor);
+            // note that we pass the *id* of the source here, not the source itself; this is because we don't want to pass
+            // Hibernate-managed objects between Hibernate sessions--and the  @Transactional(propagation = Propagation.REQUIRES_NEW)
+            // starts a new transaction (which Hibernate handles by opening a new session)
+            // we refresh the source afterwards to pick up any changes made during the inner transaction
+            // *note that because of this refresh any changes made to the identifier source up to this point will be lost*
+            List<String> identifiers = Context.getService(IdentifierSourceService.class).generateIdentifiersInternal(source.getId(), batchSize, comment);
+            dao.refreshIdentifierSource(source);
+            return identifiers;
         }
 	}
 
@@ -185,7 +188,15 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private List<String> generateIdentifiersInternal(IdentifierSource source, Integer batchSize, String comment, IdentifierSourceProcessor processor) {
+    public List<String> generateIdentifiersInternal(Integer sourceId, Integer batchSize, String comment) {
+
+        IdentifierSource source = getIdentifierSource(sourceId);
+        IdentifierSourceProcessor processor = getProcessor(source);
+
+        if (processor == null) {
+            throw new APIException("No registered processor found for source: " + source);
+        }
+
         List<String> identifiers = processor.getIdentifiers(source, batchSize);
 
         Date now = new Date();
@@ -195,6 +206,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
             LogEntry logEntry = new LogEntry(source, s, now, currentUser, comment);
             dao.saveLogEntry(logEntry);
         }
+
         return identifiers;
     }
 
