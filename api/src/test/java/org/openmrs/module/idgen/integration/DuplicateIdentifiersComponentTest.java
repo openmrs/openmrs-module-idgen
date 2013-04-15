@@ -59,8 +59,6 @@ public class DuplicateIdentifiersComponentTest extends BaseModuleContextSensitiv
     }
 
     @Test
-    @NotTransactional
-    @DirtiesContext
     public void testUnderLoad() throws Exception {
 
         final List<String> generated = new ArrayList<String>();
