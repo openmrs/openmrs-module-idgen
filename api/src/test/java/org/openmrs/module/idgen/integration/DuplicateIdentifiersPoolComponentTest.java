@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests out the synchronization problem where duplicate identifiers are assigned
  */
-@Ignore
 public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSensitiveTest {
 
     public static final int NUM_THREADS = 15;
