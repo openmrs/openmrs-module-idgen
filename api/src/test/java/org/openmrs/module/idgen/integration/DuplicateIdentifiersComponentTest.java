@@ -39,7 +39,6 @@ public class DuplicateIdentifiersComponentTest extends BaseModuleContextSensitiv
     private IdentifierPool identifierPool;
 
     @Before
-    @Transactional
     public void setUp() throws Exception {
         identifierPool = new IdentifierPool();
         identifierPool.setName("Test pool");
