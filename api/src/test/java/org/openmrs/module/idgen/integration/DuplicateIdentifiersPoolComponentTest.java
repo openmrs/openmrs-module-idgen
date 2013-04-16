@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 @Ignore
 public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSensitiveTest {
 
-    public static final int NUM_THREADS = 10;
+    public static final int NUM_THREADS = 15;
 
     @Autowired
     private IdentifierSourceService service;

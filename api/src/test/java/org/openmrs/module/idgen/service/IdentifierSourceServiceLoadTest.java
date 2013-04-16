@@ -29,14 +29,13 @@ import java.util.List;
 /**
  * Can't run this in the same test as the other IdentifierSourceService tests
  */
+@Ignore
 public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveTest {
 
     public static final int NUM_THREADS = 500;
     public static final int NUM_PER_THREAD = 10;
 
-    @NotTransactional
     @Test
-    @Ignore
     public void testThatWeDoNotGenerateTheSameIdentifierTwiceUnderHeavyLoad() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestDataForLoadTest.xml");
 
