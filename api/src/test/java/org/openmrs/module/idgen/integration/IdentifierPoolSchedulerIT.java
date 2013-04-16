@@ -19,7 +19,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.BaseIdentifierSource;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -27,12 +26,10 @@ import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
 import org.openmrs.module.idgen.service.BaseIdentifierSourceService;
-import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.NotTransactional;
+
 
 import java.util.HashMap;
 import java.util.Map;

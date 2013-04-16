@@ -5,19 +5,14 @@ import org.junit.Test;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
-import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.NotTransactional;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -43,7 +38,7 @@ public class DuplicateIdentifiersComponentTest extends BaseModuleContextSensitiv
         identifierPool = new IdentifierPool();
         identifierPool.setName("Test pool");
         identifierPool.setSequential(false);
-        identifierPool.setIdentifierType(patientService.getPatientIdentifierType(2));
+        identifierPool.setIdentifierType(patientService.getPatientIdentifierType(4));
         service.saveIdentifierSource(identifierPool);
 
         List<String> identifiers = new ArrayList<String>();
