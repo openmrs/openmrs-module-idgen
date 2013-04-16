@@ -1,6 +1,7 @@
 package org.openmrs.module.idgen.integration;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
@@ -20,7 +21,8 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests out the synchronization problem where duplicate identifiers are assigned
  */
-public class DuplicateIdentifiersComponentTest extends BaseModuleContextSensitiveTest {
+@Ignore
+public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSensitiveTest {
 
     public static final int NUM_THREADS = 10;
 
