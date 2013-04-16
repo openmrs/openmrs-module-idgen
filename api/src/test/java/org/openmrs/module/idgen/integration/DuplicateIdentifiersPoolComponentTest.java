@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
  */
 public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSensitiveTest {
 
-    public static final int NUM_THREADS = 15;
+    public static final int NUM_THREADS = 25;
 
     @Autowired
     private IdentifierSourceService service;
@@ -32,15 +32,12 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
     @Qualifier("patientService")
     private PatientService patientService;
 
-    private IdentifierPool identifierPool;
-
     @Before
     public void setUp() throws Exception {
-        identifierPool = new IdentifierPool();
-        identifierPool.setName("Test pool");
-        identifierPool.setSequential(false);
-        identifierPool.setIdentifierType(patientService.getPatientIdentifierType(4));
-        service.saveIdentifierSource(identifierPool);
+
+        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+
+        IdentifierPool identifierPool = (IdentifierPool) Context.getService(IdentifierSourceService.class).getIdentifierSource(4);
 
         List<String> identifiers = new ArrayList<String>();
 
@@ -49,6 +46,7 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
         }
 
         service.addIdentifiersToPool(identifierPool, identifiers);
+        service.saveIdentifierSource(identifierPool);
         Context.flushSession();
     }
 
@@ -70,7 +68,7 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
                         } catch (InterruptedException ex) {
                             // pass
                         }
-                        generated.addAll(service.generateIdentifiers(identifierPool, 1, "thread"));
+                        generated.addAll(service.generateIdentifiers(Context.getService(IdentifierSourceService.class).getIdentifierSource(4), 1, "thread"));
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {

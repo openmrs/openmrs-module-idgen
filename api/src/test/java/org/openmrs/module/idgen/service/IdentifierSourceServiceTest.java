@@ -46,9 +46,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
     @Before
     public void beforeEachTest() throws Exception {
 
-        initializeInMemoryDatabase();
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-        authenticate();
 
         iss = new BaseIdentifierSourceServiceStub();
         iss.setDao(dao);
@@ -80,7 +78,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
 		List<IdentifierSource>  sig = iss.getAllIdentifierSources(false);
-		Assert.assertTrue(sig.size() == 3);
+		Assert.assertTrue(sig.size() == 4);
 	}
 	
 
