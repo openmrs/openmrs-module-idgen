@@ -50,7 +50,6 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
 
         service.addIdentifiersToPool(identifierPool, identifiers);
         Context.flushSession();
-        Context.evictFromSession(identifierPool);
     }
 
     @Test
