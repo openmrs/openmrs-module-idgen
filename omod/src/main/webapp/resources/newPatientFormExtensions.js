@@ -90,7 +90,7 @@ function addIdentifierRow(item, patientId, row) {
 				if (this.checked) {
 					var comment = patientId ? 'Edit Patient' : 'New Patient';
 					jQuery.get("../../module/idgen/generateIdentifier.form?source="+item.sourceId+"&comment="+comment, function(data){
-						jQuery(identifierInput).val(data).addClass("readOnlyInput").attr("readOnly", "true");
+						jQuery(identifierInput).val(data.identifiers[0]).addClass("readOnlyInput").attr("readOnly", "true");
 					});
 				}
 				else {
