@@ -29,7 +29,6 @@ import java.util.Set;
  */
 public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceProcessor {
 
-    @Autowired
     private IdentifierSourceService identifierSourceService;
 
     /**

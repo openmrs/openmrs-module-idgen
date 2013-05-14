@@ -23,7 +23,11 @@
 			<map>
 				<entry>
 					<key><value>org.openmrs.module.idgen.SequentialIdentifierGenerator</value></key>
-					<bean class="org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor"/>
+					<bean class="org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor">
+                        <property name="identifierSourceService">
+                            <ref bean="baseIdentifierSourceService" />
+                        </property>
+                    </bean>
 				</entry>
 				<entry>
 					<key><value>org.openmrs.module.idgen.RemoteIdentifierSource</value></key>
