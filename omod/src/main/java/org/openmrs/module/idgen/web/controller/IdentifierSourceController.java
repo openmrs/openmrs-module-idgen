@@ -225,12 +225,12 @@ public class IdentifierSourceController {
 
         IdentifierPool pool = (IdentifierPool)source;
         List<String> ids = new ArrayList<String>();
-        if(inputFile!=null){
+        if(inputFile != null){
             try {
                 try{
                     ObjectMapper mapper = new ObjectMapper();
                     RemoteIdentifiersMessage remoteIdentifiersMessage = mapper.readValue(inputFile.getInputStream(), RemoteIdentifiersMessage.class);
-                    if(remoteIdentifiersMessage!=null){
+                    if(remoteIdentifiersMessage != null){
                         ids= remoteIdentifiersMessage.getIdentifiers();
                     }
                 }catch (IOException ex){
