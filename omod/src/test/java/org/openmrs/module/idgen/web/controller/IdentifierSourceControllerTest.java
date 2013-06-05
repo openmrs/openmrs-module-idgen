@@ -75,7 +75,7 @@ public class IdentifierSourceControllerTest {
     @Test
     public void importIdentifiers_shouldAcceptJson() throws Exception {
         Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), (List<String>) Mockito.anyCollectionOf(String.class));
-        
+
         IdentifierPool identifierPool = new IdentifierPool();
         String identifiers = "{\"identifiers\":[\"1\",\"2\",\"3\"]}";
         InputStream inputStream = new ByteArrayInputStream(identifiers.getBytes());

@@ -220,36 +220,31 @@ public class IdentifierSourceController {
      */
     @RequestMapping("/module/idgen/addIdentifiersFromFile")
     public String addIdentifiersFromFile(ModelMap model, HttpServletRequest request, HttpServletResponse response,
-    							   @RequestParam(required=true, value="source") IdentifierSource source,
-    							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
-    	
-    	IdentifierPool pool = (IdentifierPool)source;
-    	List<String> ids = new ArrayList<String>();
+                                         @RequestParam(required=true, value="source") IdentifierSource source,
+                                         @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
+
+        IdentifierPool pool = (IdentifierPool)source;
+        List<String> ids = new ArrayList<String>();
         if(inputFile!=null){
             try {
-                String jsonIdentifiers = IOUtils.toString(inputFile.getInputStream());
-                if(StringUtils.isNotBlank(jsonIdentifiers)){
-                    try{
-                        ObjectMapper mapper = new ObjectMapper();
-                        RemoteIdentifiersMessage remoteIdentifiersMessage = mapper.readValue(jsonIdentifiers, RemoteIdentifiersMessage.class);
-                        if(remoteIdentifiersMessage!=null){
-                            ids= remoteIdentifiersMessage.getIdentifiers();
-                        }
-                    }catch (IOException ex){
-                        log.error("Unexpected response: " + jsonIdentifiers, ex);
-                        throw new Exception(ex);
+                try{
+                    ObjectMapper mapper = new ObjectMapper();
+                    RemoteIdentifiersMessage remoteIdentifiersMessage = mapper.readValue(inputFile.getInputStream(), RemoteIdentifiersMessage.class);
+                    if(remoteIdentifiersMessage!=null){
+                        ids= remoteIdentifiersMessage.getIdentifiers();
                     }
+                }catch (IOException ex){
+                    log.error("Unexpected response: " , ex);
+                    throw new Exception(ex);
                 }
-
             }catch (Exception e){
                 log.error("failed to read uploaded file", e);
                 throw new Exception(e);
             }
-
         }
-		iss.addIdentifiersToPool(pool, ids);
-		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
-		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
+        iss.addIdentifiersToPool(pool, ids);
+        request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
+        return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
     
     /**
