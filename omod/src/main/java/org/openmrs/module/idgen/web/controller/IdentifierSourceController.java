@@ -1,6 +1,7 @@
 package org.openmrs.module.idgen.web.controller;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -223,19 +225,29 @@ public class IdentifierSourceController {
     	
     	IdentifierPool pool = (IdentifierPool)source;
     	List<String> ids = new ArrayList<String>();
-    	BufferedReader r = null;
-    	try {
-    		r = new BufferedReader(new InputStreamReader(inputFile.getInputStream()));
-    		for (String s = r.readLine(); s != null; s = r.readLine()) {
-    			ids.add(s);
-    		}
-    	}
-    	finally {
-    		if (r != null) {
-    			r.close();
-    		}
-    	}
-		Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);
+        if(inputFile!=null){
+            try {
+                String jsonIdentifiers = IOUtils.toString(inputFile.getInputStream());
+                if(StringUtils.isNotBlank(jsonIdentifiers)){
+                    try{
+                        ObjectMapper mapper = new ObjectMapper();
+                        RemoteIdentifiersMessage remoteIdentifiersMessage = mapper.readValue(jsonIdentifiers, RemoteIdentifiersMessage.class);
+                        if(remoteIdentifiersMessage!=null){
+                            ids= remoteIdentifiersMessage.getIdentifiers();
+                        }
+                    }catch (IOException ex){
+                        log.error("Unexpected response: " + jsonIdentifiers, ex);
+                        throw new Exception(ex);
+                    }
+                }
+
+            }catch (Exception e){
+                log.error("failed to read uploaded file", e);
+                throw new Exception(e);
+            }
+
+        }
+		iss.addIdentifiersToPool(pool, ids);
 		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
 		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
     }
