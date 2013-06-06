@@ -1,6 +1,9 @@
 package org.openmrs.module.idgen.web.controller;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +14,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -218,26 +222,39 @@ public class IdentifierSourceController {
      */
     @RequestMapping("/module/idgen/addIdentifiersFromFile")
     public String addIdentifiersFromFile(ModelMap model, HttpServletRequest request, HttpServletResponse response,
-    							   @RequestParam(required=true, value="source") IdentifierSource source,
-    							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
-    	
-    	IdentifierPool pool = (IdentifierPool)source;
-    	List<String> ids = new ArrayList<String>();
-    	BufferedReader r = null;
-    	try {
-    		r = new BufferedReader(new InputStreamReader(inputFile.getInputStream()));
-    		for (String s = r.readLine(); s != null; s = r.readLine()) {
-    			ids.add(s);
-    		}
-    	}
-    	finally {
-    		if (r != null) {
-    			r.close();
-    		}
-    	}
-		Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);
-		request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
-		return "redirect:/module/idgen/viewIdentifierSource.form?source="+source.getId();
+                                         @RequestParam(required=true, value="source") IdentifierSource source,
+                                         @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
+
+        IdentifierPool pool = (IdentifierPool)source;
+        List<String> ids = new ArrayList<String>();
+        InputStream streamReader = null;
+        if(inputFile != null){
+            try {
+                streamReader = inputFile.getInputStream();
+                if(streamReader != null){
+                    try{
+                        ObjectMapper mapper = new ObjectMapper();
+                        RemoteIdentifiersMessage remoteIdentifiersMessage = mapper.readValue(streamReader, RemoteIdentifiersMessage.class);
+                        if(remoteIdentifiersMessage != null){
+                            ids = remoteIdentifiersMessage.getIdentifiers();
+                            iss.addIdentifiersToPool(pool, ids);
+                            request.getSession().setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Success: Identifiers successfully uploaded.");
+                        }
+                    }catch (IOException ex){
+                        log.error("Unexpected response: " , ex);
+                        throw new Exception(ex);
+                    }
+                }
+            }catch (Exception e){
+                log.error("failed to read uploaded file", e);
+                throw new Exception(e);
+            }finally {
+                if(streamReader != null){
+                    streamReader.close();
+                }
+            }
+        }
+        return "redirect:/module/idgen/viewIdentifierSource.form?source=" + source.getId();
     }
     
     /**
