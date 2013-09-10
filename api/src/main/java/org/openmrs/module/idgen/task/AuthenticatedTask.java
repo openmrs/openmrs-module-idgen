@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
+import org.openmrs.module.idgen.util.ExceptionUtils;
 import org.openmrs.scheduler.SchedulerConstants;
 
 import java.util.Date;
@@ -54,7 +55,14 @@ public abstract class AuthenticatedTask extends TimerTask {
             doRun();
         }
         catch (Exception e) {
-            log.error("An error occurred while running scheduled task", e);
+            if (ExceptionUtils.isThrownFrom(e, "org.hibernate.cache.impl.bridge.RegionFactoryCacheProviderBridge", "nextTimestamp")) {
+                // Ignore this. It means we're trying to run the task while OpenMRS is starting up or shutting down
+                if (log.isDebugEnabled()) {
+                    log.debug("An error occurred while running scheduled task", e);
+                }
+            } else {
+                log.error("An error occurred while running scheduled task", e);
+            }
         }
         finally {
             if (Context.isSessionOpen()) {
