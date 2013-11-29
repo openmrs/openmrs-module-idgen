@@ -70,7 +70,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
 		if (!includeRetired) {
-			criteria.add(Expression.like("retired", false));
+			criteria.add(Restrictions.eq("retired", Boolean.FALSE));
 		}
 		criteria.addOrder(Order.asc("name"));
 		return criteria.list();
