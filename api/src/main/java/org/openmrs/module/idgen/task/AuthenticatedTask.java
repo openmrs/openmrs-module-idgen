@@ -47,7 +47,12 @@ public abstract class AuthenticatedTask extends TimerTask {
     @Override
     public final void run() {
         try {
-            Context.openSession();
+            try {
+                Context.openSession();
+            } catch (NullPointerException ex) {
+                log.info("Skipping run of " + getClass().getSimpleName() + " because we could not open a session. Probably OpenMRS startup is not yet complete.");
+                return;
+            }
             if (!Context.isAuthenticated()) {
                 authenticate();
             }
