@@ -70,9 +70,14 @@ public class SequentialIdentifierGeneratorValidator extends IdentifierSourceVali
 					errors.reject("Validator named " + source.getIdentifierType().getValidator() + " cannot be loaded");
 				}
 			}
-			if (source.getLength() != null && source.getLength() > 0) {
-				if (source.getLength() != firstId.length()) {
-					errors.reject("Invalid configuration. First identifier generated would be '" + firstId + "' which does not match length of " + source.getLength());
+			if (source.getMinLength() != null && source.getMinLength() > 0) {
+				if (source.getMinLength() > firstId.length()) {
+					errors.reject("Invalid configuration. First identifier generated would be '" + firstId + "' which is shorter than minimum length of " + source.getMinLength());
+				}
+			}
+			if (source.getMaxLength() != null && source.getMaxLength() > 0) {
+				if (source.getMaxLength() < firstId.length()) {
+					errors.reject("Invalid configuration. First identifier generated would be '" + firstId + "' which exceeds maximum length of " + source.getMaxLength());
 				}
 			}
 		}

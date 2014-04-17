@@ -30,8 +30,9 @@
 			<property name="firstIdentifierBase" type="string" column="first_identifier_base" not-null="true" />
 			<property name="prefix" type="string" />
 			<property name="suffix" type="string" />
-			<property name="length" type="int" column="length" />
-		</joined-subclass>
+			<property name="minLength" type="int" column="min_length" />
+            <property name="maxLength" type="int" column="max_length" />
+        </joined-subclass>
 
 		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
 			<key column="id"/>
