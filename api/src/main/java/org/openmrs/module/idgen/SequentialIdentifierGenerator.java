@@ -28,9 +28,10 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     private String prefix; // Optional prefix
     private String suffix; // Optional suffix
     private String firstIdentifierBase; // First identifier to start at
-    private Integer length; // If > 0, will always return identifiers with the given length
+	private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
+	private Integer maxLength; // If > 0, will always return identifiers no longer than this length
     private String baseCharacterSet; // Enables configuration in appropriate Base
-	
+
     //***** INSTANCE METHODS *****
 
     /**
@@ -45,17 +46,21 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
      * Returns a new identifier for the given seed.  This does not change the state of the source
      * @param seed the seed to use for generation of the identifier
      * @return a new identifier for the given seed
+	 * @should generate an identifier within minLength and maxLength bounds
+	 * @should throw an error if generated identifier is shorter than minLength
+	 * @should throw an error if generated identifier is longer than maxLength
      */
     public String getIdentifierForSeed(long seed) {
-    	
+
     	// Convert the next sequence integer into a String with the appropriate Base characters
-    	int minLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
-    	String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), minLength);
-    	
+		int seqLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
+
+		String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), seqLength);
+
     	// Add optional prefix and suffix
     	identifier = (prefix == null ? identifier : prefix + identifier);
     	identifier = (suffix == null ? identifier : identifier + suffix);
-    	
+
     	// Add check-digit, if required
     	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
     		try {
@@ -68,14 +73,21 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     		}
     	}
 
-    	if (length != null && length > 0) {
-    		if (identifier.length() != length) {
-    			throw new RuntimeException("Invalid configuration for IdentifierSource. Length set to " + length + " but generated " + identifier);
-    		}
-    	}
+		if (this.minLength != null && this.minLength > 0) {
+			if (identifier.length() < this.minLength) {
+				throw new RuntimeException("Invalid configuration for IdentifierSource. Length minimum set to " + this.minLength + " but generated " + identifier);
+			}
+		}
+
+		if (this.maxLength != null && this.maxLength > 0) {
+			if (identifier.length() > this.maxLength) {
+				throw new RuntimeException("Invalid configuration for IdentifierSource. Length maximum set to " + this.maxLength + " but generated " + identifier);
+			}
+		}
+
     	return identifier;
     }
-    
+
     //***** PROPERTY ACCESS *****
 
 	/**
@@ -121,17 +133,31 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the length
+	 * @return the minLength
 	 */
-	public Integer getLength() {
-		return length;
+	public Integer getMinLength() {
+		return minLength;
 	}
 
 	/**
-	 * @param length the length to set
+	 * @param minLength the minLength to set
 	 */
-	public void setLength(Integer length) {
-		this.length = length;
+	public void setMinLength(Integer minLength) {
+		this.minLength = minLength;
+	}
+
+	/**
+	 * @return the maxLength
+	 */
+	public Integer getMaxLength() {
+		return maxLength;
+	}
+
+	/**
+	 * @param maxLength the maxLength to set
+	 */
+	public void setMaxLength(Integer maxLength) {
+		this.maxLength = maxLength;
 	}
 
 	/**
