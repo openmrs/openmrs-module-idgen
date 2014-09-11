@@ -19,6 +19,15 @@
 			<th align="right"><spring:message code="PatientIdentifier.identifierType" />:</th>
 			<td>${option.identifierType}</td>
 		</tr>
+        <tr>
+            <th align="right" valign="top"><spring:message code="idgen.location" />:</th>
+            <td>
+                <frm:select path="location">
+                    <frm:option value=""></frm:option>
+                    <frm:options items="${availableLocations}" itemValue="id" itemLabel="name"/>
+                </frm:select>
+            </td>
+        </tr>
 		<tr>
 			<th align="right" valign="top"><spring:message code="idgen.sourceToAutogenerateFrom" />:</th>
 			<td>

@@ -120,16 +120,16 @@ public class IdentifierSourceController {
 			
 			Map<PatientIdentifierType, List<IdentifierSource>> sourcesByType = iss.getIdentifierSourcesByType(ret);
 			
-			List<PatientIdentifierType> identiferTypes = new ArrayList<PatientIdentifierType>();
+			List<PatientIdentifierType> identifierTypes = new ArrayList<PatientIdentifierType>();
 			for (Iterator<PatientIdentifierType> i = sourcesByType.keySet().iterator(); i.hasNext();) {
 				PatientIdentifierType pit = i.next();
 				if (sourcesByType.get(pit).isEmpty()) {
 					i.remove();
 				}
-				identiferTypes.add(pit);
+				identifierTypes.add(pit);
 			}
 			model.addAttribute("sourcesByType", sourcesByType);
-			model.addAttribute("identiferTypes", identiferTypes);
+			model.addAttribute("identifierTypes", identifierTypes);
 			model.addAttribute("sourceTypes", iss.getIdentifierSourceTypes());
 		}
     }

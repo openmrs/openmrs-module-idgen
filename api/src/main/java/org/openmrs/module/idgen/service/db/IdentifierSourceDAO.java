@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
@@ -74,15 +75,38 @@ public interface IdentifierSourceDAO {
 	 */
 	@Transactional(readOnly=true)
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws DAOException;
-	
+
+    /**
+     * @param autoGenerationOptionId
+     * @return AutoGenerationOption
+     */
+    @Transactional(readOnly=true)
+    public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws DAOException;
+
 	/**
 	 * @param type
-	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
+	 * @param location
+     * @return the AutoGenerationOption that matches the given PatientIdentifierType
 	 */
 	@Transactional(readOnly=true)
-	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws DAOException;
-	
-	/**
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws DAOException;
+
+    /**
+     * @param type
+     * @return the AutoGenerationOption that matches the given PatientIdentifierType
+     * @throws DAOException
+     */
+    @Transactional(readOnly = true)
+    public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws DAOException;
+
+    /**
+     * @param type
+     * @return the AutoGenerationOption that matches the given PatientIdentifierType
+     */
+    @Transactional(readOnly=true)
+    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws DAOException;
+
+    /**
 	 * Persists a AutoGenerationOption, either as a save or update.
 	 * @param option
 	 * @return the AutoGenerationOption that was passed in

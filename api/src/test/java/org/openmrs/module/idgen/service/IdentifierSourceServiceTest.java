@@ -13,17 +13,16 @@
  */
 package org.openmrs.module.idgen.service;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import junit.framework.Assert;
-
+import org.hibernate.NonUniqueResultException;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Location;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
@@ -35,6 +34,13 @@ import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest {
 	
@@ -42,6 +48,14 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 
     @Autowired
     IdentifierSourceDAO dao;
+
+    @Autowired
+    @Qualifier("patientService")
+    PatientService patientService;
+
+    @Autowired
+    @Qualifier("locationService")
+    LocationService locationService;
 
     @Before
     public void beforeEachTest() throws Exception {
@@ -152,7 +166,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		IdentifierSource s = iss.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getClass(), SequentialIdentifierGenerator.class);
 		Assert.assertEquals(s.getName(), name);
-		Assert.assertEquals(((SequentialIdentifierGenerator)s).getBaseCharacterSet(), baseChars);
+		Assert.assertEquals(((SequentialIdentifierGenerator) s).getBaseCharacterSet(), baseChars);
 	}
 
 	/**
@@ -213,6 +227,51 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
     public void getIdentifierSourceByUuid_shouldGetSource() {
         IdentifierSource identifierSource = iss.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
         Assert.assertEquals(3, identifierSource.getId().intValue());
+    }
+
+    @Test
+    public void getAutoGenerationOptionByPatientIdentifier_shouldGetAutoGenerationOptionByIdentifier() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
+        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType);
+        Assert.assertEquals(1, autoGenerationOption.getId().intValue());
+    }
+
+    @Test
+    public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldGetAutoGenerationOptionByIdentifier() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
+        Location location = locationService.getLocation(2);
+        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        Assert.assertEquals(3, autoGenerationOption.getId().intValue());
+    }
+
+    @Test
+    public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldReturnNullIfNoOptionForLocation() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
+        Location location = locationService.getLocation(4);
+        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        Assert.assertNull(autoGenerationOption);
+    }
+
+    @Test(expected = NonUniqueResultException.class)
+    public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldFailWhenTryingToFetchOptionByJustPatientIdentifierIfConfiguredByLocation() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
+        iss.getAutoGenerationOption(patientIdentifierType);
+    }
+
+    @Test
+    public void getAutoGenerationOptionsByPatientIdentifier_shouldReturnAllAutoGenerationOptions() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
+        List<AutoGenerationOption> autoGenerationOptions = iss.getAutoGenerationOptions(patientIdentifierType);
+        Assert.assertEquals(2, autoGenerationOptions.size());
+        // poor man's check that the list contains both options
+        Assert.assertTrue( (autoGenerationOptions.get(0).getId().equals(2) && autoGenerationOptions.get(1).getId().equals(3))
+                            || (autoGenerationOptions.get(0).getId().equals(3) && autoGenerationOptions.get(1).getId().equals(2)));
+    }
+
+    @Test
+    public void getAutoGenerationOptionById_shouldFetchAutoGenerationOptionByPrimaryKey() {
+        AutoGenerationOption option = iss.getAutoGenerationOption(2);
+        Assert.assertEquals(2, option.getId().intValue());
     }
 
     private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {

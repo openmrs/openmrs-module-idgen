@@ -22,6 +22,7 @@ import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -132,16 +133,48 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 		Query query = sessionFactory.getCurrentSession().createQuery(hql);
 		return Integer.parseInt(query.uniqueResult().toString());
 	}
-	
-	/** 
-	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
+
+    /**
+     * @see IdentifierSourceDAO#getAutoGenerationOption(Integer)
+     */
+    @Transactional(readOnly=true)
+    @Override
+    public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws DAOException {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
+        criteria.add(Expression.eq("id", autoGenerationOptionId));
+        return (AutoGenerationOption)criteria.uniqueResult();
+    }
+
+    /**
+	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType,Location)
 	 */
 	@Transactional(readOnly=true)
-	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
 		criteria.add(Expression.eq("identifierType", type));
+        criteria.add(Expression.eq("location", location));
 		return (AutoGenerationOption)criteria.uniqueResult();
 	}
+
+    /**
+     * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
+     */
+    @Transactional(readOnly=true)
+    public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
+        criteria.add(Expression.eq("identifierType", type));
+        return (List<AutoGenerationOption>) criteria.list();
+    }
+
+    /**
+     * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
+     */
+    @Transactional(readOnly=true)
+    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
+        criteria.add(Expression.eq("identifierType", type));
+        return (AutoGenerationOption)criteria.uniqueResult();
+    }
 
 	/** 
 	 * @see IdentifierSourceDAO#saveAutoGenerationOption(AutoGenerationOption)

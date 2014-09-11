@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen.service;
 
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
@@ -103,6 +104,14 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
 	public String generateIdentifier(PatientIdentifierType type, String comment);
+
+    /**
+     * Given a PatientIdentifierType and Location, generates an identifier using the proper IdentifierSource
+     * Returns null if this PatientIdentifierType is not set to be auto-generated
+     */
+    @Transactional
+    @Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+    public String generateIdentifier(PatientIdentifierType type, Location location, String comment);
 	
 	/**
 	 * Generates a Single Identifiers from the given source
@@ -164,14 +173,41 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional
 	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
-	
-	/**
-	 * @param id the id to retrieve for the given type
-	 * @return the AutoGenerationOption that matches the given PatientIdentifierType
+
+    /**
+     * @param id of auto generation option
+     * @return the AutoGenerationOption
+
+     */
+    @Transactional(readOnly = true)
+    public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException;
+
+
+    /**
+	 * @param patient identifier type
+     * @param location location
+	 * @return the AutoGenerationOption that matches the given PatientIdentifierType and Location
+
 	 */
 	@Transactional(readOnly = true)
-	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
-	
+	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;
+
+    /**
+     * @param patient identifier type
+     * @return all AutoGenerationOptions that match the given patient identifier type
+     * @throws APIException
+     */
+    @Transactional(readOnly = true)
+    public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException;
+
+    /**
+     * @param patient identifier type
+     * @return the AutoGenerationOption that matches the given PatientIdentifierType
+     * @throws non-unique exception if more than one auto-generation option for this type
+     */
+    @Transactional(readOnly = true)
+    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
+
 	/**
 	 * Persists a AutoGenerationOption, either as a save or update.
 	 * @param option

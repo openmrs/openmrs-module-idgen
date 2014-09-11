@@ -178,4 +178,31 @@
         </sql>
     </diff>
 
+    <diff>
+        <version>2.5</version>
+        <author>Partners In Health</author>
+        <date>10 September 2014</date>
+        <description>
+            Add location column to idgen_auto_generation_option table
+        </description>
+        <sql>
+            ALTER TABLE `idgen_auto_generation_option` ADD COLUMN `location` int(11);
+            ALTER TABLE `idgen_auto_generation_option` ADD CONSTRAINT `location_for_auto_generation_option` FOREIGN KEY (`location`) REFERENCES `location` (`location_id`);
+        </sql>
+    </diff>
+
+    <diff>
+        <version>2.5.1</version>
+        <author>Partners In Health</author>
+        <date>10 September 2014</date>
+        <description>
+            Remove unique constraint from patient identifier column (we need to drop and recreate the foreign key to do this)
+        </description>
+        <sql>
+            ALTER TABLE `idgen_auto_generation_option` DROP FOREIGN KEY `identifier_type for idgen_auto_generation_option`;
+            ALTER TABLE `idgen_auto_generation_option` DROP INDEX `identifier_type`;
+            ALTER TABLE `idgen_auto_generation_option` ADD CONSTRAINT `identifier_type for idgen_auto_generation_option` FOREIGN KEY (`identifier_type`) REFERENCES `patient_identifier_type` (`patient_identifier_type_id`);
+        </sql>
+    </diff>
+
 </sqldiff>

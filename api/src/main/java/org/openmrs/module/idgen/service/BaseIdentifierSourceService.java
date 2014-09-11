@@ -15,6 +15,7 @@ package org.openmrs.module.idgen.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -217,10 +218,24 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     }
 
     /**
-	 * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, java.lang.String)
+     * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, java.lang.String)
+     */
+    public String generateIdentifier(PatientIdentifierType type, String comment) {
+        AutoGenerationOption option = getAutoGenerationOption(type);
+
+        if (option != null && option.isAutomaticGenerationEnabled()) {
+            return generateIdentifier(option.getSource(), comment);
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+	 * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, org.openmrs.Location, java.lang.String)
 	 */
-	public String generateIdentifier(PatientIdentifierType type, String comment) {
-		AutoGenerationOption option = getAutoGenerationOption(type);
+	public String generateIdentifier(PatientIdentifierType type, Location location, String comment) {
+		AutoGenerationOption option = getAutoGenerationOption(type, location);
 	
 		if (option != null && option.isAutomaticGenerationEnabled()) {
 			return generateIdentifier(option.getSource(), comment);
@@ -276,8 +291,33 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 		List<String> identifiers = generateIdentifiers(pool.getSource(), batchSize, "Generating identifier for pool " + pool.getName());
 		addIdentifiersToPool(pool, identifiers);
 	}
-	
-	/** 
+
+    /**
+     * @see IdentifierSourceService#getAutoGenerationOption(Integer)
+     */
+    @Transactional(readOnly=true)
+    @Override
+    public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException {
+        return dao.getAutoGenerationOption(autoGenerationOptionId);
+    }
+
+    /**
+     * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType,Location)
+     */
+    @Transactional(readOnly=true)
+    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException {
+        return dao.getAutoGenerationOption(type, location);
+    }
+
+    /**
+     * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType,Location)
+     */
+    @Transactional(readOnly = true)
+    public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException {
+        return dao.getAutoGenerationOptions(type);
+    }
+
+    /**
 	 * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType)
 	 */
 	@Transactional(readOnly=true)

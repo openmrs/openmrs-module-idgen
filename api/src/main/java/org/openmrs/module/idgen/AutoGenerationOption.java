@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen;
 
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 
 /**
@@ -24,6 +25,7 @@ public class AutoGenerationOption {
 	
     private Integer id;
     private PatientIdentifierType identifierType;
+    private Location location;
     private IdentifierSource source;
     private boolean manualEntryEnabled = true;
     private boolean automaticGenerationEnabled = false;
@@ -108,7 +110,21 @@ public class AutoGenerationOption {
 		this.identifierType = identifierType;
 	}
 
-	/**
+    /**
+     * @return the location
+     */
+    public Location getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    /**
 	 * @return the source
 	 */
 	public IdentifierSource getSource() {
