@@ -11,8 +11,8 @@
 	<url>https://wiki.openmrs.org/display/docs/Idgen+Module</url>
 
 	<scm>
-		<connection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</connection>
-		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-idgen/</developerConnection>
+		<connection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</connection>
+		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-idgen/</url>
 	  <tag>2.8</tag>
   </scm>
