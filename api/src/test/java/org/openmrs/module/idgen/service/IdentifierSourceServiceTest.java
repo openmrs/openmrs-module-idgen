@@ -259,6 +259,14 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
     }
 
     @Test
+    public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldReturnOptionsNotConfiguredByLocation() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
+        Location location = locationService.getLocation(4);
+        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        Assert.assertEquals(1, autoGenerationOption.getId().intValue());
+    }
+
+    @Test
     public void getAutoGenerationOptionsByPatientIdentifier_shouldReturnAllAutoGenerationOptions() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
         List<AutoGenerationOption> autoGenerationOptions = iss.getAutoGenerationOptions(patientIdentifierType);

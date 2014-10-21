@@ -86,7 +86,8 @@ public interface IdentifierSourceDAO {
 	/**
 	 * @param type
 	 * @param location
-     * @return the AutoGenerationOption that matches the given PatientIdentifierType
+     * @return the AutoGenerationOption that matches the given PatientIdentifierType and location
+     * @should return AutoGenerationOptions that do not have an associated location
 	 */
 	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws DAOException;

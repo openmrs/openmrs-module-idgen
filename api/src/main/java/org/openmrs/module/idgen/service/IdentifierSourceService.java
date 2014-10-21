@@ -187,7 +187,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @param patient identifier type
      * @param location location
 	 * @return the AutoGenerationOption that matches the given PatientIdentifierType and Location
-
+     * @should return options that don't have a configured location
 	 */
 	@Transactional(readOnly = true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;

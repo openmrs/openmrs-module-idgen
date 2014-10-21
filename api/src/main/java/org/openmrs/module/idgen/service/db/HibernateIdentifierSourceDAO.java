@@ -152,8 +152,8 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
 		criteria.add(Expression.eq("identifierType", type));
-        criteria.add(Expression.eq("location", location));
-		return (AutoGenerationOption)criteria.uniqueResult();
+        criteria.add(Restrictions.or(Expression.eq("location", location), Expression.isNull("location")));
+		return (AutoGenerationOption) criteria.uniqueResult();
 	}
 
     /**
