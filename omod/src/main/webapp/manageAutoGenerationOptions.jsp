@@ -31,19 +31,19 @@
                 <c:forEach items="${entry.value}" var="option">
                     <tr>
                         <td>
-                            <a href="editAutoGenerationOption.form?autoGenerationOption=${option.id}">${entry.key.name}</a>
+                            <a href="editAutoGenerationOption.form?autoGenerationOption=${option.id}"><spring:message code="idgen.entry.key.name"/></a>
                         </td>
 
                         <c:choose>
                             <c:when test="${!empty option.location}">
-                                <td>${option.location.name}</td>
+                                <td><spring:message code="idgen.option.location.name"/></td>
                             </c:when>
                             <c:otherwise>
                                 <td><spring:message code="general.none"/></td>
                             </c:otherwise>
                         </c:choose>
 
-                        <td>${option.source.name}</td>
+                        <td><spring:message code="idgen.option.source.name"/></td>
                         <td><spring:message code="general.${option.manualEntryEnabled}"/></td>
                         <td><spring:message code="general.${option.automaticGenerationEnabled}"/></td>
                         <td>
@@ -70,7 +70,7 @@
                     <select name="identifierType">
                         <option value=""></option>
                         <c:forEach items="${identifierTypes}" var="pit">
-                            <option value="${pit.patientIdentifierTypeId}">${pit.name}</option>
+                            <option value="${pit.patientIdentifierTypeId}"><spring:message code=idgen.pit.name"/></option>
                         </c:forEach>
                     </select>
                 </td>

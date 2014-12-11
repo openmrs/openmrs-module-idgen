@@ -17,7 +17,7 @@
 	<table>
 		<tr>
 			<th align="right"><spring:message code="PatientIdentifier.identifierType" />:</th>
-			<td>${option.identifierType}</td>
+			<td><spring:message code="idgen.option.identifierType" /></td>
 		</tr>
         <tr>
             <th align="right" valign="top"><spring:message code="idgen.location" />:</th>

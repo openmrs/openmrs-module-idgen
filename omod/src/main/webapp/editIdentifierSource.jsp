@@ -16,10 +16,10 @@
 			<spring:message code="general.new" />: <spring:message code="idgen.${source['class'].name}" />
 		</c:when>
 		<c:otherwise>
-			<spring:message code="general.edit" />: ${source.name}
+			<spring:message code="general.edit" />: <spring:message code="idgen.source.name" />
 		</c:otherwise>
 	</c:choose>
-	<spring:message code="idgen.general.for"/> ${source.identifierType.name}
+	<spring:message code="idgen.general.for"/> <spring:message code="idgen.source.identifierType.name" />
 </h3>
 
 <frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form">
@@ -41,7 +41,7 @@
 			<td>
 				<c:choose>
 					<c:when test="${!empty source.identifierType.validator}">
-						${source.identifierType.validator}
+						<spring:message code="idgen.source.identifierType.validator" />
 					</c:when>
 					<c:otherwise>
 						<spring:message code="general.none" />
@@ -54,7 +54,7 @@
 			<td>
 				<c:choose>
 					<c:when test="${!empty source.identifierType.format}">
-						${source.identifierType.format}
+						<spring:message code="idgen.source.identifierType.format" />
 					</c:when>
 					<c:otherwise>
 						<spring:message code="general.none" />
@@ -80,7 +80,7 @@
 					<c:choose>
 						<c:when test="${source.initialized}">
 							<frm:hidden path="firstIdentifierBase"/>
-							${source.firstIdentifierBase}
+							<spring:message code="source.firstIdentifierBase" />
 							<spring:message code="idgen.inUseUnableToModify" />
 						</c:when>
 						<c:otherwise>
