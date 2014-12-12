@@ -47,7 +47,7 @@
 
 <c:if test="${source['class'].name == 'org.openmrs.module.idgen.SequentialIdentifierGenerator'}">
 
-	This Identifier Source generates sequential identifiers with the following configuration:<br/><br/>
+	<spring:message code="idgen.idSourceGeneratesIds"/><br/><br/>
 	
 	<table id="sourceTable">
 		<tr>
@@ -92,21 +92,21 @@
 </c:if>
 
 <c:if test="${source['class'].name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
-	This Identifier Source connects to the following remote URL to retrieve new identifiers:<br/>
+	<spring:message code="idgen.idSourceConnectsToURL"/><br/>
 	${source.url}
 </c:if>
 
 <c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 
-	This Identifier Source manages a pool of pre-generated identifiers.<br/><br/>
+	<spring:message code="idgen.idSourceManagesPoolOfIds"/><br/><br/>
 	
-	Quantity Consumed:  ${fn:length(source.usedIdentifiers)}<br/>
-	Quantity Available: ${fn:length(source.availableIdentifiers)}
+	<spring:message code="idgen.quantityConsumed"/>${fn:length(source.usedIdentifiers)}<br/>
+	<spring:message code="idgen.quantityAvailable"/>${fn:length(source.availableIdentifiers)}
 	
 	<br/><br/>
 	
 	<form action="addIdentifiersFromFile.form" method="post" enctype="multipart/form-data">
-		The pool can be filled via manual upload from file: 
+		<spring:message code="idgen.poolCanBeFilled"/>
 		<input type="hidden" name="source" value="${source.id}"/>
 		<input type="file" name="inputFile"/>
 		<input type="submit" value="Upload"/>
@@ -115,8 +115,8 @@
 	<c:if test="${!empty source.source}">
 		<br/>
 		<form action="addIdentifiersFromSource.form" method="post" enctype="multipart/form-data">
-			The pool can also be filled by directly connecting to Identifier Source ${source.source.name}.<br/>
-			Quantity to upload from ${source.source.name}:
+			<spring:message code="idgen.poolCanAlsoBeFilled"/><br/>
+			<spring:message code="idgen.quantityToUpload"/>
 			<input type="hidden" name="source" value="${source.id}"/>
 			<input type="input" name="batchSize"/>
 			<input type="submit" value="Upload"/>
@@ -127,12 +127,12 @@
 </c:if>
 <hr/>
 <form action="exportIdentifiers.form">
-	<b>Export Identifiers: </b>
+	<b><spring:message code="idgen.exportIds"/></b>
 	<c:set var="available" value="t"/>
 	<c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 		<c:if test="${fn:length(source.availableIdentifiers) == 0}">
 			<c:set var="available" value="f"/>
-			None available for export.
+			<spring:message code="idgen.exportNoneAvailable"/>
 		</c:if>
 	</c:if>
 	<br/>
