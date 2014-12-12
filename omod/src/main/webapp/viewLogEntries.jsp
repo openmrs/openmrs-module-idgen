@@ -43,7 +43,7 @@
 					<select name="source">
 						<option value=""></option>
 						<c:forEach items="${identifierSources}" var="idSource">
-							<option value="${idSource.id}"<c:if test="${source == idSource}"> <spring:message code="idgen.selected"/></c:if>><spring:message code="idgen.idSource.name"/></option>
+							<option value="${idSource.id}"<c:if test="${source == idSource}"> <spring:message code="idgen.selected"/></c:if>>${idSource.name}</option>
 						</c:forEach>
 					</select>
 				</td>
@@ -86,11 +86,11 @@
 			<c:if test="${!empty logEntries}">
 				<c:forEach items="${logEntries}" var="entry" varStatus="entryStatus">
 					<tr>
-						<td><spring:message code="idgen.entry.source.name"/></td>
-						<td><spring:message code="idgen.entry.identifier"/></td>
+						<td>${entry.source.name}</td>
+						<td>${entry.identifier}</td>
 						<td><openmrs:formatDate date="${entry.dateGenerated}"/></td>
-						<td><spring:message code="idgen.entry.generatedBy.personName"/></td>
-						<td><spring:message code="idgen.entry.comment"/></td>
+						<td>${entry.generatedBy.personName}</td>
+						<td>${entry.comment}</td>
 					</tr>
 				</c:forEach>
 			</c:if>

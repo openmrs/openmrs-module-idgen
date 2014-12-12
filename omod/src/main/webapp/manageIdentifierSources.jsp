@@ -33,9 +33,9 @@
 					
 						<tr class="${entryStatus.index % 2 == 0 ? 'evenRow' : 'oddRow'} ${status.last ? 'underlineRow' : '' }">
 						
-							<td><spring:message code="idgen.entry.key.name"/></td>
+							<td>${entry.key.name}</td>
 							<td><spring:message code="idgen.${source['class'].name}"/></td>
-							<td><spring:message code="idgen.source.name"/></td>
+							<td>${source.name}</td>
 							<td>
 								<button style="height:20px; font-size:8pt; vertical-align:middle;" onclick="document.location.href='editIdentifierSource.form?source=${source.id}';">
 									<spring:message code="idgen.configure"/>
@@ -64,7 +64,7 @@
 					<select name="identifierType">
 						<option value=""></option>
 						<c:forEach items="${identifierTypes}" var="pit">
-							<option value="${pit.patientIdentifierTypeId}"><spring:message code="idgen.pit.name"/></option>
+							<option value="${pit.patientIdentifierTypeId}">${pit.name}</option>
 						</c:forEach>
 					</select>
 				</td>

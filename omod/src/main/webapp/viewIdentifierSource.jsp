@@ -10,31 +10,31 @@
 	.underlineRow td {border-bottom: 1px solid black;}
 </style>
 
-<h3><spring:message code="idgen.source.identifierType.name"/>: <spring:message code="idgen.source.name"/></h3>
+<h3>${source.identifierType.name}: ${source.name}</h3>
 
 <table id="sourceTable">
 	<tr>
 		<th><spring:message code="idgen.sourceName" /></th>
 		<td>
-			<spring:message code="idgen.source.name"/>
+			${source.name}
 			&nbsp;&nbsp;
 			(<a href="editIdentifierSource.form?source=${source.id}"><spring:message code="general.edit" />)
 		</td>
 	</tr>
 	<tr>
 		<th><spring:message code="general.description" />:</th>
-		<td><spring:message code="idgen.source.description"/></td>
+		<td>${source.description}</td>
 	</tr>
 	<tr>
 		<th><spring:message code="PatientIdentifier.identifierType" /></th>
-		<td><spring:message code="idgen.source.identifierType.name"/></td>
+		<td>${source.identifierType.name}</td>
 	</tr>
 	<tr>
 		<th><spring:message code="idgen.checkDigitAlgorithm" />:</td>
 		<td>
 			<c:choose>
 				<c:when test="${!empty source.identifierType.validator}">
-					<spring:message code="idgen.source.identifierType.validator"/>
+					${source.identifierType.validator}
 				</c:when>
 				<c:otherwise>
 					<spring:message code="general.none" />
@@ -52,34 +52,34 @@
 	<table id="sourceTable">
 		<tr>
 			<th><spring:message code="idgen.baseCharacterSet"/>:</th>
-			<td><spring:message code="idgen.source.baseCharacterSet"/></td>
+			<td>${source.baseCharacterSet}</td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.firstIdentifierBase"/>:</th>
-			<td><spring:message code="idgen.source.firstIdentifierBase"/></td>
+			<td>${source.firstIdentifierBase}</td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.prefix"/>:</th>
-			<td><spring:message code="igden.source.prefix"/></td>
+			<td>${source.prefix}</td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.suffix"/>:</th>
-			<td><spring:message code="idgen.source.suffix"/></td>
+			<td>${source.suffix}</td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.minLength"/>:</th>
-			<td><spring:message code="idgen.source.minLength"/></td>
+			<td>${source.minLength}</td>
 		</tr>
         <tr>
             <th><spring:message code="idgen.maxLength"/>:</th>
-            <td><spring:message code="idgen.source.maxLength"/></td>
+            <td>${source.maxLength}</td>
         </tr>
         <tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
 			<th><spring:message code="idgen.reservedIdentifiers"/>:</th>
 			<td>
 				<form action="reserveIdentifiersFromFile.form" method="post" enctype="multipart/form-data">
-					<a href="exportReservedIdentifiers.form?source=${source.id}"><spring:message code="idgen.lengthOfReservedIdentifiers"/> <spring:message code="idgen.defined"/></a>
+					<a href="exportReservedIdentifiers.form?source=${source.id}">${fn:length(source.reservedIdentifiers)} <spring:message code="idgen.defined"/></a>
 					&nbsp;&nbsp;
 					<spring:message code="idgen.uploadReservedIdentifiers"/>: 
 					<input type="hidden" name="source" value="${source.id}"/>
@@ -93,15 +93,15 @@
 
 <c:if test="${source['class'].name == 'org.openmrs.module.idgen.RemoteIdentifierSource'}">
 	<spring:message code="idgen.idSourceConnectsToURL"/><br/>
-	<spring:message code="idgen.source.url"/>
+	${source.url}
 </c:if>
 
 <c:if test="${source['class'].name == 'org.openmrs.module.idgen.IdentifierPool'}">
 
 	<spring:message code="idgen.idSourceManagesPoolOfIds"/><br/><br/>
 	
-	<spring:message code="idgen.quantityConsumed"/><br/>
-	<spring:message code="idgen.quantityAvailable"/>
+	<spring:message code="idgen.quantityConsumed"/>${fn:length(source.usedIdentifiers)}<br/>
+	<spring:message code="idgen.quantityAvailable"/>${fn:length(source.availableIdentifiers)}
 	
 	<br/><br/>
 	
