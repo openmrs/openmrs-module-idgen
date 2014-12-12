@@ -43,7 +43,7 @@
 					<select name="source">
 						<option value=""></option>
 						<c:forEach items="${identifierSources}" var="idSource">
-							<option value="${idSource.id}"<c:if test="${source == idSource}"> <spring:message code="idgen.selected"/></c:if>>${idSource.name}</option>
+							<option value="${idSource.id}"<c:if test="${source == idSource}"> selected</c:if>>${idSource.name}</option>
 						</c:forEach>
 					</select>
 				</td>
