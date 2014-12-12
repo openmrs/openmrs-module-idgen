@@ -70,7 +70,7 @@
                     <select name="identifierType">
                         <option value=""></option>
                         <c:forEach items="${identifierTypes}" var="pit">
-                            <option value="${pit.patientIdentifierTypeId}">${pit.name}</option>
+                            <option value="${pit.patientIdentifierTypeId}">>${pit.name}</option>
                         </c:forEach>
                     </select>
                 </td>
