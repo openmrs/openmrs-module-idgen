@@ -22,19 +22,20 @@ jQuery(document).ready(function() {
 		
 		// For each identifier row added by default on the page, re-organize the cells and add the generation cell. Remove any with no identifiers
 		jQuery("#identifiersTbody").children("tr").each(function () {
-			if (this.id != 'identifierRow' && jQuery(this).find("input[name='identifier']").val() == '') {
+			if (!this.id.match(/existingIdentifiersRow\[\d+\]/g) && jQuery(this).find("input[name$='identifier']").val() == '') {
 				jQuery(this).remove();
+			} else {
+				var identifierTypeId = jQuery(this).find("select[name$='identifierType'] option:selected").val();
+				var identifierTypeName = jQuery(this).find("select[name$='identifierType'] option:selected").html();
+				idTypesAdded.push(identifierTypeId);
+				jQuery(this).children("td:eq(1)").remove();
+				jQuery(this).children("td:eq(0)").before('<td valign="top"><span class="identifierTypeName">'+identifierTypeName+'</span><input type="hidden" class="identifierTypeHidden" name="identifierType" value="'+identifierTypeId+'"/></td>');		
+				jQuery(this).children("td:eq(2)").addClass("identifierInput");
+				if (jQuery("#idgenColumnHeader").length > 0) {
+					jQuery(this).children("td:eq(1)").before('<td valign="top" align="center"><span class="autoGenerationHidden">N/A</span><input class="autoGenerationOption" type="checkbox" value=""/></td>');
+				}
+				addIdentifierRow(jsonData.allIdentifiers[identifierTypeId], patientId, this);
 			};
-			var identifierTypeId = jQuery(this).find("select[name='identifierType'] option:selected").val();
-			var identifierTypeName = jQuery(this).find("select[name='identifierType'] option:selected").html();
-			idTypesAdded.push(identifierTypeId);
-			jQuery(this).children("td:eq(1)").remove();
-			jQuery(this).children("td:eq(0)").before('<td valign="top"><span class="identifierTypeName">'+identifierTypeName+'</span><input type="hidden" class="identifierTypeHidden" name="identifierType" value="'+identifierTypeId+'"/></td>');		
-			jQuery(this).children("td:eq(2)").addClass("identifierInput");
-			if (jQuery("#idgenColumnHeader").length > 0) {
-				jQuery(this).children("td:eq(1)").before('<td valign="top" align="center"><span class="autoGenerationHidden">N/A</span><input class="autoGenerationOption" type="checkbox" value=""/></td>');
-			}
-			addIdentifierRow(jsonData.allIdentifiers[identifierTypeId], patientId, this);
 		});
 	
 		// Create and insert select list for adding new identifiers
@@ -74,7 +75,7 @@ function addIdentifierRow(item, patientId, row) {
 
 	jQuery(row).find(".identifierTypeName").html(item.typeName);
 	jQuery(row).find(".identifierTypeHidden").val(item.typeId);
-	var identifierInput = jQuery(row).find("input[name='identifier']");
+	var identifierInput = jQuery(row).find("input[name$='identifier']");
 
 	if (!item.sourceId || item.sourceId == '' || jQuery(identifierInput).val() != '') {
 		jQuery(row).find(".autoGenerationOption").hide();
