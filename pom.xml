@@ -80,6 +80,13 @@
             <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        
 	</dependencies>
 
 	<properties>
@@ -295,6 +302,8 @@
 				</plugins>
 			</build>
 		</profile>
+	
+		
 	</profiles>
 
 	<repositories>
