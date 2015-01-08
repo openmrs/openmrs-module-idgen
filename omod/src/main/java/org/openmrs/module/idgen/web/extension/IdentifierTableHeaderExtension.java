@@ -19,12 +19,12 @@ import java.util.Map;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.Extension;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.web.WebConstants;
 import org.springframework.util.StringUtils;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 /**
  * Provides additional Header Columns to the edit identifier table
@@ -56,10 +56,7 @@ public class IdentifierTableHeaderExtension extends Extension {
 
  		StringBuilder sb = new StringBuilder();
 		
-		
- 		if (!autogen.isEmpty()) {
- 	 		DefaultArtifactVersion openMRSversionShort = new DefaultArtifactVersion(OpenmrsConstants.OPENMRS_VERSION_SHORT);
- 			
+ 		if (!autogen.isEmpty()) { 			
  			// solving IDGEN-11: when webapp_name is empty, double slashes cause wrong url
  			// in 1.10+, use WebUtil.getContextPath(); See TRUNK-
  			String contextPath = "";
@@ -67,10 +64,10 @@ public class IdentifierTableHeaderExtension extends Extension {
  				contextPath += "/" + WebConstants.WEBAPP_NAME;
  			}
  			
- 	 		if (openMRSversionShort.compareTo(new DefaultArtifactVersion("1.7")) < 0) {
+ 	 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION_SHORT, "1.7") < 0) {
  	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n");
  	 		}
- 	 		if (openMRSversionShort.compareTo(new DefaultArtifactVersion("1.8")) < 0) {
+ 	 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION_SHORT, "1.8") < 0) {
  	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/newPatientFormExtensions.js\" type=\"text/javascript\"></script>\n"); 		
  	 		}
  	 		else {
