@@ -80,6 +80,7 @@
             <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
+        
 	</dependencies>
 
 	<properties>
@@ -295,6 +296,8 @@
 				</plugins>
 			</build>
 		</profile>
+	
+		
 	</profiles>
 
 	<repositories>

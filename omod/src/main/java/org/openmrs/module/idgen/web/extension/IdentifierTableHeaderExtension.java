@@ -19,6 +19,7 @@ import java.util.Map;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.Extension;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.util.OpenmrsConstants;
@@ -54,8 +55,8 @@ public class IdentifierTableHeaderExtension extends Extension {
  		}
 
  		StringBuilder sb = new StringBuilder();
- 		if (!autogen.isEmpty()) {
- 			
+		
+ 		if (!autogen.isEmpty()) { 			
  			// solving IDGEN-11: when webapp_name is empty, double slashes cause wrong url
  			// in 1.10+, use WebUtil.getContextPath(); See TRUNK-
  			String contextPath = "";
@@ -63,10 +64,10 @@ public class IdentifierTableHeaderExtension extends Extension {
  				contextPath += "/" + WebConstants.WEBAPP_NAME;
  			}
  			
- 	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.7") < 0) {
+ 	 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION_SHORT, "1.7") < 0) {
  	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/jquery-1.3.2.min.js\" type=\"text/javascript\"></script>\n");
  	 		}
- 	 		if (OpenmrsConstants.OPENMRS_VERSION_SHORT.compareTo("1.8") < 0) {
+ 	 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION_SHORT, "1.8") < 0) {
  	 			sb.append("<script src=\"" + contextPath + "/moduleResources/idgen/newPatientFormExtensions.js\" type=\"text/javascript\"></script>\n"); 		
  	 		}
  	 		else {
