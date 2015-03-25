@@ -10,8 +10,8 @@
 		Identifier auto-generation and allocation functionality.  
 		See <a href="http://openmrs.org/wiki/Idgen_Module">http://openmrs.org/wiki/Idgen_Module</a> for more information
 	</description>
-	<activator>@MODULE_PACKAGE@.ModuleActivator</activator>	
-	<require_version>1.6</require_version>
+	<activator>@MODULE_PACKAGE@.IdgenModuleActivator</activator>
+	<require_version>1.9.2</require_version>
 	
 	<extension>
 		<point>org.openmrs.admin.list</point>

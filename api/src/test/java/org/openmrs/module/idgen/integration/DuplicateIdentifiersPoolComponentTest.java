@@ -1,15 +1,13 @@
 package org.openmrs.module.idgen.integration;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
+import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.NotTransactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,36 +19,25 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests out the synchronization problem where duplicate identifiers are assigned
  */
-public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSensitiveTest {
+public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
 
     public static final int NUM_THREADS = 25;
 
-    @Autowired
-    private IdentifierSourceService service;
-
-    @Autowired
-    @Qualifier("patientService")
-    private PatientService patientService;
-
     @Before
     public void setUp() throws Exception {
-
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-
-        IdentifierPool identifierPool = (IdentifierPool) Context.getService(IdentifierSourceService.class).getIdentifierSource(4);
-
+        IdentifierPool identifierPool = (IdentifierPool) getService().getIdentifierSource(4);
         List<String> identifiers = new ArrayList<String>();
-
         for (int i = 1; i <= NUM_THREADS; ++i) {
             identifiers.add(new String("" + i));
         }
-
-        service.addIdentifiersToPool(identifierPool, identifiers);
-        service.saveIdentifierSource(identifierPool);
+        getService().addIdentifiersToPool(identifierPool, identifiers);
+        getService().saveIdentifierSource(identifierPool);
         Context.flushSession();
     }
 
     @Test
+    @NotTransactional
     public void testUnderLoad() throws Exception {
 
         final List<String> generated = new ArrayList<String>();
@@ -61,22 +48,17 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
                 @Override
                 public void run() {
                     Context.openSession();
+                    IdentifierSource source = getService().getIdentifierSource(4);
                     try {
                         authenticate();
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                            // pass
-                        }
-                        generated.addAll(service.generateIdentifiers(Context.getService(IdentifierSourceService.class).getIdentifierSource(4), 1, "thread"));
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                            // pass
-                        }
-                    } catch (Exception e) {
+                        sleep(100);
+                        generated.addAll(getService().generateIdentifiers(source, 1, "thread"));
+                        sleep(100);
+                    }
+                    catch (Exception e) {
                         throw new RuntimeException(e);
-                    } finally {
+                    }
+                    finally {
                         Context.closeSession();
                     }
                 }
@@ -88,8 +70,8 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
         for (Thread thread : threads) {
             try {
                 thread.join();
-            } catch (InterruptedException e) {
-                // pass
+            }
+            catch (InterruptedException e) {
             }
         }
 
@@ -97,5 +79,16 @@ public class DuplicateIdentifiersPoolComponentTest extends BaseModuleContextSens
         assertThat(new HashSet<String>(generated).size(), is(NUM_THREADS));
     }
 
+    public void sleep(long time) {
+        try {
+            Thread.sleep(time);
+        }
+        catch (InterruptedException ex) {
+        }
+    }
+
+    public IdentifierSourceService getService() {
+        return Context.getService(IdentifierSourceService.class);
+    }
 }
 

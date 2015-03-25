@@ -17,69 +17,36 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
-import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.SequentialIdentifierGenerator;
-import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
-import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
-import org.openmrs.module.idgen.service.BaseIdentifierSourceService;
-import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.module.idgen.IdgenBaseTest;
+import org.openmrs.module.idgen.RemoteIdentifierSource;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
 
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class IdentifierPoolSchedulerIT extends BaseModuleContextSensitiveTest {
-
-    BaseIdentifierSourceService service;
-
-    @Autowired
-    IdentifierSourceDAO dao;
+public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
 
     @Before
-    public void beforeEachTest() {
-        service = new BaseIdentifierSourceServiceStub();
-        service.setDao(dao);
-
-        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
-        processor.setIdentifierSourceService(service);
-
-        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
-        processors.put(SequentialIdentifierGenerator.class, processor);
-        service.setProcessors(processors);
+    public void setUp() throws Exception {
+        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
     }
 
     @Test(expected = EmptyIdentifierPoolException.class)
     public void shouldNotGetMoreIdentifiersOnDemandIfConfiguredToUseScheduledTask() throws Exception {
-        PatientIdentifierType identifierType = Context.getPatientService().getPatientIdentifierType(2);
-
-        SequentialIdentifierGenerator generator = buildGenerator(identifierType);
-        service.saveIdentifierSource(generator);
-
-        IdentifierPool pool = buildPool(identifierType, generator);
-        pool.setRefillWithScheduledTask(true);
-        service.saveIdentifierSource(pool);
-
-        service.generateIdentifier(pool, "this will fail");
+        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
+        getService().generateIdentifier(pool, "this will fail");
     }
 
     @Test
     public void shouldGetMoreIdentifiersOnDemandIfNotConfiguredToUseScheduledTask() throws Exception {
-        PatientIdentifierType identifierType = Context.getPatientService().getPatientIdentifierType(2);
 
-        SequentialIdentifierGenerator generator = buildGenerator(identifierType);
-        service.saveIdentifierSource(generator);
+        // register a stub RemoteIdentifierSourceProcessor that won't really go to the internet
+        RemoteIdentifierSourceProcessorStub remoteProcessorStub = new RemoteIdentifierSourceProcessorStub();
+        remoteProcessorStub.setBatchSize(3);
+        getService().registerProcessor(RemoteIdentifierSource.class, remoteProcessorStub);
 
-        IdentifierPool pool = buildPool(identifierType, generator);
-        pool.setRefillWithScheduledTask(false);
-        service.saveIdentifierSource(pool);
-
-        service.generateIdentifier(pool, "this will work");
+        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(5); // Configured to not refill from scheduler
+        getService().generateIdentifier(pool, "this will work");
         Assert.assertTrue(pool.getAvailableIdentifiers().size() > 0);
         Assert.assertTrue(pool.getUsedIdentifiers().size() == 1);
     }
@@ -87,58 +54,12 @@ public class IdentifierPoolSchedulerIT extends BaseModuleContextSensitiveTest {
     @Test
     @Ignore("I don't know of a way to get the timer task to actually commit to the DB in this same transaction")
     public void shouldGetMoreIdentifiersOnScheduleWhenConfigured() throws Exception {
-        PatientIdentifierType identifierType = Context.getPatientService().getPatientIdentifierType(2);
-
-        SequentialIdentifierGenerator generator = buildGenerator(identifierType);
-        service.saveIdentifierSource(generator);
-
-        IdentifierPool pool = buildPool(identifierType, generator);
-        pool.setRefillWithScheduledTask(true);
-        service.saveIdentifierSource(pool);
-
-        Assert.assertEquals(0, pool.getAvailableIdentifiers().size());
-
+        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
         Thread.sleep(12000);
-
         Assert.assertTrue(pool.getAvailableIdentifiers().size() > 0);
     }
 
-    private IdentifierPool buildPool(PatientIdentifierType identifierType, SequentialIdentifierGenerator generator) {
-        IdentifierPool pool = new IdentifierPool();
-        pool.setName("Pool");
-        pool.setMinPoolSize(1);
-        pool.setBatchSize(5);
-        pool.setSequential(true);
-        pool.setSource(generator);
-        pool.setIdentifierType(identifierType);
-        return pool;
-    }
-
-    private SequentialIdentifierGenerator buildGenerator(PatientIdentifierType identifierType) {
-        SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
-        generator.setName("Generator");
-        generator.setBaseCharacterSet("123456790");
-        generator.setFirstIdentifierBase("1");
-        generator.setIdentifierType(identifierType);
-        return generator;
-    }
-
-    private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
-
-        // we need to override the functionality to get and set sequential values since we are now
-        // bypassing Hibernate and going directly to the DB to do this
-
-        private long sequenceValue;
-
-        @Override
-        public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
-            this.sequenceValue = sequenceValue;
-        }
-
-        @Override
-        public Long getSequenceValue(SequentialIdentifierGenerator seq) {
-            return sequenceValue;
-        }
-
+    public IdentifierSourceService getService() {
+        return Context.getService(IdentifierSourceService.class);
     }
 }

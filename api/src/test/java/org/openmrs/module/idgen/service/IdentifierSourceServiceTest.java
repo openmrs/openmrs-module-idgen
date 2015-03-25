@@ -22,27 +22,17 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.AutoGenerationOption;
-import org.openmrs.module.idgen.IdentifierPool;
-import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.PooledIdentifier;
-import org.openmrs.module.idgen.RemoteIdentifierSource;
-import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.*;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest {
+public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	
 	private BaseIdentifierSourceService iss;
 
@@ -74,7 +64,7 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
     }
 	
 	/**
-	 * @see {@link IdentifierSourceService#generateIdentifiers(IdentifierSource, integer, String)}
+	 * @see {@link IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)}
 	 */
 	@Test
 	@Verifies(value = "should return batch of ID of correct size", method = "generateIdentifiers(IdentifierSource, integer, String)")
@@ -83,18 +73,16 @@ public class IdentifierSourceServiceTest extends BaseModuleContextSensitiveTest 
 		List<String>  sig = iss.generateIdentifiers(is, 7, "hello");
 		Assert.assertEquals(sig.toString(), "[G-0, H-8, I-5, J-3, K-1, L-9, M-7]");
 	}
-	
-	
+
 	/**
-	 * @see {@link IdentifierSourceService#getAllIdentifierSources(Boolean)}
+	 * @see {@link IdentifierSourceService#getAllIdentifierSources(boolean)}
 	 */
 	@Test
 	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
 		List<IdentifierSource>  sig = iss.getAllIdentifierSources(false);
-		Assert.assertTrue(sig.size() == 4);
+		Assert.assertTrue(sig.size() == 6);
 	}
-	
 
 	/**
 	 * @see {@link IdentifierSourceService#getIdentifierSource(Integer)}

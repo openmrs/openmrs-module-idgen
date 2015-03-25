@@ -20,28 +20,32 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
-import java.util.List;
-
 /**
  * For all identifier pools that are configured to be refilled by a scheduled task, refill if necessary
  */
-public class RefillIdentifierPoolsTask extends AuthenticatedTask {
+public class RefillIdentifierPoolsTask extends IdgenTask {
 
     private Log log = LogFactory.getLog(getClass());
 
     @Override
-    public void doRun() {
-        IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
+    public Runnable getRunnableTask() {
+        return new RunnableTask();
+    }
 
-        for (IdentifierSource source : service.getAllIdentifierSources(false)) {
-            if (source instanceof IdentifierPool) {
-                IdentifierPool pool = (IdentifierPool) source;
-                if (pool.isRefillWithScheduledTask()) {
-                    try {
-                        service.checkAndRefillIdentifierPool(pool);
-                    }
-                    catch (Exception ex) {
-                        log.warn("Failed to refill identifier pool: " + pool.getName(), ex);
+    private class RunnableTask implements Runnable {
+        @Override
+        public void run() {
+            IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
+            for (IdentifierSource source : service.getAllIdentifierSources(false)) {
+                if (source instanceof IdentifierPool) {
+                    IdentifierPool pool = (IdentifierPool) source;
+                    if (pool.isRefillWithScheduledTask()) {
+                        try {
+                            service.checkAndRefillIdentifierPool(pool);
+                        }
+                        catch (Exception ex) {
+                            log.warn("Failed to refill identifier pool: " + pool.getName(), ex);
+                        }
                     }
                 }
             }

@@ -19,8 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.springframework.test.annotation.NotTransactional;
+import org.openmrs.module.idgen.IdgenBaseTest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,7 +29,7 @@ import java.util.List;
  * Can't run this in the same test as the other IdentifierSourceService tests
  */
 @Ignore
-public class IdentifierSourceServiceLoadTest extends BaseModuleContextSensitiveTest {
+public class IdentifierSourceServiceLoadTest extends IdgenBaseTest {
 
     public static final int NUM_THREADS = 500;
     public static final int NUM_PER_THREAD = 10;

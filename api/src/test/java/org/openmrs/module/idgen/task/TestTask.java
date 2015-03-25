@@ -18,16 +18,20 @@ import org.openmrs.api.context.Context;
 /**
  * Just to test that we're using the spring scheduler right
  */
-public class TestTask extends AuthenticatedTask {
+public class TestTask extends IdgenTask {
 
     static boolean hasRun = false;
-
     static boolean wasAuthenticated = false;
 
     @Override
-    public void doRun() {
-        hasRun = true;
-        wasAuthenticated = Context.isAuthenticated();
+    public Runnable getRunnableTask() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                hasRun = true;
+                wasAuthenticated = Context.isAuthenticated();
+            }
+        };
     }
 
     public static boolean hasRun() {

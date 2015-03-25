@@ -29,7 +29,7 @@
     <bean id="idgenTestTimerFactory" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
         <property name="scheduledExecutorTasks">
             <list>
-                <bean id="refillIdentifierPools" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
+                <bean id="testTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
                     <property name="delay" value="5000" />
                     <property name="period" value="5000" />
                     <property name="runnable">
