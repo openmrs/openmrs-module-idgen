@@ -51,6 +51,11 @@
 		<lang>en</lang>
 		<file>messages.properties</file>
 	</messages>
+	
+	<messages>
+		<lang>de</lang>
+		<file>messages_de.properties</file>
+	</messages>
 
 	<mappingFiles>
 		IdentifierSource.hbm.xml
