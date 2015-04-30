@@ -77,11 +77,24 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
         HttpClient client = new DefaultHttpClient();
-        HttpResponse httpResponse = client.execute(post);
-        String responseText = EntityUtils.toString(httpResponse.getEntity());
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
+        HttpResponse httpResponse;
+        String responseText;
+        Integer statusCode;
+
+        try {
+            httpResponse = client.execute(post);
+            responseText = EntityUtils.toString(httpResponse.getEntity());
+            statusCode = httpResponse.getStatusLine().getStatusCode();
+        }
+        finally {
+            // always release the connection!
+            post.releaseConnection();
+        }
+
+        if (statusCode != 200) {
             throw new IOException("Unexpected response: " + httpResponse.getStatusLine().getStatusCode() + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
         }
+
         return responseText;
     }
 
