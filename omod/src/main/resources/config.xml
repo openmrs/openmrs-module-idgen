@@ -26,6 +26,10 @@
 		<class>@MODULE_PACKAGE@.web.extension.IdentifierTableHeaderExtension</class>
 	</extension>
 	
+	<require_modules>
+		<require_module>org.openmrs.module.webservices.rest</require_module>
+	</require_modules>
+
 	<!-- Required Privileges -->
 	<privilege>
 		<name>Manage Identifier Sources</name>
