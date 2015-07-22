@@ -260,6 +260,8 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @param seq
      * @param sequenceValue
      */
+    @Transactional
+    @Authorized(IdgenConstants.PRIV_MANAGE_IDENTIFIER_SEQUENCE)
     void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue);
 
     /**
