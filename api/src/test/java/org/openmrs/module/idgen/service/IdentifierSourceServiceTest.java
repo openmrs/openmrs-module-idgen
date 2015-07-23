@@ -270,6 +270,17 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
         Assert.assertEquals(2, option.getId().intValue());
     }
 
+    /**
+     * @see {@link IdentifierSourceService#setSequenceValue(SequentialIdentifierGenerator, long)}
+     */
+    @Test
+    public void setSequenceValue_shouldUpdateTheSequenceValue() throws Exception {
+        IdentifierSource is = iss.getIdentifierSource(1);
+        iss.setSequenceValue((SequentialIdentifierGenerator) is, (long) 1234567);
+        Assert.assertEquals(iss.getSequenceValue((SequentialIdentifierGenerator) is),new Long(1234567));
+    }
+
+
     private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
 
         // we need to override the functionality to get and set sequential values since we are now
@@ -280,6 +291,11 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
         @Override
         public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
             this.sequenceValue = sequenceValue;
+        }
+
+        @Override
+        public void setSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
+            saveSequenceValue(seq,sequenceValue);
         }
 
         @Override

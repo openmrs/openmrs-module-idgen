@@ -435,6 +435,14 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     }
 
     /**
+     * @see IdentifierSourceService#setSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator, long)
+     */
+    @Override
+    public void setSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
+        saveSequenceValue(seq, sequenceValue);
+    }
+
+    /**
      * @see IdentifierSourceService#getSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator)
      */
     @Override

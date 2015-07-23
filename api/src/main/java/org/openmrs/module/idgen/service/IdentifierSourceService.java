@@ -256,12 +256,19 @@ public interface IdentifierSourceService extends OpenmrsService {
     IdentifierSource getIdentifierSourceByUuid(String uuid);
 
     /**
-     * Updates sequenceValue of seq directly to the database via SQL, bypassing hibernate's caching
+     * Updates sequenceValue of seq directly to the database via SQL, bypassing hibernate's caching (needs privilege)
      * @param seq
      * @param sequenceValue
      */
     @Transactional
     @Authorized(IdgenConstants.PRIV_MANAGE_IDENTIFIER_SEQUENCE)
+    void setSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue);
+
+    /**
+     * Updates sequenceValue of seq directly to the database via SQL, bypassing hibernate's caching (doesn't need privilege)
+     * @param seq
+     * @param sequenceValue
+     */
     void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue);
 
     /**
