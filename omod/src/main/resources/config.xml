@@ -47,6 +47,11 @@
 		<description>Allows user to upload a batch of identifiers</description>
 	</privilege>
 
+    <privilege>
+        <name>Manage Identifier Sequence</name>
+        <description>Ability to manage identifier sequence</description>
+    </privilege>
+
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>

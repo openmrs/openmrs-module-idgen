@@ -24,6 +24,11 @@ public class IdgenConstants {
 	public static final String PRIV_MANAGE_IDENTIFIER_SOURCES = "Manage Identifier Sources";
 	
 	/**
+	 * Privilege which grants users permission to manage identifier sequence
+	 */
+	public static final String PRIV_MANAGE_IDENTIFIER_SEQUENCE = "Manage Identifier Sequence";
+
+	/**
 	 * Privilege which grants users permission to manage auto-generation options
 	 */
 	public static final String PRIV_MANAGE_AUTOGENERATION_OPTIONS = "Manage Auto Generation Options";
