@@ -5,7 +5,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet id="drop_table_idgen_seq_id_gen" author="Dmytro Trifonov">
+    <!--<changeSet id="drop_table_idgen_seq_id_gen" author="Dmytro Trifonov">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="idgen_seq_id_gen"></tableExists>
         </preConditions>
@@ -13,7 +13,7 @@
     </changeSet>
 
     <changeSet id="drop_table_idgen_identifier_source" author="Dmytro Trifonov">
-        <preConditions onFail="WARN">
+        <preConditions onFail="MARK_RAN">
             <tableExists tableName="idgen_identifier_source"></tableExists>
         </preConditions>
         <dropTable tableName="idgen_identifier_source"></dropTable>
@@ -59,9 +59,15 @@
              <tableExists tableName="idgen_reserved_identifier"></tableExists>
         </preConditions>
         <dropTable tableName="idgen_reserved_identifier"></dropTable>
-    </changeSet>
+    </changeSet> -->
 
     <changeSet id="create_table_idgen_identifier_source" author="Dmytro Trifonov">
+        <validCheckSum>3:d327b34a43fc94ac6501aeeecb2c922a</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_identifier_source"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_identifier_source">
 
             <column name="id" type="int(11)" autoIncrement="true">
@@ -127,17 +133,23 @@
             <column name="retired_by"></column>
         </createIndex>
 
-        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="identifier_type" constraintName="identifier_type" referencedTableName="patient_identifier_type"
+        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="identifier_type" constraintName="idgen_identifier_source_identifier_type" referencedTableName="patient_identifier_type"
                                  referencedColumnNames="patient_identifier_type_id"></addForeignKeyConstraint>
-        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="creator" constraintName="creator" referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="creator" constraintName="idgen_identifier_source_creator" referencedTableName="users"
                                  referencedColumnNames="user_id"></addForeignKeyConstraint>
-        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="changed_by" constraintName="changed_by" referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="changed_by" constraintName="idgen_identifier_source_changed_by" referencedTableName="users"
                                  referencedColumnNames="user_id"></addForeignKeyConstraint>
-        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="retired_by" constraintName="retired_by" referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="idgen_identifier_source" baseColumnNames="retired_by" constraintName="idgen_identifier_source_retired_by" referencedTableName="users"
                                  referencedColumnNames="user_id"></addForeignKeyConstraint>
     </changeSet>
 
     <changeSet id="create_table_idgen_seq_id_gen" author="Dmytro Trifonov">
+        <validCheckSum>3:a5acdedc1e9677afecacf2142e9e1b50</validCheckSum>
+        <preConditions>
+            <not>
+                <tableExists tableName="idgen_seq_id_gen"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_seq_id_gen">
 
             <column name="id" type="int(11)">
@@ -164,11 +176,16 @@
 
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="idgen_seq_id_gen" baseColumnNames="id" constraintName="id" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_seq_id_gen" baseColumnNames="id" constraintName="idgen_seq_id_gen_id" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
     </changeSet>
 
     <changeSet id="create_table_idgen_remote_source" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_remote_source"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_remote_source">
 
             <column name="id" type="int(11)">
@@ -181,11 +198,16 @@
 
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="idgen_remote_source" baseColumnNames="id" constraintName="id" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_remote_source" baseColumnNames="id" constraintName="idgen_remote_source_id" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
     </changeSet>
 
     <changeSet id="create_table_idgen_id_pool" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_id_pool"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_id_pool">
 
             <column name="id" type="int(11)">
@@ -208,14 +230,19 @@
             <column name="source"></column>
         </createIndex>
 
-        <addForeignKeyConstraint baseTableName="idgen_id_pool" baseColumnNames="id" constraintName="id" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_id_pool" baseColumnNames="id" constraintName="idgen_id_pool_id" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
 
-        <addForeignKeyConstraint baseTableName="idgen_id_pool" baseColumnNames="source" constraintName="source" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_id_pool" baseColumnNames="source" constraintName="idgen_id_pool_source" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
     </changeSet>
     
     <changeSet id="create_table_idgen_pooled_identifier" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_pooled_identifier"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_pooled_identifier">
             
             <column name="id" autoIncrement="true" type="int(11)">
@@ -240,11 +267,16 @@
 
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="idgen_pooled_identifier" baseColumnNames="pool_id" constraintName="pool_id" referencedTableName="idgen_id_pool"
+        <addForeignKeyConstraint baseTableName="idgen_pooled_identifier" baseColumnNames="pool_id" constraintName="idgen_pooled_identifier_id" referencedTableName="idgen_id_pool"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
     </changeSet>
 
     <changeSet id="create_table_idgen_auto_generation_option" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_auto_generation_option"></tableExists>
+            </not>
+        </preConditions>
         <createTable tableName="idgen_auto_generation_option">
 
             <column name="id" type="int(11)" autoIncrement="true">
@@ -269,15 +301,20 @@
 
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="identifier_type" constraintName="identifier_type" referencedTableName="patient_identifier_type"
+        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="identifier_type" constraintName="idgen_auto_generation_option_identifier_type" referencedTableName="patient_identifier_type"
                                  referencedColumnNames="patient_identifier_type_id"></addForeignKeyConstraint>
 
-        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="source" constraintName="source" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="source" constraintName="idgen_auto_generation_option_source" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
 
     </changeSet>
 
     <changeSet id="create table_idgen_log_entry" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_log_entry"></tableExists>
+            </not>
+        </preConditions>
         <comment>Add table to log identifier generation</comment>
 
         <createTable tableName="idgen_log_entry">
@@ -306,26 +343,31 @@
 
         </createTable>
 
-        <createIndex tableName="idgen_log" indexName="idgen_log_id">
+        <createIndex tableName="idgen_log_entry" indexName="idgen_log_id">
             <column name="id"></column>
         </createIndex>
 
-        <createIndex tableName="idgen_log" indexName="idgen_log_source">
+        <createIndex tableName="idgen_log_entry" indexName="idgen_log_source">
             <column name="source"></column>
         </createIndex>
 
-        <createIndex tableName="idgen_log" indexName="idgen_log_generated_by">
+        <createIndex tableName="idgen_log_entry" indexName="idgen_log_generated_by">
             <column name="generated_by"></column>
         </createIndex>
 
-        <addForeignKeyConstraint baseTableName="idgen_log" baseColumnNames="source" constraintName="source" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_log" baseColumnNames="source" constraintName="idgen_log_source" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
 
-        <addForeignKeyConstraint baseTableName="idgen_log" baseColumnNames="generated_by" constraintName="generated_by" referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="idgen_log" baseColumnNames="generated_by" constraintName="idgen_log_generated_by" referencedTableName="users"
                                  referencedColumnNames="user_id"></addForeignKeyConstraint>
     </changeSet>
 
     <changeSet id="create_table_idgen_reserved_identifier" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="idgen_reserved_identifier"></tableExists>
+            </not>
+        </preConditions>
 
         <comment>Add column for pools to indicate whether they're scheduled or not</comment>
 
@@ -353,7 +395,7 @@
             <column name="source"></column>
         </createIndex>
 
-        <addForeignKeyConstraint baseTableName="idgen_reserved_identifier" baseColumnNames="source" constraintName="source" referencedTableName="idgen_identifier_source"
+        <addForeignKeyConstraint baseTableName="idgen_reserved_identifier" baseColumnNames="source" constraintName="idgen_reserved_identifier_source" referencedTableName="idgen_identifier_source"
                                  referencedColumnNames="id"></addForeignKeyConstraint>
 
     </changeSet>
@@ -372,6 +414,9 @@
     </changeSet>
     
     <changeSet id="change_idgen_seq_id_gen" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="idgen_seq_id_gen"></tableExists>
+        </preConditions>
         <comment>Change idgen_seq_id_gen length to minLength and add maxLength with values of minLength</comment>
     
         <renameColumn tableName="idgen_seq_id_gen" oldColumnName="length" newColumnName="min_length"></renameColumn>
@@ -383,6 +428,9 @@
     </changeSet>
 
     <changeSet id="alter_table_idgen_auto_generation_option" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="idgen_auto_generation_option"></tableExists>
+        </preConditions>
 
         <comment>Add location column to idgen_auto_generation_option table</comment>
 
@@ -396,10 +444,12 @@
     </changeSet>
 
     <changeSet id="remove_contraint_idgen_auto_generation_option" author="Dmytro Trifonov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="idgen_auto_generation_option"></tableExists>
+        </preConditions>
         <comment>Remove unique constraint from patient identifier column (we need to drop and recreate the foreign key to do this)</comment>
-        <dropForeignKeyConstraint baseTableName="idgen_auto_generation_option" constraintName="identifier_type"></dropForeignKeyConstraint>
-        <dropIndex tableName="idgen_auto_generation_option" indexName="identifier_type"></dropIndex>
-        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="identifier_type" constraintName="identifier_type" referencedTableName="patient_identifier_type"
+        <dropForeignKeyConstraint baseTableName="idgen_auto_generation_option" constraintName="idgen_auto_generation_option_identifier_type"></dropForeignKeyConstraint>
+        <addForeignKeyConstraint baseTableName="idgen_auto_generation_option" baseColumnNames="identifier_type" constraintName="idgen_auto_generation_option_identifier_type" referencedTableName="patient_identifier_type"
                                  referencedColumnNames="patient_identifier_type_id"></addForeignKeyConstraint>
 
     </changeSet>
