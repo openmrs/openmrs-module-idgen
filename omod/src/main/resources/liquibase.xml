@@ -82,9 +82,7 @@
                 <constraints nullable="false"></constraints>
             </column>
 
-            <column name="description" type="varchar(1000)">
-                <constraints nullable="false"></constraints>
-            </column>
+            <column name="description" type="varchar(1000)"></column>
 
             <column name="identifier_type" type="int" defaultValue="0">
                 <constraints nullable="false"></constraints>
