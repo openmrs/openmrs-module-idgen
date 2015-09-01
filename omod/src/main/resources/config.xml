@@ -12,6 +12,9 @@
 	</description>
 	<activator>@MODULE_PACKAGE@.IdgenModuleActivator</activator>
 	<require_version>1.9.2</require_version>
+	<require_modules>
+		<require_module>org.openmrs.module.webservices.rest</require_module>
+	</require_modules>
 	
 	<extension>
 		<point>org.openmrs.admin.list</point>

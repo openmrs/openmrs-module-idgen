@@ -31,6 +31,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
 	private Integer maxLength; // If > 0, will always return identifiers no longer than this length
     private String baseCharacterSet; // Enables configuration in appropriate Base
+	private Integer nextSequenceValue; // Pre-generate the next identifier
 
     //***** INSTANCE METHODS *****
 
@@ -172,5 +173,20 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	 */
 	public void setBaseCharacterSet(String baseCharacterSet) {
 		this.baseCharacterSet = baseCharacterSet;
+	}
+
+	/**
+	 * @return the nextSequenceValue
+	 */
+	public Integer getNextSequenceValue() {
+		if(nextSequenceValue == null) return -1;
+		return nextSequenceValue;
+	}
+
+	/**
+	 * @param nextSequenceValue : set the next identifier to be generated for this SequentialIdentifierGenerator
+	 */
+	public void setNextSequenceValue(Integer nextSequenceValue) {
+		this.nextSequenceValue = nextSequenceValue;
 	}
 }

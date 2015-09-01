@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-
 	<IDGEN_IDENTIFIER_SOURCE ID="1" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a901" NAME="Test Sequential Generator" IDENTIFIER_TYPE="1" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
 	<IDGEN_IDENTIFIER_SOURCE ID="2" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a902" NAME="Test Remote Source" IDENTIFIER_TYPE="2" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
 	<IDGEN_IDENTIFIER_SOURCE ID="3" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a903" NAME="Test Identifier Pool" IDENTIFIER_TYPE="1" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
@@ -11,7 +10,7 @@
 
 
 	<IDGEN_SEQ_ID_GEN ID="1" first_identifier_base="1" next_sequence_value="6" base_character_set="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" PREFIX="" min_length="0" max_length="0"  />
-	<IDGEN_SEQ_ID_GEN ID="7" first_identifier_base="200000" next_sequence_value="11" base_character_set="0123456789" PREFIX="MRS" min_length="9" max_length="9"  />
+	<IDGEN_SEQ_ID_GEN ID="7" first_identifier_base="200000" next_sequence_value="11" base_character_set="0123456789" PREFIX="MRS" min_length="4" max_length="9"  />
 
 	<IDGEN_REMOTE_SOURCE ID="2" URL="http://localhost:8080/openmrs/module/idgen/getIdentifier"/>
 	<IDGEN_REMOTE_SOURCE ID="6" URL="http://localhost:8080/openmrs/module/idgen/getIdentifier"/>

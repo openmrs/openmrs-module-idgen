@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen</artifactId>
-	<version>4.1-SNAPSHOT</version>
+	<version>4.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
@@ -86,6 +86,7 @@
 	<properties>
 		<openMRSVersion>1.9.2</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<webservicesRestModuleVersion>2.10</webservicesRestModuleVersion>
 	</properties>
 
 	<build>

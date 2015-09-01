@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -81,8 +82,11 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceService#saveIdentifierSource(IdentifierSource)
 	 */
 	@Transactional
-	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {		
-		sessionFactory.getCurrentSession().saveOrUpdate(identifierSource);
+	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
+		Session currentSession = sessionFactory.getCurrentSession();
+		currentSession.saveOrUpdate(identifierSource);
+		currentSession.flush();
+		refreshIdentifierSource(identifierSource);
 		return identifierSource;
 	}
 

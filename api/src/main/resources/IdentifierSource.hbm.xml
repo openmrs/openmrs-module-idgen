@@ -28,6 +28,7 @@
 			<key column="id"/>
 			<property name="baseCharacterSet" type="string" column="base_character_set" not-null="true" />
 			<property name="firstIdentifierBase" type="string" column="first_identifier_base" not-null="true" />
+			<property name="nextSequenceValue" type="int" column="next_sequence_value" insert="false" update="false"/>
 			<property name="prefix" type="string" />
 			<property name="suffix" type="string" />
 			<property name="minLength" type="int" column="min_length" />
