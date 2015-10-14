@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -27,6 +26,8 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -82,7 +83,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	@Transactional
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
-		Session currentSession = sessionFactory.getCurrentSession();
+		DbSession currentSession = sessionFactory.getCurrentSession();
 		currentSession.saveOrUpdate(identifierSource);
 		currentSession.flush();
 		refreshIdentifierSource(identifierSource);
