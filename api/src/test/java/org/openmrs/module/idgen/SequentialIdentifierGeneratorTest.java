@@ -3,7 +3,6 @@ package org.openmrs.module.idgen;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -61,20 +60,6 @@ public class SequentialIdentifierGeneratorTest {
 		generator.setMaxLength(1);
 
 		generator.getIdentifierForSeed(1);
-	}
-
-
-	@Test
-	public void shouldSetNextSequenceValueToNegative() throws Exception {
-		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
-		generator.setBaseCharacterSet("0123456789");
-		generator.setPrefix("FOO-");
-		generator.setSuffix("-ACK");
-		generator.setFirstIdentifierBase("000");
-		generator.setMinLength(11);
-		generator.setMaxLength(13);
-
-		assertThat(generator.getNextSequenceValue(), is(-1));
 	}
 
 }

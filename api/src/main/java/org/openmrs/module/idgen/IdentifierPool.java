@@ -103,49 +103,42 @@ public class IdentifierPool extends BaseIdentifierSource {
 	/**
 	 * @return the batchSize
 	 */
-    public Integer getBatchSize() {
+	public int getBatchSize() {
 		return batchSize;
 	}
 
 	/**
 	 * @param batchSize the batchSize to set
 	 */
-    public void setBatchSize(Integer batchSize) {
+	public void setBatchSize(int batchSize) {
 		this.batchSize = batchSize;
 	}
 
 	/**
 	 * @return the minPoolSize
 	 */
-    public Integer getMinPoolSize() {
+	public int getMinPoolSize() {
 		return minPoolSize;
 	}
 
 	/**
 	 * @param minPoolSize the minPoolSize to set
 	 */
-    public void setMinPoolSize(Integer minPoolSize) {
+	public void setMinPoolSize(int minPoolSize) {
 		this.minPoolSize = minPoolSize;
 	}
 
 	/**
 	 * @return the sequential
 	 */
-    public Boolean isSequential() {
-        return sequential;
-    }
-
-    /**
-     * @return the sequential
-     */
-    public Boolean getSequential() {
+	public boolean isSequential() {
 		return sequential;
 	}
 
 	/**
 	 * @param sequential the sequential to set
 	 */
-    public void setSequential(Boolean sequential) {
+	public void setSequential(boolean sequential) {
 		this.sequential = sequential;
 	}
 
@@ -169,21 +162,14 @@ public class IdentifierPool extends BaseIdentifierSource {
     /**
      * @return the refillWithScheduledTask
      */
-    public Boolean isRefillWithScheduledTask() {
-        return refillWithScheduledTask;
-    }
-
-    /**
-     * @return the refillWithScheduledTask
-     */
-    public Boolean getRefillWithScheduledTask() {
+    public boolean isRefillWithScheduledTask() {
         return refillWithScheduledTask;
     }
 
     /**
      * @param refillWithScheduledTask the refillWithScheduledTask to set
      */
-    public void setRefillWithScheduledTask(Boolean refillWithScheduledTask) {
+    public void setRefillWithScheduledTask(boolean refillWithScheduledTask) {
         this.refillWithScheduledTask = refillWithScheduledTask;
     }
 
