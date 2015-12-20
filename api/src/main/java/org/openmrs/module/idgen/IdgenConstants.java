@@ -14,15 +14,15 @@
 package org.openmrs.module.idgen;
 
 /**
- * Constants useful for this module
+ * Constants that are useful for this module
  */
 public class IdgenConstants {
-	
+
 	/**
 	 * Privilege which grants users permission to manage identifier sources
 	 */
 	public static final String PRIV_MANAGE_IDENTIFIER_SOURCES = "Manage Identifier Sources";
-	
+
 	/**
 	 * Privilege which grants users permission to manage auto-generation options
 	 */
@@ -32,7 +32,7 @@ public class IdgenConstants {
 	 * Privilege which grants users permission to generate a batch of identifiers to a file for offline use
 	 */
 	public static final String PRIV_GENERATE_BATCH_OF_IDENTIFIERS = "Generate Batch of Identifiers";
-	
+
 	/**
 	 * Privilege which grants users permission to upload a batch of identifiers
 	 */

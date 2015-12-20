@@ -28,8 +28,8 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     private String prefix; // Optional prefix
     private String suffix; // Optional suffix
     private String firstIdentifierBase; // First identifier to start at
-	private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
-	private Integer maxLength; // If > 0, will always return identifiers no longer than this length
+	  private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
+	  private Integer maxLength; // If > 0, will always return identifiers no longer than this length
     private String baseCharacterSet; // Enables configuration in appropriate Base
 
     //***** INSTANCE METHODS *****
@@ -46,32 +46,32 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
      * Returns a new identifier for the given seed.  This does not change the state of the source
      * @param seed the seed to use for generation of the identifier
      * @return a new identifier for the given seed
-	 * @should generate an identifier within minLength and maxLength bounds
-	 * @should throw an error if generated identifier is shorter than minLength
-	 * @should throw an error if generated identifier is longer than maxLength
+	   * @should generate an identifier within minLength and maxLength bounds
+	   * @should throw an error if generated identifier is shorter than minLength
+	   * @should throw an error if generated identifier is longer than maxLength
      */
     public String getIdentifierForSeed(long seed) {
 
-    	// Convert the next sequence integer into a String with the appropriate Base characters
+    // Convert the next sequence integer into a String with the appropriate Base characters
 		int seqLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
 
 		String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), seqLength);
 
-    	// Add optional prefix and suffix
-    	identifier = (prefix == null ? identifier : prefix + identifier);
-    	identifier = (suffix == null ? identifier : identifier + suffix);
+  	// Add optional prefix and suffix
+  	identifier = (prefix == null ? identifier : prefix + identifier);
+  	identifier = (suffix == null ? identifier : identifier + suffix);
 
-    	// Add check-digit, if required
-    	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
-    		try {
-	    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
-	    		IdentifierValidator v = (IdentifierValidator)c.newInstance();
-	    		identifier = v.getValidIdentifier(identifier);
-    		}
-    		catch (Exception e) {
-    			throw new RuntimeException("Error generating check digit with " + getIdentifierType().getValidator(), e);
-    		}
-    	}
+  	// Add check-digit, if required
+  	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
+  		try {
+    		Class<?> c = Context.loadClass(getIdentifierType().getValidator());
+    		IdentifierValidator v = (IdentifierValidator)c.newInstance();
+    		identifier = v.getValidIdentifier(identifier);
+  		}
+  		catch (Exception e) {
+  			throw new RuntimeException("Error generating check digit with " + getIdentifierType().getValidator(), e);
+  		}
+  	}
 
 		if (this.minLength != null && this.minLength > 0) {
 			if (identifier.length() < this.minLength) {

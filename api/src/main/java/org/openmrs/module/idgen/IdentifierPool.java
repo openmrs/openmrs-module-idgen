@@ -21,13 +21,13 @@ import java.util.Set;
 
 /**
  * Identifier Source which contains a pre-generated pool of identifiers,
- * and which typically is used in conjunction with another IdentifierSource 
+ * and which typically is used in conjunction with another IdentifierSource
  * which populates the pool
  */
 public class IdentifierPool extends BaseIdentifierSource {
-	
+
 	//***** PROPERTIES *****
-	
+
     private IdentifierSource source;
     private int batchSize = 1000; // for requests to pool
     private int minPoolSize = 500; // request more when we go below this number
@@ -36,7 +36,7 @@ public class IdentifierPool extends BaseIdentifierSource {
     private boolean refillWithScheduledTask = true; // if true, refill with a scheduled task, otherwise refill on demands for ids
 
     //***** INSTANCE METHODS *****
-   
+
     /**
      * Returns all available PooledIdentifiers
      */
@@ -62,8 +62,8 @@ public class IdentifierPool extends BaseIdentifierSource {
     	}
     	return Collections.unmodifiableSet(ret);
     }
-    
-	/** 
+
+	/**
 	 * @see IdentifierSource#nextIdentifier()
 	 */
 	public synchronized String nextIdentifier() {
@@ -75,15 +75,15 @@ public class IdentifierPool extends BaseIdentifierSource {
 		}
 		throw new RuntimeException("Not enough available identifiers in pool");
 	}
-	
+
 	/**
-	 * Adds a new identifier to the pool 
+	 * Adds a new identifier to the pool
 	 * @param identifier the identifier to add
 	 */
 	public synchronized void addIdentifierToPool(String identifier) {
 		getIdentifiers().add(new PooledIdentifier(this, identifier));
 	}
-	
+
 	//***** PROPERTY ACCESS *****
 
 	/**
@@ -129,7 +129,7 @@ public class IdentifierPool extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the sequential
+	 * @return boolean value of sequential-ness
 	 */
 	public boolean isSequential() {
 		return sequential;

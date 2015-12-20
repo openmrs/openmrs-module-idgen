@@ -18,11 +18,11 @@ package org.openmrs.module.idgen;
  * Indicates that the user tried to fetch an identifier from a pool, but that pool is empty
  */
 public class EmptyIdentifierPoolException extends RuntimeException {
-	
+
     private static final long serialVersionUID = 1L;
 
 	public EmptyIdentifierPoolException(String message) {
 		super(message);
 	}
-	
+
 }
