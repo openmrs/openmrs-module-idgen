@@ -129,7 +129,7 @@ public class IdentifierPool extends BaseIdentifierSource {
 	}
 
 	/**
-	 * @return the sequential
+	 * @return boolean describing whether this is sequential
 	 */
 	public boolean isSequential() {
 		return sequential;

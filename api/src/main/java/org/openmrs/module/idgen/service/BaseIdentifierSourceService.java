@@ -369,7 +369,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	}
 
 	/**
-	 * ADDS, doesn't simply set
+	 * Adds to processors, rather than replacing.
 	 * @param processorsToAdd the processors to add
 	 */
 	public void setProcessors(Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processorsToAdd) {
