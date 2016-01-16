@@ -1,4 +1,4 @@
-openmrs-module-idgen
+OpenMRS-Module-Idgen
 ====================
 
-Provides patient identifier generation for other OpenMRS modules
+This Idgen Module provides the patient identifier generation for other OpenMRS modules.
