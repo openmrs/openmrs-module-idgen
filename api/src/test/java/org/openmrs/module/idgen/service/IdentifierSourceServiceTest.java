@@ -33,8 +33,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.*;
 
 public class IdentifierSourceServiceTest extends IdgenBaseTest {
-	
-	private BaseIdentifierSourceService iss;
+
+	@Autowired
+	IdentifierSourceService iss;
 
     @Autowired
     IdentifierSourceDAO dao;
@@ -51,16 +52,6 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void beforeEachTest() throws Exception {
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-
-        iss = new BaseIdentifierSourceServiceStub();
-        iss.setDao(dao);
-
-        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
-        processor.setIdentifierSourceService(iss);
-
-        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
-        processors.put(SequentialIdentifierGenerator.class, processor);
-        iss.setProcessors(processors);
     }
 	
 	/**
@@ -268,24 +259,5 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void getAutoGenerationOptionById_shouldFetchAutoGenerationOptionByPrimaryKey() {
         AutoGenerationOption option = iss.getAutoGenerationOption(2);
         Assert.assertEquals(2, option.getId().intValue());
-    }
-
-    private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
-
-        // we need to override the functionality to get and set sequential values since we are now
-        // bypassing Hibernate and going directly to the DB to do this
-
-        private long sequenceValue = 6;
-
-        @Override
-        public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
-            this.sequenceValue = sequenceValue;
-        }
-
-        @Override
-        public Long getSequenceValue(SequentialIdentifierGenerator seq) {
-            return sequenceValue;
-        }
-
     }
 }
