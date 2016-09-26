@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen</artifactId>
-	<version>4.4.0</version>
+	<version>4.4.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
