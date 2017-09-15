@@ -1,0 +1,33 @@
+.mpisContainer{
+    border: 1px solid #00463f;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.mpisMainHeader{
+    font-weight: Bold;
+    margin-bottom: 10px;
+}
+
+.mpisHeader{
+    background-color: #00463f;
+    color: #ffffff;
+    font-weight: Bold;
+    padding: 5px;
+}
+
+.mpisRow {
+    text-align: left;
+}
+
+.mpisSelect{
+    width: 300px;
+}
+
+.mpisTable{
+
+}
+
+.mpisTable .mpisRow:hover{
+
+}
