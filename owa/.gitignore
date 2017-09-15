@@ -1,0 +1,7 @@
+node_modules
+bower_components
+dist
+config.json
+webpack.config.js
+app/js/openmrs-owa-idgen.jsx
+app/js/components/App.jsx

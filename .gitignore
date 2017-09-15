@@ -69,3 +69,14 @@ nb-configuration.xml
 .Trashes
 ehthumbs.db
 Thumbs.db 
+
+### npm owa ###
+owa/node_modules
+owa/dist
+owa/config.json
+owa/node
+owa/*.zip
+owa/etc
+owa/LICENSE
+owa/package-lock.json
+owa/webpack.config.js
