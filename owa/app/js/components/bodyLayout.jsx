@@ -12,6 +12,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink,
         Card, Button, CardTitle, CardText, Row, Col, Form, FormGroup, 
         Label, Input, FormText } from 'reactstrap';
 import classnames from 'classnames';
+import LogEntries from './view_log_entries/viewLogEntries'
 
 
 export default class BodyLayout extends React.Component {
@@ -64,7 +65,7 @@ export default class BodyLayout extends React.Component {
           <TabPane tabId="1">
             <Row>
               <Col sm="12">
-                      
+                
               </Col>
             </Row>
           </TabPane>
@@ -78,7 +79,7 @@ export default class BodyLayout extends React.Component {
           <TabPane tabId="3">
             <Row>
               <Col sm="12">
-                
+                 <LogEntries/>
               </Col>
             </Row>
           </TabPane>
