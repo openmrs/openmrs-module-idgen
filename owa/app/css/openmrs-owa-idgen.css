@@ -6,42 +6,25 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
+
 body {
     font-family: "OpenSans", Arial, sans-serif;
     -webkit-font-smoothing: subpixel-antialiased;
     max-width: 1000px;
     margin: 10px auto;
-    background: #eeeeee;
+    background: #eeeeee !important;
     color: #363463;
     font-size: 16px;
 }
 
-header {
-    position: relative;
-    background-color: #00463f;
-    color: #CCC;
-    line-height: 1em;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
-    -ms-border-radius: 5px;
-    -khtml-border-radius: 5px;
-    border-radius: 5px;
-    display: block;
-    min-height: 48px;
-}
 
-header .logo {
-    float: left;
-    margin: 4px;
-    display: block;
-}
-
-header .logo img {
-    width: 120px;
+nav img {
+    width: 120px !important;
 }
 
 #body-wrapper {
+    position: relative;
+    left: 140px;
     margin-top: 10px;
     padding: 10px;
     background-color: white;
@@ -69,4 +52,86 @@ header .logo img {
 .instructions {
     align-self: center;
 }
+.nav-header li {
+    color: #eeeeee;
+    font-size: 15px;
+    padding-right: 20px;
+    display: inline;
+    list-style: none;
+}
+
+li>a:hover {
+    color: #eeeeee;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid gold;
+}
+
+li>a:focus {
+    color: gold;
+}
+.table thead {
+    position: -webkit-sticky;
+    position: -moz-sticky;
+    position: -ms-sticky;
+    position: -o-sticky;
+    position: sticky;
+    top: 0;
+    background-color: #FFF;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.dropdown-large {
+    position: static !important;
+}
+
+.dropdown-menu-large {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 20px 0px;
+}
+
+.dropdown-menu-large>li>a:hover {
+    background-color: transparent;
+    margin-right: 0px;
+    border-bottom: 0px;
+    color: purple;
+}
+
+nav{
+    left: 140px;
+    position: relative;
+    background-color: #00463f;
+    color: #CCC;
+    line-height: 1em;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    display: block;
+    padding: 0 !important;
+}
+
+
+.navbar-light .navbar-nav .nav-link{
+    color: #eeeeee !important;
+    font-size: 15px;
+    padding-right: 20px;
+    display: inline;
+    list-style: none;
+
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+    color: #eceeef !important;
+    background-color: #009384 !important;
+    border-color: #ddd #ddd #fff;
+}
+
+
 

@@ -7,12 +7,19 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.css'; 
+import Header from './common/header'
+import BodyLayout from './bodyLayout'
 
 export default class App extends React.Component {
   render() {
     return (
-      <div>
-        <h1>Hello, world</h1>
+      <div >
+        <Header />
+        <div className="clear"></div>
+        <div id= "body-wrapper"> 
+            <BodyLayout/>
+        </div>
       </div>
     )
   }
