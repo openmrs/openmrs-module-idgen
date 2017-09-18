@@ -12,6 +12,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink,
         Card, Button, CardTitle, CardText, Row, Col, Form, FormGroup, 
         Label, Input, FormText } from 'reactstrap';
 import classnames from 'classnames';
+import ManageAutogenerationOption from './manage-autogeneration-option/ManageAutogenerationOption';
 
 
 export default class BodyLayout extends React.Component {
@@ -71,7 +72,7 @@ export default class BodyLayout extends React.Component {
           <TabPane tabId="2">
             <Row>
               <Col sm="12">
-          
+                <ManageAutogenerationOption />
               </Col>
             </Row>
           </TabPane>
