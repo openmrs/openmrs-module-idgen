@@ -14,6 +14,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink,
 import classnames from 'classnames';
 import LogEntries from './view_log_entries/viewLogEntries'
 import ManagePatientIdentifierSources from './manage_patient_identifier_sources/managePatientIdentifierSources'
+import ManageAutoGenerationOption from './manage_autogeneration_option/ManageAutoGenerationOption';
 
 export default class BodyLayout extends React.Component {
   constructor(props) {
@@ -80,7 +81,9 @@ export default class BodyLayout extends React.Component {
           </TabPane>
           <TabPane tabId="2">
             <Row>
-              <Col sm="12"></Col>
+              <Col sm="12">
+                <ManageAutoGenerationOption />
+              </Col>
             </Row>
           </TabPane>
           <TabPane tabId="3">
