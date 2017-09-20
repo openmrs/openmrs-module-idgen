@@ -17,7 +17,6 @@ body {
     font-size: 16px;
 }
 
-
 nav img {
     width: 120px !important;
 }
@@ -52,6 +51,7 @@ nav img {
 .instructions {
     align-self: center;
 }
+
 .nav-header li {
     color: #eeeeee;
     font-size: 15px;
@@ -70,6 +70,7 @@ li>a:hover {
 li>a:focus {
     color: gold;
 }
+
 .table thead {
     position: -webkit-sticky;
     position: -moz-sticky;
@@ -101,7 +102,7 @@ a:hover {
     color: purple;
 }
 
-nav{
+nav {
     left: 140px;
     position: relative;
     background-color: #00463f;
@@ -117,21 +118,224 @@ nav{
     padding: 0 !important;
 }
 
-
-.navbar-light .navbar-nav .nav-link{
+.navbar-light .navbar-nav .nav-link {
     color: #eeeeee !important;
     font-size: 15px;
     padding-right: 20px;
     display: inline;
     list-style: none;
-
 }
 
-.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
     color: #eceeef !important;
     background-color: #009384 !important;
     border-color: #ddd #ddd #fff;
 }
 
 
+/*General Styles */
 
+button,
+input,
+select,
+textarea {
+    font-family: OpenSans;
+    font-size: 100%;
+    margin: 0;
+}
+
+select {
+    border-radius: 0;
+}
+
+textarea:focus,
+input:focus,
+button:focus,
+select:focus {
+    outline: none!important;
+}
+
+a, a:visited, a:hover, a:active{
+    color: inherit;
+    text-decoration: inherit;
+}
+
+/*--------------View Logs Tab ------------*/
+.logwrapper .ReactTable {
+    margin: 20px;
+}
+
+.ReactTable .rt-resizable-header.-cursor-pointer.rt-th {
+    border-bottom: 1px solid #dddddd;
+    background: #f3f3f3;
+    width: auto;
+    text-align: left;
+    word-break: normal;
+    font-weight: bold;
+    padding: 10px 9px;
+}
+
+.rt-tr.-even {
+    background: #fffdf7;
+}
+
+.logwrapper {
+    font-family: OpenSans
+}
+
+.logwrapper .form-control,
+select.form-control {
+    border-radius: 0px;
+    line-height: 1.7em;
+}
+
+.logSearch {
+    background: #3f3d74;
+    text-align: center;
+    color: white;
+    padding: 20px 30px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    max-width: 450px;
+    margin: 0px auto 10px
+}
+
+.search_label {
+    color: #363463;
+    text-align: center;
+    line-height: 2em;
+    font-size: 1.2em;
+}
+
+input.log_searchbox {
+    margin-top: 0px;
+    font-size: 100%;
+    font-family: inherit;
+    line-height: 1.7em;
+    width: 100%;
+    padding: 5px 10px;
+}
+
+.searchlink {
+    background: #3f3d74;
+    color: #fffdf7;
+    border: 1px solid #fffdf7;
+    padding: 10px;
+    margin: 10px auto 0px;
+}
+
+.searchlink:hover {
+    color: #e8e4d8;
+    background: #3f3d74;
+}
+
+.advanced_wrapper fieldset>div {
+    float: left;
+    margin-bottom: 10px;
+}
+
+.advanced_wrapper fieldset input,
+select {
+    width: 100%
+}
+
+.logs_table_area {
+    position: relative;
+}
+
+.advanced_wrapper,
+.logs_table {
+    width: 100%;
+    left: 0;
+}
+
+.advanced_wrapper {
+    padding: 20px 20px 30px;
+    z-index: 10;
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #3f3d74;
+    border-top-width: 5px;
+    margin-top: -15px;
+    text-align: center;
+}
+
+label.search_lbl {
+    margin-bottom: 0px
+}
+
+.cancelbtn {
+    background-color: #dddddd;
+    border: #dddddd 1px solid;
+    padding: 8px 20px;
+    display: inline-block;
+    line-height: 1.2em;
+    color: #363463;
+    cursor: pointer;
+    min-width: 0;
+    max-width: 300px;
+    text-decoration: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #dddddd));
+    background: -webkit-linear-gradient(top, #ffffff, #dddddd);
+    background: -moz-linear-gradient(top, #ffffff, #dddddd);
+    background: -o-linear-gradient(top, #ffffff, #dddddd);
+    background: -ms-linear-gradient(top, #ffffff, #dddddd);
+    background: linear-gradient(top, #ffffff, #dddddd);
+}
+
+.cancelbtn:hover {
+    background: #e2e2e2;
+    border-color: #d0d0d0;
+}
+
+.button.confirm,
+button.confirm,
+input[type="submit"],
+a.button.confirm {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #a1d030), color-stop(100%, #88af28));
+    background: -webkit-linear-gradient(top, #a1d030, #88af28);
+    background: -moz-linear-gradient(top, #a1d030, #88af28);
+    background: -o-linear-gradient(top, #a1d030, #88af28);
+    background: -ms-linear-gradient(top, #a1d030, #88af28);
+    background: linear-gradient(top, #a1d030, #88af28);
+    background-color: #88af28;
+    border: #88af28 1px solid;
+    color: #fffdf7;
+    max-width: 250px;
+    min-width: 150px;
+    font-size: 1.2em;
+    padding: 8px 20px;
+    margin-right: 10px;
+}
+
+.button.confirm:hover,
+button.confirm:hover,
+input[type="submit"]:hover,
+a.button.confirm:hover {
+    background: #8eb82a;
+    border-color: #779b23;
+}
+
+.advanced_wrapper input[type="submit"] {
+    margin-top: 0px
+}
+.advanced_wrapper .rdt {
+    margin-bottom: 10px;
+}

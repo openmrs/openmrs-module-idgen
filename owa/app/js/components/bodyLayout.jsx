@@ -13,13 +13,15 @@ import { TabContent, TabPane, Nav, NavItem, NavLink,
         Label, Input, FormText } from 'reactstrap';
 import classnames from 'classnames';
 import ManageAutogenerationOption from './manage-autogeneration-option/ManageAutogenerationOption';
-
+import LogEntries from './view_log_entries/viewLogEntries'
 
 export default class BodyLayout extends React.Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+    this.toggle = this
+      .toggle
+      .bind(this);
     this.state = {
       activeTab: '1'
     };
@@ -27,9 +29,7 @@ export default class BodyLayout extends React.Component {
 
   toggle(tab) {
     if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
+      this.setState({activeTab: tab});
     }
   }
   render() {
@@ -38,25 +38,34 @@ export default class BodyLayout extends React.Component {
         <Nav tabs>
           <NavItem>
             <NavLink
-              className={classnames({ active: this.state.activeTab === '1' })}
-              onClick={() => { this.toggle('1'); }}
-            >
+              className={classnames({
+              active: this.state.activeTab === '1'
+            })}
+              onClick={() => {
+              this.toggle('1');
+            }}>
               Manage Patient Identifier Sources
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink
-              className={classnames({ active: this.state.activeTab === '2' })}
-              onClick={() => { this.toggle('2'); }}
-            >
+              className={classnames({
+              active: this.state.activeTab === '2'
+            })}
+              onClick={() => {
+              this.toggle('2');
+            }}>
               Auto-Generation Options
             </NavLink>
-            </NavItem>
-            <NavItem>
+          </NavItem>
+          <NavItem>
             <NavLink
-              className={classnames({ active: this.state.activeTab === '3' })}
-              onClick={() => { this.toggle('3'); }}
-            >
+              className={classnames({
+              active: this.state.activeTab === '3'
+            })}
+              onClick={() => {
+              this.toggle('3');
+            }}>
               View Log Entries
             </NavLink>
           </NavItem>
@@ -64,9 +73,7 @@ export default class BodyLayout extends React.Component {
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             <Row>
-              <Col sm="12">
-                      
-              </Col>
+              <Col sm="12"></Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
@@ -79,7 +86,7 @@ export default class BodyLayout extends React.Component {
           <TabPane tabId="3">
             <Row>
               <Col sm="12">
-                
+                <LogEntries/>
               </Col>
             </Row>
           </TabPane>
