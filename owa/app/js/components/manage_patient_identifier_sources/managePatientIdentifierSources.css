@@ -1,0 +1,24 @@
+.managePatientIdentifierSourcesContainer{
+    border: 1px solid #00463f;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.managePatientIdentifierSourcesMainHeader{
+    margin-bottom: 10px;
+}
+
+.managePatientIdentifierSourcesHeader{
+    background-color: #00463f;
+    color: #ffffff;
+    font-weight: Bold;
+    padding: 5px;
+}
+
+.managePatientIdentifierSourcesRow {
+    text-align: left;
+}
+
+.managePatientIdentifierSourcesSelect{
+    width: 300px;
+}

@@ -13,6 +13,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink,
         Label, Input, FormText } from 'reactstrap';
 import classnames from 'classnames';
 import LogEntries from './view_log_entries/viewLogEntries'
+import ManagePatientIdentifierSources from './manage_patient_identifier_sources/managePatientIdentifierSources'
 
 export default class BodyLayout extends React.Component {
   constructor(props) {
@@ -72,7 +73,9 @@ export default class BodyLayout extends React.Component {
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
             <Row>
-              <Col sm="12"></Col>
+              <Col sm="12">
+                <ManagePatientIdentifierSources />
+              </Col>
             </Row>
           </TabPane>
           <TabPane tabId="2">
