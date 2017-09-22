@@ -24,7 +24,6 @@ nav img {
 #body-wrapper {
     position: relative;
     left: 140px;
-    margin-top: 10px;
     padding: 10px;
     background-color: white;
     -moz-border-radius: 5px;
@@ -61,7 +60,6 @@ nav img {
 }
 
 li>a:hover {
-    color: #eeeeee;
     cursor: pointer;
     text-decoration: none;
     border-bottom: 1px solid gold;
@@ -140,7 +138,7 @@ button,
 input,
 select,
 textarea {
-    font-family: OpenSans;
+    font-family: "OpenSans", Arial, sans-serif;
     font-size: 100%;
     margin: 0;
 }
@@ -180,9 +178,6 @@ a, a:visited, a:hover, a:active{
     background: #fffdf7;
 }
 
-.logwrapper {
-    font-family: OpenSans
-}
 
 .logwrapper .form-control,
 select.form-control {

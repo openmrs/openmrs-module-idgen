@@ -7,21 +7,17 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.css'; 
-import Header from './common/header'
-import BodyLayout from './bodyLayout'
-import BreadCrumbs from './breadcrumbs/breadcrumbs'
-
-export default class App extends React.Component {
+import FaHome from 'react-icons/lib/fa/home'
+import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
+import './breadCrumbs.css'
+export default class BreadCrumbs extends React.Component {
   render() {
     return (
-      <div >
-        <Header />
-        <BreadCrumbs />
-        <div id= "body-wrapper"> 
-            <BodyLayout/>
-        </div>
-      </div>
+        <Breadcrumb>
+          <BreadcrumbItem><a href="../../"><FaHome /></a></BreadcrumbItem>
+          <BreadcrumbItem active>IDGEN</BreadcrumbItem>
+        </Breadcrumb>
+      
     )
   }
 }
