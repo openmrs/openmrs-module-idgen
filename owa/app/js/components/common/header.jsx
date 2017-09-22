@@ -28,6 +28,7 @@ export default class Header extends React.Component {
       dropdownOpen: false,
       locationTags: [],
       currentLocationTag: "",
+      defaultLocation: "",
       currentUser: "",
       currentLogOutUrl: "",
     };
@@ -44,10 +45,12 @@ export default class Header extends React.Component {
    * Gets the OpenMrs configuration and sets the logout link
    * @memberOf Header
    */
-  componentWillMount() {
+  componentDidMount() {
     apiCall(null, 'get', '/location').then((response) => {
-      this.setState({locationTags: response.results});
-      this.setState({currentLocationTag: response.results[0].display});
+      this.setState({
+        locationTags: response.results,
+        defaultLocation: response.results[0].display
+      });
       this.getUri();
     });
 
@@ -71,6 +74,15 @@ export default class Header extends React.Component {
         
     });
   }
+
+  handleOnClick(location){
+    this.setState({
+      currentLocationTag: location,
+      dropdownOpen: false
+      
+    });
+
+  }
   render() {
     return (
         <div >
@@ -80,35 +92,29 @@ export default class Header extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <Link to="" activeClassName="active">
-                                    <UncontrolledNavDropdown>
-                                        <DropdownToggle nav caret> <FaUser/>
-                                         {' ' + this.state.currentUser}
-                                        </DropdownToggle>
-                                        <DropdownMenu>
-                                          <DropdownItem header><a href="#">My Account</a></DropdownItem>
-                                        </DropdownMenu>
-                                      </UncontrolledNavDropdown>
-                     
-                    </Link>
+                  <UncontrolledNavDropdown>
+                      <DropdownToggle nav caret> <FaUser/>
+                       {' ' + this.state.currentUser}
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem header><a href="#">My Account</a></DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledNavDropdown>
               </NavItem>
               <NavItem>
-                    <Link to="" activeClassName="active">
-                                    <UncontrolledNavDropdown>
-                                        <DropdownToggle nav caret> <FaMapMarker/>
-                                         {' ' + this.state.currentLocationTag}
-                                        </DropdownToggle>
-                                        <DropdownMenu>
-                                          {this.state.locationTags.map(location =><DropdownItem header><a href="#">{location.display}</a></DropdownItem>)}
-                                        </DropdownMenu>
-                                      </UncontrolledNavDropdown>
-                     
-                    </Link>
+                  <UncontrolledNavDropdown>
+                      <DropdownToggle nav caret> <FaMapMarker/>
+                       {(this.state.currentLocationTag != "")
+                          ? this.state.currentLocationTag
+                          : this.state.defaultLocation}
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        {this.state.locationTags.map((location, index )=><DropdownItem key={index} header><a href="#" onClick={this.handleOnClick.bind(this, location.display)}>{location.display}</a></DropdownItem>)}
+                      </DropdownMenu>
+                    </UncontrolledNavDropdown>
               </NavItem>
               <NavItem>
-                    <Link to="" activeClassName="active">
-                    <NavLink href={this.state.currentLogOutUrl}>Logout {' '} <FaSignOut/></NavLink>
-                    </Link>
+                <NavLink href={this.state.currentLogOutUrl}>Logout {' '} <FaSignOut/></NavLink>
               </NavItem>
             </Nav>
           </Collapse>
