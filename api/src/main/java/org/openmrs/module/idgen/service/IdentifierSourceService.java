@@ -206,7 +206,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @throws non-unique exception if more than one auto-generation option for this type
      */
     @Transactional(readOnly = true)
-    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
+		public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
 
 	/**
 	 * Persists a AutoGenerationOption, either as a save or update.

@@ -1,0 +1,4 @@
+<dataset>
+    <IDGEN_IDENTIFIER_SOURCE ID="999" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a999" NAME="Sequential Generator To Test Load" IDENTIFIER_TYPE="2" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
+    <IDGEN_SEQ_ID_GEN ID="999" first_identifier_base="1" NEXT_SEQUENCE_VALUE="1" base_character_set="1234567890" PREFIX="" min_length="0" max_length="0"/>
+</dataset>
