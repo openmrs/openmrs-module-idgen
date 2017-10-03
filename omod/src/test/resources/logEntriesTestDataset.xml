@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <log_entry source="Generator" generatedby="Admin" identifier="100892" comment="New patient " dateGenerated="3/10/2016"/>
+    <log_entry source="Generator" generatedby="Admin" identifier="100HH9" comment="Demo Data " dateGenerated="3/10/2017"/>
+    <log_entry source="Generator" generatedby="Admin" identifier="100H9T" comment=" " dateGenerated="1/10/2017"/>
+    <log_entry source="Clinical Officer" generatedby="Admin" identifier="100H28" comment="New Visit " dateGenerated="2/10/2017"/>
+    <log_entry source="Doctor" generatedby="Admin" identifier="100GYF" comment="" dateGenerated="20/09/2017"/>
+</dataset>
