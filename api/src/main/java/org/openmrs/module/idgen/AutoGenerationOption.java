@@ -22,7 +22,6 @@ import org.openmrs.PatientIdentifierType;
 public class AutoGenerationOption {
 	
 	//***** PROPERTIES *****
-	
     private Integer id;
     private PatientIdentifierType identifierType;
     private Location location;
@@ -164,5 +163,9 @@ public class AutoGenerationOption {
 	 */
 	public void setAutomaticGenerationEnabled(boolean automaticGenerationEnabled) {
 		this.automaticGenerationEnabled = automaticGenerationEnabled;
+	}
+	
+	public String getUuid(){
+		return this.getSource().getUuid();
 	}
 }
