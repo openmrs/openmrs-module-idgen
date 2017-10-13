@@ -16,6 +16,7 @@
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
+        <WEBSERVICES_VERSION>2.13</WEBSERVICES_VERSION>
     </properties>
 
 	<dependencies>
@@ -34,13 +35,13 @@
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>webservices.rest-omod</artifactId>
-			<version>2.0</version>
+			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>webservices.rest-omod-common</artifactId>
-			<version>2.0</version>
+			<version>${WEBSERVICES_VERSION}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
