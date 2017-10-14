@@ -41,6 +41,9 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 	private Date dateRetired;
 	private String retireReason;
 	private Set<String> reservedIdentifiers;
+        private Set<String> autoGenerationOptions;
+        private Set<String> identifierPools;
+        private Set<String> logEntrys;
 	
 	//***** CONSTRUCTORS *****
 	
@@ -261,5 +264,50 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 	 */
 	public void setReservedIdentifiers(Set<String> reservedIdentifiers) {
 		this.reservedIdentifiers = reservedIdentifiers;
+	}
+        /**
+	 * @return the autoGenerationOptions
+	 */
+	public Set<String> getAutoGenerationOptions() {
+		if (autoGenerationOptions == null) {
+			autoGenerationOptions = new HashSet<String>();
+		}
+		return autoGenerationOptions;
+	}
+	/**
+	 * @param autoGenerationOptions the autoGenerationOptions to set
+	 */
+	public void setAutoGenerationOptions(Set<String> autoGenerationOptions) {
+		this.autoGenerationOptions = autoGenerationOptions;
+	}
+        /**
+	 * @return the identifierPools
+	 */
+	public Set<String> getIdentifierPools() {
+		if (identifierPools == null) {
+			identifierPools = new HashSet<String>();
+		}
+		return identifierPools;
+	}
+	/**
+	 * @param identifierPools the identifierPools to set
+	 */
+	public void setIdentifierPools(Set<String> identifierPools) {
+		this.identifierPools = identifierPools;
+	}
+        /**
+	 * @return the logEntrys
+	 */
+	public Set<String> getLogEntrys() {
+		if (logEntrys == null) {
+			logEntrys = new HashSet<String>();
+		}
+		return logEntrys;
+	}
+	/**
+	 * @param logEntrys the logEntrys to set
+	 */
+	public void setLogEntrys(Set<String> logEntrys) {
+		this.logEntrys = logEntrys;
 	}
 }	

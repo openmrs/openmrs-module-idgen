@@ -89,6 +89,17 @@ public interface IdentifierSourceService extends OpenmrsService {
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
+	 * Retires the IdentifierSource, leaving it in the database, but removing it from data entry screens
+	 * 
+	 * @param identifierSource the identifierSource to retire
+	 * @param reason the retiredReason to set
+	 * @throws APIException
+	 * @should set the retired bit before saving
+	 */
+	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
+	public void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException;
+	
+	/**
 	 * Deletes a IdentifierSource from the database.
 	 * @param identifierSource the IdentifierSource to purge
 	 * @should delete an IdentifierSource from the system

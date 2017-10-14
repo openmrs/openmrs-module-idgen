@@ -442,4 +442,14 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
         return dao.getSequenceValue(seq);
     }
 
+    /**
+     * @see IdentifierSourceService#retireIdentifierSource(org.openmrs.module.idgen.IdentifierSource, String)
+     */
+	@Override
+	public void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException {
+		identifierSource.setRetired(true);
+		identifierSource.setRetireReason(reason);
+		dao.saveIdentifierSource(identifierSource);		
+	}
+
 }

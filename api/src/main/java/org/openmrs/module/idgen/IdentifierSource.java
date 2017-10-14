@@ -170,4 +170,34 @@ public abstract class IdentifierSource {
 	 * @param - the reserved identifier to add
 	 */
 	public abstract void addReservedIdentifier(String reservedIdentifier);
+        
+        /**
+	 * @return Set of auto generation options
+	 */
+	public abstract Set<String> getAutoGenerationOptions();
+	
+	/**
+	 * @param - the auto generation options to set
+	 */
+	public abstract void setAutoGenerationOptions(Set<String> autoGenerationOptions);
+        
+        /**
+	 * @return Set of identifier pools
+	 */
+	public abstract Set<String> getIdentifierPools();
+	
+	/**
+	 * @param - the identifier pools to set
+	 */
+	public abstract void setIdentifierPools(Set<String> identifierPools);
+        
+        /**
+	 * @return Set of log entrys
+	 */
+	public abstract Set<String> getLogEntrys();
+	
+	/**
+	 * @param - the log entrys to set
+	 */
+	public abstract void setLogEntrys(Set<String> logEntrys);
 }	
