@@ -157,4 +157,8 @@ public class LogEntry {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
+	public String getUuid() {
+		return this.getIdentifier();
+	}
 }
