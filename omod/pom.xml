@@ -44,6 +44,12 @@
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-common</artifactId>
+			<version>2.20.0</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

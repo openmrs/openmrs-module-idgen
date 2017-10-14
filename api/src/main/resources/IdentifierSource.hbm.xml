@@ -23,6 +23,21 @@
 			<key column="source" not-null="true" />
 			<element column="identifier" type="string"/>
 		</set>
+                
+                <set name="autoGenerationOptions" table="idgen_auto_generation_option" lazy="true" cascade="all-delete-orphan">
+			<key column="source" update="false" />
+			<one-to-many class="AutoGenerationOption" />
+		</set>
+                
+                <set name="identifierPools" table="idgen_id_pool" lazy="true" cascade="all-delete-orphan">
+			<key column="source" update="false" />
+			<one-to-many class="IdentifierPool" />
+		</set>
+                
+                <set name="logEntrys" table="idgen_log_entry" lazy="true" cascade="all-delete-orphan">
+			<key column="source" update="false" />
+			<one-to-many class="LogEntry" />
+		</set>
 		
 		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
 			<key column="id"/>
