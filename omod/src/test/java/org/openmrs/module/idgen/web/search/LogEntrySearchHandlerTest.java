@@ -72,8 +72,8 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 	@Test
 	public void getSearchConfig_shouldReturnLogEntryByDateGenerated() throws Exception {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
-		req.addParameter("fromDate", "2016-10-01 12:00:00.433");
-		req.addParameter("toDate", "2017-09-30 12:00:00.433");
+		req.addParameter("fromDate", "2016-10-01T12:00:00.433");
+		req.addParameter("toDate", "2017-09-30T12:00:00.433");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertEquals(2, Util.getResultsSize(result));
 	}
