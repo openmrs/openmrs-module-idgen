@@ -93,8 +93,8 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 	@Test
 	public void shouldSearchAndReturnAListOfLogEntriesGeneratedInDateRange() throws Exception {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
-		req.addParameter("fromDate", "2016-10-01 12:00:00.423");
-		req.addParameter("toDate", "2017-09-30 12:00:00.423");
+		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
+		req.addParameter("toDate", "2017-09-30T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertEquals(2, Util.getResultsSize(result));
 	}
@@ -102,8 +102,8 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 	@Test
 	public void shouldSearchAndReturnNothingIfNoLogsGeneratedWithinRange() throws Exception {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
-		req.addParameter("fromDate", "2015-10-01 12:00:00.423");
-		req.addParameter("toDate", "2016-09-30 12:00:00.423");
+		req.addParameter("fromDate", "2015-10-01T12:00:00.423");
+		req.addParameter("toDate", "2016-09-30T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
@@ -138,8 +138,8 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("generatedBy", USER_UUID);
 		req.addParameter("identifier", "100");
 		req.addParameter("comment", "New");
-		req.addParameter("fromDate", "2016-10-01 12:00:00.423");
-		req.addParameter("toDate", "2017-10-04 12:00:00.423");
+		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
+		req.addParameter("toDate", "2017-10-04T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertEquals(2, Util.getResultsSize(result));
 	}

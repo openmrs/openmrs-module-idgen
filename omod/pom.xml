@@ -45,6 +45,19 @@
 			<classifier>tests</classifier>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-common</artifactId>
+			<version>${WEBSERVICES_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+                <dependency>
+                        <groupId>org.openmrs.module</groupId>
+                        <artifactId>idgen-api</artifactId>
+                        <version>${project.parent.version}</version>
+                        <scope>test</scope>
+                        <type>test-jar</type>
+                </dependency>
 	</dependencies>
 
 	<build>
