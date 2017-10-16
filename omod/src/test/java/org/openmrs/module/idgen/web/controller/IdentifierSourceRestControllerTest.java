@@ -11,7 +11,9 @@ package org.openmrs.module.idgen.web.controller;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
@@ -23,14 +25,13 @@ import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceContr
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import static org.mockito.Matchers.endsWith;
 
 public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
 	
@@ -206,7 +207,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     @Test
     public void shouldThrowAnExceptionWhenARequiredParameterIsMissing() throws Exception {
         expectedException.expect(org.openmrs.module.webservices.validation.ValidationException.class);
-        expectedException.expectMessage(endsWith("source type, patient identifier type, name"));
+        expectedException.expectMessage(allOf(containsString("source type"), containsString("patient identifier type"), containsString("name")));
         
         SimpleObject sequentialIdentifierSource = new SimpleObject();
         sequentialIdentifierSource.add("description", "test identifier source");
