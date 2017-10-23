@@ -165,4 +165,8 @@ public class AutoGenerationOption {
 	public void setAutomaticGenerationEnabled(boolean automaticGenerationEnabled) {
 		this.automaticGenerationEnabled = automaticGenerationEnabled;
 	}
+	
+	public String getUuid() {
+		return this.getId().toString();
+	}
 }
