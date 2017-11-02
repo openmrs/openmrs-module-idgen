@@ -17,13 +17,16 @@ body {
     font-size: 16px;
 }
 
+html body {
+    margin: 0px auto
+}
+
 nav img {
     width: 120px !important;
 }
 
 #body-wrapper {
     position: relative;
-    left: 140px;
     padding: 10px;
     background-color: white;
     -moz-border-radius: 5px;
@@ -101,7 +104,6 @@ a:hover {
 }
 
 nav {
-    left: 140px;
     position: relative;
     background-color: #00463f;
     color: #CCC;
@@ -154,14 +156,59 @@ select:focus {
     outline: none!important;
 }
 
-a, a:visited, a:hover, a:active{
+a,
+a:visited,
+a:hover,
+a:active {
     color: inherit;
     text-decoration: inherit;
 }
 
+
 /*--------------View Logs Tab ------------*/
+
+.center {
+    text-align: center
+}
+
+.noborder.searchlink,
+.noborder.searchlink:hover {
+    border: 0px;
+    margin: 0px;
+    font-size: 23px;
+    color: #3f3d74;
+    background: #ffffff
+}
+
+.logLabel.logSearch {
+    background: #fff
+}
+
 .logwrapper .ReactTable {
     margin: 20px;
+}
+
+.filterLabels {
+    padding: 0px 20px;
+    font-size: 12px
+}
+
+.filterLabels span {
+    margin: 3px;
+}
+
+.filteredBy {
+    border: 1px solid #b9b9b9;
+    background: #e2e2e2;
+    color: #717171;
+    padding: 3px 5px;
+    font-style: italic;
+    display: inline-block;
+    font-size: 10px;
+}
+
+.filteredBy:hover {
+    color: #545454
 }
 
 .ReactTable .rt-resizable-header.-cursor-pointer.rt-th {
@@ -178,26 +225,52 @@ a, a:visited, a:hover, a:active{
     background: #fffdf7;
 }
 
-
 .logwrapper .form-control,
 select.form-control {
     border-radius: 0px;
     line-height: 1.7em;
 }
 
-.logSearch {
-    background: #3f3d74;
-    text-align: center;
-    color: white;
-    padding: 20px 30px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
-    -ms-border-radius: 5px;
-    -khtml-border-radius: 5px;
-    border-radius: 5px;
-    max-width: 450px;
-    margin: 0px auto 10px
+.logSearchTitle {
+    background-color: #00463f;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 5px;
+    font-size: 15px;
+    text-align: left
+}
+.logs_filter.input-group{
+    margin:20px auto 10px;
+    float: right;
+    width: auto
+}
+
+#advancedSearchForm {
+    border: 1px solid #00463f;
+    padding-bottom: 20px
+}
+
+.advanced_wrapper .react-datepicker__input-container, .advanced_wrapper .react-datepicker-wrapper {
+    display: block
+}
+
+.advanced_wrapper .input-group .form-control {
+    width: 100%;
+    font-size: 13px;
+}
+
+.input-group.date {
+    width: 49%;
+    float: left;
+}
+.dateSeparator.input-group {
+    width: 2%;
+    float: left;
+    display: block;
+    line-height: 2em;
+}
+.advanced_wrapper .input-group.date>div{
+    width:100%
 }
 
 .search_label {
@@ -221,7 +294,7 @@ input.log_searchbox {
     color: #fffdf7;
     border: 1px solid #fffdf7;
     padding: 10px;
-    margin: 10px auto 0px;
+    margin: 10px auto 10px;
 }
 
 .searchlink:hover {
@@ -234,34 +307,50 @@ input.log_searchbox {
     margin-bottom: 10px;
 }
 
+.advanced_wrapper select option:first-child {
+    color: #666
+}
+
 .advanced_wrapper fieldset input,
 select {
     width: 100%
 }
 
 .logs_table_area {
-    position: relative;
+    font-size: 13px;
+    color: rgb(111, 123, 138);
 }
 
 .advanced_wrapper,
 .logs_table {
-    width: 100%;
     left: 0;
+    width: 100%
 }
 
 .advanced_wrapper {
-    padding: 20px 20px 30px;
-    z-index: 10;
-    position: absolute;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #3f3d74;
-    border-top-width: 5px;
-    margin-top: -15px;
     text-align: center;
+    margin: 15px 0px
+}
+
+#advancedSearchForm .react-datepicker__day--selected,
+#advancedSearchForm .react-datepicker__day--in-selecting-range,
+#advancedSearchForm .react-datepicker__day--in-range,
+#advancedSearchForm .react-datepicker__day--keyboard-selected {
+    background-color: #403e75;
+}
+
+#advancedSearchForm .react-datepicker__day--today {
+    color: #403e75;
+    border: 1px solid #403e75
+}
+
+#advancedSearchForm .react-datepicker__day--today.react-datepicker__day--keyboard-selected,
+#advancedSearchForm .react-datepicker__day--today.react-datepicker__day--selected {
+    color: #fbe5e5
 }
 
 label.search_lbl {
-    margin-bottom: 0px
+    margin: 10px 0px 5px;
 }
 
 .cancelbtn {
@@ -328,9 +417,6 @@ a.button.confirm:hover {
     border-color: #779b23;
 }
 
-.advanced_wrapper input[type="submit"] {
-    margin-top: 0px
-}
 .advanced_wrapper .rdt {
     margin-bottom: 10px;
 }
