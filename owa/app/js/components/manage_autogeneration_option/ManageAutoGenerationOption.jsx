@@ -410,38 +410,12 @@ class ManageAutoGenerationOption extends Component {
           </Row>
           <Row id="tableCont">
             <Col sm="12" id="tableTitle">
-              <h2>Showing 1 - 10 of 10 </h2>
+              <h2>
+                Showing 1 - {genOptions.length} of {genOptions.length}
+              </h2>
             </Col>
 
             <Col className="tableContent" sm="12">
-              <Row id="tableDiv">
-                <Col sm="6">
-                  <FormGroup>
-                    <Input type="select" name="select">
-                      <option>10</option>
-                      <option>20</option>
-                      <option>30</option>
-                      <option>40</option>
-                      <option>50</option>
-                    </Input>
-                  </FormGroup>
-                </Col>
-
-                <Col className="searchDiv" sm="6">
-                  <FormGroup>
-                    <Label id="label" for="exampleEmail">
-                      <span>Search: </span>
-                      <Input
-                        className="searchInput"
-                        type="text"
-                        name="search"
-                        id="search"
-                        placeholder="Search"
-                      />
-                    </Label>
-                  </FormGroup>
-                </Col>
-              </Row>
               <Row sm="12">
                 <Table size="sm" striped responsive hover>
                   <thead>
