@@ -58,13 +58,17 @@ public class LogEntrySearchHandler implements SearchHandler {
         Date dateFrom = fromDate != null ? (Date) ConversionUtil.convert(fromDate, Date.class) : null;
         Date dateTo = toDate != null ? (Date) ConversionUtil.convert(toDate, Date.class) : null;
         User user = generatedBy != null ? service.getUserByUuid(generatedBy): null;
-        if (logSource == null && identifier == null && comment == null && dateFrom == null && dateTo == null
-                && user == null) {
+        if (source != null && logSource == null) {
             return new EmptySearchResult();
         }
-        List<LogEntry> logEntries = identifierSourceService.getLogEntries(logSource, dateFrom, dateTo, identifier, user, comment);
-
-        return new NeedsPaging<LogEntry>(logEntries, context);
+        else if (generatedBy != null && user == null) {
+            return new EmptySearchResult();
+        } 
+        else {
+            List<LogEntry> logEntries = identifierSourceService.getLogEntries(logSource, dateFrom, dateTo, identifier,
+                    user, comment); 
+            return new NeedsPaging<LogEntry>(logEntries, context);
+        }
     }
     @Override
     public SearchConfig getSearchConfig() {
