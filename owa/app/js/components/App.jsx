@@ -7,21 +7,22 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.css'; 
-import Header from './common/header'
-import BodyLayout from './bodyLayout'
-import BreadCrumbs from './breadcrumbs/breadcrumbs'
+import 'bootstrap/dist/css/bootstrap.css';
+import 'sweetalert2/dist/sweetalert2.min.css';
+import Header from './common/header';
+import BodyLayout from './bodyLayout';
+import BreadCrumbs from './breadcrumbs/breadcrumbs';
 
 export default class App extends React.Component {
   render() {
     return (
-      <div >
+      <div>
         <Header />
         <BreadCrumbs />
-        <div id= "body-wrapper"> 
-            <BodyLayout/>
+        <div id="body-wrapper">
+          <BodyLayout />
         </div>
       </div>
-    )
+    );
   }
 }

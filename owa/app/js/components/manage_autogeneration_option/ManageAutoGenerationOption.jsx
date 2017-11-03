@@ -1,52 +1,33 @@
 import React, { Component } from 'react';
-import { Button, Container, Row, Col, FormGroup, Label, Input, Table,
-    Modal, ModalHeader, ModalBody, ModalFooter, Alert } from 'reactstrap';
+import {
+  Button,
+  Container,
+  Row,
+  Col,
+  FormGroup,
+  Label,
+  Input,
+  Table,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Alert
+} from 'reactstrap';
 import { MdDelete } from 'react-icons/lib/md';
+import axios from 'axios';
+import swal from 'sweetalert2';
+import apiCall from '../../utilities/apiHelper';
 import './css/manage-autogeneration.css';
 
 class ManageAutoGenerationOption extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      genOptions: [
-        {
-          idType: 'OpenMRS ID',
-          location: 'Armani Hospital',
-          sourceName: 'Generator for OpenMRS ID',
-          manualEntry: false,
-          autoGen: true
-        },
-        {
-          idType: 'OpenMRS ID',
-          location: 'Buruju Hospital',
-          sourceName: 'Generator for OpenMRS ID',
-          manualEntry: false,
-          autoGen: false
-        },
-        {
-          idType: 'OpenMRS ID',
-          location: 'Laboratory',
-          sourceName: 'Generator for OpenMRS ID',
-          manualEntry: false,
-          autoGen: true
-        }
-      ],
-      identifierTypes: [
-        { id: 1, name: 'OpenMRS ID'},
-        { id: 2, name: 'OpenMRS Identification Number'},
-        { id: 3, name: 'Old Identification Number '}
-      ],
-      locations: [
-        { id: 1, name: 'Armani Hospital' },
-        { id: 2, name: 'Buruju Hospital' },
-        { id: 3, name: 'Ocean view Clinic' },
-        { id: 4, name: 'Indiana Out patient ward' },
-        { id: 5, name: 'Laboratory' }
-      ],
-      genOptionAutogenerateSources: [
-        { id: 1, name: 'Generator for OpenMRS ID' },
-        { id: 2, name: 'Generator for Something Else' }
-      ],
+      genOptions: [],
+      identifierTypes: [],
+      locations: [],
+      genOptionAutogenerateSources: [],
       modal: false,
       firstLevelCompleted: false,
       currentGenOption: {
@@ -69,6 +50,53 @@ class ManageAutoGenerationOption extends Component {
     this.onChange = this.onChange.bind(this);
     this.saveNewAutoGenOptions = this.saveNewAutoGenOptions.bind(this);
     this.editCurrentGenOption = this.editCurrentGenOption.bind(this);
+    this.loadAutoGenerationOptions = this.loadAutoGenerationOptions.bind(this);
+    this.loadLocations = this.loadLocations.bind(this);
+    this.loadIdentifierTypes = this.loadIdentifierTypes.bind(this);
+    this.loadSources = this.loadSources.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadLocations();
+    this.loadAutoGenerationOptions();
+    this.loadIdentifierTypes();
+    this.loadSources();
+  }
+
+  loadLocations() {
+    apiCall(null, 'get', '/location').then(response => {
+      this.setState({
+        locations: response.results
+      });
+    });
+  }
+
+  loadAutoGenerationOptions() {
+    apiCall(
+      null,
+      'get',
+      '/idgen/autogenerationoption?v=full'
+    ).then(response => {
+      this.setState({
+        genOptions: response.results
+      });
+    });
+  }
+
+  loadIdentifierTypes() {
+    apiCall(null, 'get', '/patientidentifiertype?v=full').then(response => {
+      this.setState({
+        identifierTypes: response.results
+      });
+    });
+  }
+
+  loadSources() {
+    apiCall(null, 'get', '/idgen/identifiersource').then(response => {
+      this.setState({
+        genOptionAutogenerateSources: response.results
+      });
+    });
   }
 
   getGenDetails(id) {
@@ -79,47 +107,118 @@ class ManageAutoGenerationOption extends Component {
       modal: true,
       currentGenOption: {
         id,
-        identifierType: selectedGenOption.idType,
-        currentLocation: selectedGenOption.location,
-        autogenerateSource: selectedGenOption.sourceName,
-        autoGenerationEnabled: selectedGenOption.autoGen,
-        manualEntryEnabled: selectedGenOption.manualEntry
-      },
+        uuid: selectedGenOption.uuid,
+        identifierType: selectedGenOption.identifierType.uuid,
+        currentLocation: selectedGenOption.location
+          ? selectedGenOption.location.uuid
+          : '',
+        autogenerateSource: selectedGenOption.source.uuid,
+        autoGenerationEnabled: selectedGenOption.automaticGenerationEnabled,
+        manualEntryEnabled: selectedGenOption.manualEntryEnabled
+      }
     });
   }
 
   editCurrentGenOption() {
     const { genOptions, currentGenOption } = this.state;
-    const { id, identifierType, currentLocation, autogenerateSource,
-        autoGenerationEnabled, manualEntryEnabled } = currentGenOption;
-    const selectedGenOption = genOptions[id];
-    selectedGenOption.idType = identifierType;
-    selectedGenOption.location = currentLocation;
-    selectedGenOption.sourceName = autogenerateSource;
-    selectedGenOption.autoGen = autoGenerationEnabled;
-    selectedGenOption.manualEntry = manualEntryEnabled;
-    genOptions[id] = selectedGenOption; 
-    this.setState({
-      genOptions,
-      modal: false
+    const {
+      id,
+      uuid,
+      identifierType,
+      currentLocation,
+      autogenerateSource,
+      autoGenerationEnabled,
+      manualEntryEnabled
+    } = currentGenOption;
+    console.log(uuid);
+    apiCall(
+      {
+        uuid,
+        identifierType: identifierType,
+        location: currentLocation,
+        source: autogenerateSource,
+        automaticGenerationEnabled: autoGenerationEnabled,
+        manualEntryEnabled
+      },
+      'post',
+      `/idgen/autogenerationoption/${uuid}`
+    ).then(res => {
+      swal({
+        title: 'Success',
+        html: 'Edit successfull',
+        type: 'success',
+        allowOutsideClick: false
+      }).then(() => {
+        this.loadAutoGenerationOptions();
+        this.setState({
+          modal: false
+        });
+      });
     });
   }
 
   onChange(e) {
     let currentGenOption;
-    if (e.target.name === 'autoGenerationEnabled' || e.target.name === 'manualEntryEnabled') {
-      currentGenOption = Object.assign({}, this.state.currentGenOption, { [e.target.name]: e.target.checked});
+    if (
+      e.target.name === 'autoGenerationEnabled' ||
+      e.target.name === 'manualEntryEnabled'
+    ) {
+      currentGenOption = Object.assign({}, this.state.currentGenOption, {
+        [e.target.name]: e.target.checked
+      });
     } else {
-      currentGenOption = Object.assign({}, this.state.currentGenOption, { [e.target.name]: e.target.value});
+      console.log(e.target.value);
+      currentGenOption = Object.assign({}, this.state.currentGenOption, {
+        [e.target.name]: e.target.value
+      });
     }
     this.setState({
       alertVisible: false,
       currentGenOption
-    })
+    });
   }
 
   deleteGenOption(id) {
-    console.log('delete', id);
+    const display = this.state.genOptions[id].identifierType.display;
+    swal({
+      title: 'Confirm Delete?',
+      text: `Do you really want to delete the "${display}" autogeneration option?`,
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#88af28',
+      cancelButtonColor: '#ff3d3d',
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+      buttonsStyling: true,
+      allowOutsideClick: false
+    }).then(() => {
+      const uuid = this.state.genOptions[id].uuid;
+      apiCall(
+        null,
+        'delete',
+        `/idgen/autogenerationoption/${uuid}?purge=true`
+      ).then(
+        res => {
+          swal({
+            title: 'Success',
+            html: `"${display}" autogeneration option deleted successfully!`,
+            type: 'success',
+            allowOutsideClick: true
+          });
+          this.loadAutoGenerationOptions();
+        },
+        () => {
+          swal({
+            title: 'Delete not successful',
+            html:
+              'The Resource Does not Support the Requested Operation [Deleting of AutoGenerationOption is not supported]',
+            type: 'error',
+            allowOutsideClick: true
+          });
+        }
+      );
+    });
   }
 
   createGenOptions() {
@@ -150,8 +249,8 @@ class ManageAutoGenerationOption extends Component {
         errors: {
           message: 'Please select an identifier type'
         },
-        alertVisible: true,
-      })
+        alertVisible: true
+      });
     } else {
       this.setState({
         firstLevelCompleted: true,
@@ -164,7 +263,6 @@ class ManageAutoGenerationOption extends Component {
         }
       });
     }
-    
   }
 
   onDismiss() {
@@ -173,25 +271,43 @@ class ManageAutoGenerationOption extends Component {
 
   saveNewAutoGenOptions() {
     const { currentGenOption, genOptions } = this.state;
-    if (currentGenOption.currentLocation === '' || currentGenOption.autogenerateSource === '') {
+    if (
+      currentGenOption.currentLocation === '' ||
+      currentGenOption.autogenerateSource === ''
+    ) {
       this.setState({
         errors: {
-          message: 'All fields are required',
+          message: 'All fields are required'
         },
         alertVisible: true
-      })
+      });
     } else {
-      const newIdentifierType = {
-        idType: currentGenOption.identifierType,
-        location: currentGenOption.currentLocation,
-        sourceName: currentGenOption.autogenerateSource,
-        manualEntry: currentGenOption.manualEntryEnabled,
-        autoGen: currentGenOption.autoGenerationEnabled
-      }
-      genOptions.push(newIdentifierType);
-      this.setState({
-        genOptions
-      }, () => {
+      const {
+        id,
+        identifierType,
+        currentLocation,
+        autogenerateSource,
+        autoGenerationEnabled,
+        manualEntryEnabled
+      } = currentGenOption;
+      apiCall(
+        {
+          identifierType: identifierType,
+          location: currentLocation,
+          source: autogenerateSource,
+          automaticGenerationEnabled: autoGenerationEnabled,
+          manualEntryEnabled
+        },
+        'post',
+        '/idgen/autogenerationoption'
+      ).then(res => {
+        swal({
+          title: 'Success',
+          html: 'New AutoGeneration Option added successfully',
+          type: 'success',
+          allowOutsideClick: true
+        });
+        this.loadAutoGenerationOptions();
         this.setState({
           modal: false,
           currentGenOption: {
@@ -202,14 +318,22 @@ class ManageAutoGenerationOption extends Component {
             autoGenerationEnabled: false,
             manualEntryEnabled: false
           }
-        })
+        });
       });
     }
   }
 
   render() {
-    const { genOptions, currentGenOption, identifierTypes, saveGenOptionStatus,
-      locations, genOptionAutogenerateSources, errors, firstLevelCompleted } = this.state;
+    const {
+      genOptions,
+      currentGenOption,
+      identifierTypes,
+      saveGenOptionStatus,
+      locations,
+      genOptionAutogenerateSources,
+      errors,
+      firstLevelCompleted
+    } = this.state;
     let allGenOptions;
     let allIdentifierTypes;
     let allLocations;
@@ -218,59 +342,71 @@ class ManageAutoGenerationOption extends Component {
       allGenOptions = genOptions.map((genOption, i) => (
         <tr key={i}>
           <th scope="row">{i + 1}</th>
-          <td onClick={() => this.getGenDetails(i)}>{genOption.idType}</td>
-          <td onClick={() => this.getGenDetails(i)}>{genOption.location}</td>
-          <td onClick={() => this.getGenDetails(i)}>{genOption.sourceName}</td>
-          <td onClick={() => this.getGenDetails(i)}>{genOption.manualEntry.toString()}</td>
-          <td onClick={() => this.getGenDetails(i)}>{genOption.autoGen.toString()}</td>
-          <td onClick={() => this.deleteGenOption(i)}><MdDelete /></td>
+          <td onClick={() => this.getGenDetails(i)}>
+            {genOption.identifierType.display}
+          </td>
+          <td onClick={() => this.getGenDetails(i)}>
+            {genOption.location ? genOption.location.display : 'No location'}
+          </td>
+          <td onClick={() => this.getGenDetails(i)}>{genOption.source.name}</td>
+          <td onClick={() => this.getGenDetails(i)}>
+            {genOption.manualEntryEnabled.toString()}
+          </td>
+          <td onClick={() => this.getGenDetails(i)}>
+            {genOption.automaticGenerationEnabled.toString()}
+          </td>
+          <td onClick={() => this.deleteGenOption(i)}>
+            <MdDelete />
+          </td>
         </tr>
       ));
     } else {
       allGenOptions = (
         <tr>
-          <p>Nothing to show</p>
+          <td colSpan="3">Nothing to show</td>
         </tr>
-      )
+      );
     }
 
     if (identifierTypes.length > 0) {
       allIdentifierTypes = identifierTypes.map((identifierType, i) => (
-        <option key={i} value={identifierType.name}>{identifierType.name}</option>
+        <option key={i} value={identifierType.uuid}>
+          {identifierType.display}
+        </option>
       ));
     } else {
-      allIdentifierTypes = (
-        <option value=""></option>
-      );
+      allIdentifierTypes = <option value="" />;
     }
 
     if (locations.length > 0) {
       allLocations = locations.map((location, i) => (
-        <option key={i} value={location.name}>{location.name}</option>
-      ));
-    } else {
-      allLocations = (
-        <option value=""></option>
-      );
-    }
-
-    if (genOptionAutogenerateSources.length > 0) {
-      AllAutoGenerateSources = genOptionAutogenerateSources.map((genOptionAutogenerateSource, i) => (
-        <option key={i} value={genOptionAutogenerateSource.name}>
-          {genOptionAutogenerateSource.name}
+        <option key={i} value={location.uuid}>
+          {location.display}
         </option>
       ));
     } else {
-      AllAutoGenerateSources = (
-        <option value=""></option>
-      );     
+      allLocations = <option value="" />;
+    }
+
+    if (genOptionAutogenerateSources.length > 0) {
+      AllAutoGenerateSources = genOptionAutogenerateSources.map(
+        (genOptionAutogenerateSource, i) => (
+          <option key={i} value={genOptionAutogenerateSource.uuid}>
+            {genOptionAutogenerateSource.display}
+          </option>
+        )
+      );
+    } else {
+      AllAutoGenerateSources = <option value="" />;
     }
 
     return (
       <div className="mao-content">
         <Container>
           <Row id="addNewCont">
-            <Button id="addBtn" color="primary" onClick={this.createGenOptions}>Add New</Button>
+            <Button id="addBtn" color="primary" onClick={this.createGenOptions}>
+              Add New
+            </Button>
           </Row>
           <Row id="tableCont">
             <Col sm="12" id="tableTitle">
@@ -293,9 +429,9 @@ class ManageAutoGenerationOption extends Component {
 
                 <Col className="searchDiv" sm="6">
                   <FormGroup>
-                    <Label id="label" for="exampleEmail"> 
+                    <Label id="label" for="exampleEmail">
                       <span>Search: </span>
-                      <Input 
+                      <Input
                         className="searchInput"
                         type="text"
                         name="search"
@@ -307,30 +443,36 @@ class ManageAutoGenerationOption extends Component {
                 </Col>
               </Row>
               <Row sm="12">
-              <Table size="sm" striped responsive hover>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Identifier Type</th>
-                    <th>Location</th>
-                    <th>Source Name</th>
-                    <th>Manual Entry Enabled?</th>
-                    <th>Automatic Generation Enabled?</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allGenOptions}
-                </tbody>
-              </Table>
+                <Table size="sm" striped responsive hover>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Identifier Type</th>
+                      <th>Location</th>
+                      <th>Source Name</th>
+                      <th>Manual Entry Enabled?</th>
+                      <th>Automatic Generation Enabled?</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>{allGenOptions}</tbody>
+                </Table>
               </Row>
               <Row>
                 <div className="modalDiv">
-                  <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+                  <Modal
+                    isOpen={this.state.modal}
+                    toggle={this.toggle}
+                    className={this.props.className}
+                  >
                     <ModalHeader toggle={this.toggle}>
-                      { !firstLevelCompleted || saveGenOptionStatus === 'new' ? 'Add new' :
-                        (<span><h3>{currentGenOption.identifierType} | </h3> Edit </span> )
-                      } <span>Auto Generation Option </span>
+                      {!firstLevelCompleted || saveGenOptionStatus === 'new' ? (
+                        'Add new'
+                      ) : (
+                        <span>Edit&nbsp;</span>
+                      )}
+                      &nbsp;
+                      <span>Auto Generation Option </span>
                     </ModalHeader>
                     <ModalBody>
                       <Alert
@@ -340,7 +482,7 @@ class ManageAutoGenerationOption extends Component {
                       >
                         {errors.message}
                       </Alert>
-                      { !firstLevelCompleted ? (
+                      {!firstLevelCompleted ? (
                         <div>
                           <FormGroup>
                             <Label for="identifier">Identifier Type: </Label>
@@ -350,6 +492,7 @@ class ManageAutoGenerationOption extends Component {
                               type="select"
                               defaultValue={currentGenOption.identifierType}
                               name="identifierType"
+                              className="myselect"
                             >
                               <option value="">Select Identifier type</option>
                               {allIdentifierTypes}
@@ -366,6 +509,8 @@ class ManageAutoGenerationOption extends Component {
                               type="select"
                               defaultValue={currentGenOption.currentLocation}
                               name="currentLocation"
+                              className="myselect"
+                              value={currentGenOption.currentLocation}
                             >
                               <option value="">Select a location</option>
                               {allLocations}
@@ -378,6 +523,7 @@ class ManageAutoGenerationOption extends Component {
                               type="select"
                               defaultValue={currentGenOption.autogenerateSource}
                               name="autogenerateSource"
+                              className="myselect"
                             >
                               <option value="">Select a source</option>
                               {AllAutoGenerateSources}
@@ -392,10 +538,13 @@ class ManageAutoGenerationOption extends Component {
                                 <Input
                                   onClick={this.onChange}
                                   name="autoGenerationEnabled"
-                                  checked={currentGenOption.autoGenerationEnabled}
+                                  checked={
+                                    currentGenOption.autoGenerationEnabled
+                                  }
                                   type="checkbox"
-                                /><span> </span>
-                                Automatic Generation Enabled? 
+                                />
+                                <span> </span>
+                                Automatic Generation Enabled?
                               </Label>
                             </FormGroup>
                             <FormGroup>
@@ -405,17 +554,17 @@ class ManageAutoGenerationOption extends Component {
                                   name="manualEntryEnabled"
                                   checked={currentGenOption.manualEntryEnabled}
                                   type="checkbox"
-                                /><span> </span>
+                                />
+                                <span> </span>
                                 Manual Entry Enabled?
                               </Label>
                             </FormGroup>
                           </div>
                         </div>
                       )}
-                      
                     </ModalBody>
                     <ModalFooter>
-                      { !firstLevelCompleted ? (
+                      {!firstLevelCompleted ? (
                         <Button
                           color="primary"
                           onClick={this.nextStage}
@@ -427,14 +576,19 @@ class ManageAutoGenerationOption extends Component {
                         <Button
                           color="primary"
                           className="color-green"
-                          onClick={saveGenOptionStatus === 'new' ? this.saveNewAutoGenOptions :
-                            this.editCurrentGenOption}
+                          onClick={
+                            saveGenOptionStatus === 'new'
+                              ? this.saveNewAutoGenOptions
+                              : this.editCurrentGenOption
+                          }
                         >
                           <span>Save</span>
                         </Button>
-                      ) }
+                      )}
                       <span> </span>
-                      <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                      <Button color="secondary" onClick={this.toggle}>
+                        Cancel
+                      </Button>
                     </ModalFooter>
                   </Modal>
                 </div>
@@ -448,4 +602,3 @@ class ManageAutoGenerationOption extends Component {
 }
 
 export default ManageAutoGenerationOption;
-
