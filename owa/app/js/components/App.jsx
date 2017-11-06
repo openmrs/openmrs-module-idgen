@@ -14,13 +14,26 @@ import BodyLayout from './bodyLayout';
 import BreadCrumbs from './breadcrumbs/breadcrumbs';
 
 export default class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      activeTab: '1'
+    };
+      this.toggle = this.toggle.bind(this);
+  }
+
+  toggle(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({activeTab: tab});
+    }
+  }
   render() {
     return (
       <div>
         <Header />
-        <BreadCrumbs />
+        <BreadCrumbs activeTab={this.state.activeTab}/>
         <div id="body-wrapper">
-          <BodyLayout />
+          <BodyLayout  activeTab={this.state.activeTab} showTab={this.toggle} />
         </div>
       </div>
     );

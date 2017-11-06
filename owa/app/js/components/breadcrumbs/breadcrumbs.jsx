@@ -9,15 +9,19 @@
 import React from 'react';
 import FaHome from 'react-icons/lib/fa/home'
 import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
-import './breadCrumbs.css'
+import './breadCrumbs.css';
+
 export default class BreadCrumbs extends React.Component {
   render() {
     return (
         <Breadcrumb>
           <BreadcrumbItem><a href="../../"><FaHome /></a></BreadcrumbItem>
-          <BreadcrumbItem active>IDGEN</BreadcrumbItem>
+          <BreadcrumbItem>IDGEN</BreadcrumbItem>
+          <BreadcrumbItem active>
+          {(this.props.activeTab == 2) ? "Auto-Generation Options" :
+           (this.props.activeTab == 3) ? "View Log Entries" : "Manage Patient Identifier Sources"}
+          </BreadcrumbItem>
         </Breadcrumb>
-      
     )
   }
 }
