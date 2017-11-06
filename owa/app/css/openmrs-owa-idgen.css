@@ -164,9 +164,31 @@ a:active {
     text-decoration: inherit;
 }
 
+/*-------------Bread Crumbs---------------*/
+ol.breadcrumb {
+    padding: 5px 0px;
+    margin-bottom: 1rem;
+    list-style: none;
+    background-color: #eceeef;
+    border-radius: 0;
+    border-bottom: 1px solid #fff;
+    margin-bottom: 10px;
+}
+
+.breadcrumb-item {
+    text-decoration: underline;
+    color: #555;
+    font-size: .9em
+}
+
+li.breadcrumb-item.active {
+    color: #363463;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .9em;
+}
 
 /*--------------View Logs Tab ------------*/
-
 .center {
     text-align: center
 }
@@ -239,8 +261,9 @@ select.form-control {
     font-size: 15px;
     text-align: left
 }
-.logs_filter.input-group{
-    margin:20px auto 10px;
+
+.logs_filter.input-group {
+    margin: 20px auto 10px;
     float: right;
     width: auto
 }
@@ -250,7 +273,8 @@ select.form-control {
     padding-bottom: 20px
 }
 
-.advanced_wrapper .react-datepicker__input-container, .advanced_wrapper .react-datepicker-wrapper {
+.advanced_wrapper .react-datepicker__input-container,
+.advanced_wrapper .react-datepicker-wrapper {
     display: block
 }
 
@@ -263,14 +287,16 @@ select.form-control {
     width: 49%;
     float: left;
 }
+
 .dateSeparator.input-group {
     width: 2%;
     float: left;
     display: block;
     line-height: 2em;
 }
-.advanced_wrapper .input-group.date>div{
-    width:100%
+
+.advanced_wrapper .input-group.date>div {
+    width: 100%
 }
 
 .search_label {
