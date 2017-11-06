@@ -17,22 +17,6 @@ import ManagePatientIdentifierSources from './manage_patient_identifier_sources/
 import ManageAutoGenerationOption from './manage_autogeneration_option/ManageAutoGenerationOption';
 
 export default class BodyLayout extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.toggle = this
-      .toggle
-      .bind(this);
-    this.state = {
-      activeTab: '1'
-    };
-  }
-
-  toggle(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({activeTab: tab});
-    }
-  }
   render() {
     return (
       <div>
@@ -40,10 +24,10 @@ export default class BodyLayout extends React.Component {
           <NavItem>
             <NavLink
               className={classnames({
-              active: this.state.activeTab === '1'
+              active: this.props.activeTab === '1'
             })}
               onClick={() => {
-              this.toggle('1');
+              this.props.showTab('1');
             }}>
               Manage Patient Identifier Sources
             </NavLink>
@@ -51,10 +35,10 @@ export default class BodyLayout extends React.Component {
           <NavItem>
             <NavLink
               className={classnames({
-              active: this.state.activeTab === '2'
+              active: this.props.activeTab === '2'
             })}
               onClick={() => {
-              this.toggle('2');
+              this.props.showTab('2');
             }}>
               Auto-Generation Options
             </NavLink>
@@ -62,16 +46,16 @@ export default class BodyLayout extends React.Component {
           <NavItem>
             <NavLink
               className={classnames({
-              active: this.state.activeTab === '3'
+              active: this.props.activeTab === '3'
             })}
               onClick={() => {
-              this.toggle('3');
+              this.props.showTab('3');
             }}>
               View Log Entries
             </NavLink>
           </NavItem>
         </Nav>
-        <TabContent activeTab={this.state.activeTab}>
+        <TabContent activeTab={this.props.activeTab}>
           <TabPane tabId="1">
             <Row>
               <Col sm="12">
