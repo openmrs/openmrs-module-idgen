@@ -10,7 +10,7 @@ import React from 'react';
 import {Link, IndexLink} from 'react-router';
 import apiCall from '../../utilities/apiHelper';
 import imageFile from '../../../img/openmrs-with-title-small.png';
-import { UncontrolledNavDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
+import { UncontrolledNavDropdown, NavDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
         Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, 
         NavLink } from 'reactstrap';
 import {FaSignOut, FaUser,FaMapMarker} from 'react-icons/lib/fa';
@@ -31,20 +31,17 @@ export default class Header extends React.Component {
       defaultLocation: "",
       currentUser: "",
       currentLogOutUrl: "",
+      contextPath:""
     };
     this.getUri = this.getUri.bind(this);
   }
 
   toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
+    this.setState(prevState=>({
+      dropdownOpen: !prevState.dropdownOpen
+    }));
   }
 
-  /**
-   * Gets the OpenMrs configuration and sets the logout link
-   * @memberOf Header
-   */
   componentDidMount() {
     apiCall(null, 'get', '/location').then((response) => {
       this.setState({
@@ -57,31 +54,28 @@ export default class Header extends React.Component {
     apiCall(null, 'get', '/session').then((response) => {
       this.setState({currentUser: response.user.display});
     });
+    const host = location.href.split('/')[3];
+    const locationorigin = location.origin;
+    const contextPath = locationorigin + '/' + host;
+    this.setState({ contextPath })
   }
-
-  /**
-   * Gets logout Url 
-   * 
-   * @returns {string} - logout url
-   */  
+ 
   getUri() {
     this.state.locationTags.map((location) => {
       let url = location.links[0].uri;
       let arrUrl = url.split("/");
       let customUrl = `/${arrUrl[3]}/appui/header/logout.action?successUrl=${arrUrl[3]}`;
       this.setState({currentLogOutUrl: customUrl});
-      return customUrl;
-        
+      return customUrl;   
     });
   }
 
   handleOnClick(location){
-    this.setState({
+    this.setState(prevState=>({
       currentLocationTag: location,
-      dropdownOpen: false
-      
-    });
 
+      dropdownOpen: !prevState.dropdownOpen
+    }));
   }
   render() {
     return (
@@ -97,12 +91,14 @@ export default class Header extends React.Component {
                        {' ' + this.state.currentUser}
                       </DropdownToggle>
                       <DropdownMenu>
-                        <DropdownItem header><a href="#">My Account</a></DropdownItem>
+                        <DropdownItem href={`${this.state.contextPath}/adminui/myaccount/myAccount.page`}>
+                        My Account
+                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledNavDropdown>
               </NavItem>
               <NavItem>
-                  <UncontrolledNavDropdown>
+                  <NavDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
                       <DropdownToggle nav caret> <FaMapMarker/>
                        {(this.state.currentLocationTag != "")
                           ? this.state.currentLocationTag
@@ -111,7 +107,7 @@ export default class Header extends React.Component {
                       <DropdownMenu>
                         {this.state.locationTags.map((location, index )=><DropdownItem key={index} header><a href="#" onClick={this.handleOnClick.bind(this, location.display)}>{location.display}</a></DropdownItem>)}
                       </DropdownMenu>
-                    </UncontrolledNavDropdown>
+                    </NavDropdown>
               </NavItem>
               <NavItem>
                 <NavLink href={this.state.currentLogOutUrl}>Logout {' '} <FaSignOut/></NavLink>
