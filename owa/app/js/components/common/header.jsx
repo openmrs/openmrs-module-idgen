@@ -31,6 +31,7 @@ export default class Header extends React.Component {
       defaultLocation: "",
       currentUser: "",
       currentLogOutUrl: "",
+      contextPath:""
     };
     this.getUri = this.getUri.bind(this);
   }
@@ -41,10 +42,6 @@ export default class Header extends React.Component {
     });
   }
 
-  /**
-   * Gets the OpenMrs configuration and sets the logout link
-   * @memberOf Header
-   */
   componentDidMount() {
     apiCall(null, 'get', '/location').then((response) => {
       this.setState({
@@ -57,21 +54,19 @@ export default class Header extends React.Component {
     apiCall(null, 'get', '/session').then((response) => {
       this.setState({currentUser: response.user.display});
     });
+    const host = location.href.split('/')[3];
+    const locationorigin = location.origin;
+    const contextPath = locationorigin + '/' + host;
+    this.setState({ contextPath })
   }
-
-  /**
-   * Gets logout Url 
-   * 
-   * @returns {string} - logout url
-   */  
+ 
   getUri() {
     this.state.locationTags.map((location) => {
       let url = location.links[0].uri;
       let arrUrl = url.split("/");
       let customUrl = `/${arrUrl[3]}/appui/header/logout.action?successUrl=${arrUrl[3]}`;
       this.setState({currentLogOutUrl: customUrl});
-      return customUrl;
-        
+      return customUrl;   
     });
   }
 
@@ -79,7 +74,6 @@ export default class Header extends React.Component {
     this.setState({
       currentLocationTag: location,
       dropdownOpen: false
-      
     });
 
   }
@@ -97,7 +91,9 @@ export default class Header extends React.Component {
                        {' ' + this.state.currentUser}
                       </DropdownToggle>
                       <DropdownMenu>
-                        <DropdownItem header><a href="#">My Account</a></DropdownItem>
+                        <DropdownItem href={`${this.state.contextPath}/adminui/myaccount/myAccount.page`}>
+                        My Account
+                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledNavDropdown>
               </NavItem>
