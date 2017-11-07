@@ -10,7 +10,7 @@ import React from 'react';
 import {Link, IndexLink} from 'react-router';
 import apiCall from '../../utilities/apiHelper';
 import imageFile from '../../../img/openmrs-with-title-small.png';
-import { UncontrolledNavDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
+import { UncontrolledNavDropdown, NavDropdown, DropdownToggle, DropdownMenu, DropdownItem, 
         Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, 
         NavLink } from 'reactstrap';
 import {FaSignOut, FaUser,FaMapMarker} from 'react-icons/lib/fa';
@@ -37,9 +37,9 @@ export default class Header extends React.Component {
   }
 
   toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
+    this.setState(prevState=>({
+      dropdownOpen: !prevState.dropdownOpen
+    }));
   }
 
   componentDidMount() {
@@ -71,11 +71,10 @@ export default class Header extends React.Component {
   }
 
   handleOnClick(location){
-    this.setState({
+    this.setState(prevState=>({
       currentLocationTag: location,
-      dropdownOpen: false
-    });
-
+      dropdownOpen: !prevState.dropdownOpen
+    }));
   }
   render() {
     return (
@@ -85,30 +84,26 @@ export default class Header extends React.Component {
           <NavbarBrand href="../../"><img src={image.src} alt={image.alt}/></NavbarBrand>
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
-              <NavItem>
-                  <UncontrolledNavDropdown>
-                      <DropdownToggle nav caret> <FaUser/>
-                       {' ' + this.state.currentUser}
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem href={`${this.state.contextPath}/adminui/myaccount/myAccount.page`}>
-                        My Account
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledNavDropdown>
-              </NavItem>
-              <NavItem>
-                  <UncontrolledNavDropdown>
-                      <DropdownToggle nav caret> <FaMapMarker/>
-                       {(this.state.currentLocationTag != "")
-                          ? this.state.currentLocationTag
-                          : this.state.defaultLocation}
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        {this.state.locationTags.map((location, index )=><DropdownItem key={index} header><a href="#" onClick={this.handleOnClick.bind(this, location.display)}>{location.display}</a></DropdownItem>)}
-                      </DropdownMenu>
-                    </UncontrolledNavDropdown>
-              </NavItem>
+              <UncontrolledNavDropdown>
+                  <DropdownToggle nav caret> <FaUser/>
+                   {' ' + this.state.currentUser}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    <DropdownItem href={`${this.state.contextPath}/adminui/myaccount/myAccount.page`}>
+                    My Account
+                    </DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledNavDropdown>
+              <NavDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+                <DropdownToggle nav caret> <FaMapMarker/>
+                 {(this.state.currentLocationTag != "")
+                    ? this.state.currentLocationTag
+                    : this.state.defaultLocation}
+                </DropdownToggle>
+                <DropdownMenu>
+                  {this.state.locationTags.map((location, index )=><DropdownItem key={index} header><a href="#" onClick={this.handleOnClick.bind(this, location.display)}>{location.display}</a></DropdownItem>)}
+                </DropdownMenu>
+              </NavDropdown>
               <NavItem>
                 <NavLink href={this.state.currentLogOutUrl}>Logout {' '} <FaSignOut/></NavLink>
               </NavItem>
