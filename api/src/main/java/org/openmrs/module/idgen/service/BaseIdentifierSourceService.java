@@ -425,6 +425,14 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     public IdentifierSource getIdentifierSourceByUuid(String uuid) {
         return dao.getIdentifierSourceByUuid(uuid);
     }
+    
+    /**
+     * @see IdentifierSourceService#getIdentifierSourcesByType(PatientIdentifierType)
+     */
+    @Override
+    public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType){
+        return dao.getIdentifierSourcesByType(patientIdentifierType);
+    }
 
     /**
      * @see IdentifierSourceService#saveSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator, long)

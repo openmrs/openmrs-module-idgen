@@ -8,6 +8,7 @@
  */
 package org.openmrs.module.idgen.web.controller;
 
+import java.util.List;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
@@ -20,7 +21,6 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.webservices.rest.SimpleObject;
-import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +32,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import org.openmrs.module.webservices.rest.test.Util;
 
 public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
 	
@@ -40,6 +41,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     public static final String POOL_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a903";
     public static final String IDENTIFIER_TYPE_UUID = "2f470aa8-1d73-43b7-81b5-01f0c0dfa53c";
     public static final String IDENTIFIER_SOURCE_TO_PURGE_UUID = "0d42284f-9e9b-4a81-a88b-8bb42bc0a906";
+    public static final String PATIENT_IDENTIFIER_TYPE_UUID = "2f470aa8-1d73-43b7-81b5-01f0c0dfa53c";
     public static final String SEQUENTIAL_IDENTIFIER_SOURCE_TYPE = "SequentialIdentifierGenerator";
     public static final String REMOTE_IDENTIFIER_SOURCE_TYPE = "RemoteIdentifierSource";
     public static final String IDENTIFIER_POOL_SOURCE_TYPE = "IdentifierPool";
@@ -71,9 +73,90 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     }
 
     @Override
-    @Test(expected = ResourceDoesNotSupportOperationException.class)
     public void shouldGetAll() throws Exception {
-        super.shouldGetAll();
+        SimpleObject result = deserialize(handle(newGetRequest(getURI())));
+        assertNotNull(result);
+        assertEquals(getAllCount(), Util.getResultsSize(result));
+    }
+    
+    @Test
+    public void shouldUploadReservedIdentifiers() throws Exception {
+        String reservedIdentifiers = 
+                "{\"reservedIdentifiers\": \"1,2,3,4\"," +
+                "\"sourceUuid\": \""+SEQUENTIAL_IDENTIFIER_SOURCE_UUID+"\"}";
+        
+        MockHttpServletRequest getRequest = newGetRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID);
+        getRequest.addParameter("v", "custom:(reservedIdentifiers)");
+        SimpleObject initialIdentifiers = deserialize(handle(getRequest));
+        assertEquals(initialIdentifiers.get("reservedIdentifiers").toString(), "[]");
+        
+        newPostRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID, reservedIdentifiers);
+        
+        MockHttpServletRequest getRequestAfterPost = newGetRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID);
+        getRequestAfterPost.addParameter("v", "custom:(reservedIdentifiers)");
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterPost));
+        assertEquals(identifiersAfterUpload.get("reservedIdentifiers").toString(), "[1,2,3,4]");
+    }
+    
+    @Test
+    public void shouldUploadIdentifiersFromSource() throws Exception {
+        String uploadIdentifiers = 
+                "{\"batchSizeToUpload\": \"10\"," +
+                "\"sourceUuid\": \""+POOL_SOURCE_UUID+"\"}";
+        
+        MockHttpServletRequest getRequest = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
+        getRequest.addParameter("v", "custom:(identifiers)");
+        SimpleObject initialIdentifiers = deserialize(handle(getRequest));
+        assertEquals(initialIdentifiers.get("identifiers").toString(), "[]");
+        
+        newPostRequest(getURI() + "/" + POOL_SOURCE_UUID, uploadIdentifiers);
+        
+        MockHttpServletRequest getRequestAfterPost = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
+        getRequestAfterPost.addParameter("v", "custom:(identifiers)");
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterPost));
+        assertTrue(identifiersAfterUpload.get("identifiers").toString().length() > 2);
+        
+    }
+    
+    @Test
+    public void shouldUploadIdentifiersFromFile() throws Exception {
+        String uploadIdentifiers = 
+                "{\"identifiersToUpload\": \"1,2,3,4\"," +
+                "\"sourceUuid\": \""+POOL_SOURCE_UUID+"\"}";
+        
+        MockHttpServletRequest getRequest = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
+        getRequest.addParameter("v", "custom:(identifiers)");
+        SimpleObject initialIdentifiers = deserialize(handle(getRequest));
+        assertEquals(initialIdentifiers.get("identifiers").toString(), "[]");
+        
+        newPostRequest(getURI() + "/" + POOL_SOURCE_UUID, uploadIdentifiers);
+        
+        MockHttpServletRequest getRequestAfterPost = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
+        getRequestAfterPost.addParameter("v", "custom:(identifiers)");
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterPost));
+        assertEquals(identifiersAfterUpload.get("identifiers").toString(), "[1,2,3,4]");
+    }
+    
+    @Test
+    public void shouldGenerateIdentifiers() throws Exception {
+        String generateIdentifiers = 
+                "{\"generateIdentifiers\": \"true\"," +
+                "\"comment\": \"new remote identifiers\"," + 
+                "\"numberToGenerate\": \"5\"," + 
+                "\"sourceUuid\": \""+SEQUENTIAL_IDENTIFIER_SOURCE_UUID+"\"}";
+        MockHttpServletRequest request = newPostRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID, generateIdentifiers);
+        SimpleObject result = deserialize(handle(request));
+        assertNotNull(result);
+        assertEquals(result.get("identifiers"), "[G-0, H-8, I-5, J-3, K-1]");
+    }
+    
+    @Test
+    public void shouldSearchByPatientIdentifierType() throws Exception {
+        MockHttpServletRequest request = newGetRequest(getURI());
+        request.addParameter("identifierType", PATIENT_IDENTIFIER_TYPE_UUID);
+        List<Object> result = deserialize(handle(request)).get("results");
+        assertNotNull(result);
+        assertEquals(REMOTE_IDENTIFIER_SOURCE_UUID, PropertyUtils.getProperty(result.get(0), "uuid"));
     }
 
     @Test
@@ -93,18 +176,18 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
 
     @Test
     public void shouldEditARemoteIdentifierSource() throws Exception {
-        String name = "{\"name\":\"Updated Remote Identifier Name\"}";
+        String name = "{\"name\":\"Updated Remote Identifier Name\", \"url\": \"http://ssss/\"}";
         assertEquals("Test Remote Source", service.getIdentifierSourceByUuid(REMOTE_IDENTIFIER_SOURCE_UUID).getName());
-        handle(newPostRequest(getURI() + "/" + getUuid(), name));
-        assertEquals("Updated Remote Identifier Name", service.getIdentifierSourceByUuid(getUuid()).getName());
+        handle(newPostRequest(getURI() + "/" + REMOTE_IDENTIFIER_SOURCE_UUID, name));
+        assertEquals("Updated Remote Identifier Name", service.getIdentifierSourceByUuid(REMOTE_IDENTIFIER_SOURCE_UUID).getName());
     }
 
     @Test
     public void shouldEditAnIdentifierPoolSource() throws Exception {
         String name = "{\"name\":\"Updated Identifier Pool Name\"}";
         assertEquals("Test Identifier Pool", service.getIdentifierSourceByUuid(POOL_SOURCE_UUID).getName());
-        handle(newPostRequest(getURI() + "/" + getUuid(), name));
-        assertEquals("Updated Identifier Pool Name", service.getIdentifierSourceByUuid(getUuid()).getName());
+        handle(newPostRequest(getURI() + "/" + POOL_SOURCE_UUID, name));
+        assertEquals("Updated Identifier Pool Name", service.getIdentifierSourceByUuid(POOL_SOURCE_UUID).getName());
     }
     
     @Test

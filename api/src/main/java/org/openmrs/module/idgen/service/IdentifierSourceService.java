@@ -265,6 +265,14 @@ public interface IdentifierSourceService extends OpenmrsService {
      */
     @Transactional(readOnly=true)
     IdentifierSource getIdentifierSourceByUuid(String uuid);
+    
+    /**
+     * Retrieves the identifier source(s) for a given patient identifier type. 
+     * @param patientIdentifierType the Patient Identifier Type used to retrieve the Identifier Source(s).
+     * @return the identifier source(s) with the given identifier type.
+     */
+    @Transactional(readOnly=true)
+    List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType);
 
     /**
      * Updates sequenceValue of seq directly to the database via SQL, bypassing hibernate's caching

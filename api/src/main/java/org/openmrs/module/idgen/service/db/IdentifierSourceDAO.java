@@ -142,6 +142,11 @@ public interface IdentifierSourceDAO {
      * @return the IdentifierSource with the given uuid
      */
     IdentifierSource getIdentifierSourceByUuid(String uuid);
+    
+    /**
+     * @see IdentifierSourceService#getIdentifierSourcesByType(PatientIdentifierType)
+     */
+    List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType);
 
     /**
      * Updates generator's sequenceValue in the database via SQL, bypassing Hibernate caches

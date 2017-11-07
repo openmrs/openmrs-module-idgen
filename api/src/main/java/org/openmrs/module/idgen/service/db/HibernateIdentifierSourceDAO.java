@@ -248,6 +248,16 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
         criteria.add(Restrictions.eq("uuid", uuid));
         return (IdentifierSource) criteria.uniqueResult();
     }
+    
+    /**
+     * @see IdentifierSourceDAO#getIdentifierSourcesByType(PatientIdentifierType)
+     */
+    @Override
+    public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
+        criteria.add(Expression.eq("identifierType", patientIdentifierType));
+        return (List<IdentifierSource>) criteria.list();
+    }    
 
     /**
 	 * @see org.openmrs.module.idgen.service.db.IdentifierSourceDAO#saveLogEntry(LogEntry)
