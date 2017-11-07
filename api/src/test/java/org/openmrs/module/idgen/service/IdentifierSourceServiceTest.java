@@ -220,6 +220,13 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
         IdentifierSource identifierSource = identifierSourceService.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
         Assert.assertEquals(3, identifierSource.getId().intValue());
     }
+    
+    @Test
+    public void getIdentifierSourcesByPatientIdentifierType_shouldGetIdentifierSourcesByPatientIdentifierType() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
+        List<IdentifierSource> identifierSource = identifierSourceService.getIdentifierSourcesByType(patientIdentifierType);
+        Assert.assertEquals(2, identifierSource.size());
+    }
 
     @Test
     public void getAutoGenerationOptionByPatientIdentifier_shouldGetAutoGenerationOptionByIdentifier() {

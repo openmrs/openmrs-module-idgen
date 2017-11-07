@@ -34,8 +34,11 @@ import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentat
 import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
+import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
+import org.openmrs.module.webservices.rest.web.resource.impl.EmptySearchResult;
+import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
@@ -85,15 +88,12 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
         description.addProperty("description");
         return description;
     }
-
-    @PropertyGetter("identifierType")
-    public String getidentifierType(IdentifierSource identifierSource) {
-        return identifierSource.getIdentifierType().getUuid();
-    }
 	
     @PropertyGetter("display")
     public String getDisplayString(IdentifierSource identifierSource) {
-        return identifierSource.getIdentifierType() + " - " + identifierSource.getName();
+        return identifierSource.getIdentifierType() + " - " 
+                + identifierSource.getName() + " - "
+                + identifierSource.getClass().getName();
     }
 
     @Override
@@ -114,7 +114,7 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
         Object identifierTypeUuid = postBody.get("identifierType");
         Object name = postBody.get("name");
         Object description = postBody.get("description");
-
+        
         if (identifierSourceType == null || StringUtils.isBlank(identifierSourceType.toString())) {
             errors.add("source type"); 
         }
@@ -217,10 +217,7 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
             Object sequential = postBody.get("sequential");
             Object refillWithScheduledTask = postBody.get("refillWithScheduledTask");
 
-            if (sourceUuid == null || StringUtils.isBlank(sourceUuid.toString())) {
-                errors.add("identifier souce");
-            }
-            else{
+            if (sourceUuid != null && StringUtils.isNotBlank(sourceUuid.toString())) {
                 IdentifierSource poolIdentifierSource = Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(sourceUuid.toString());
                 if(poolIdentifierSource != null){
                     identifierSource.setSource(poolIdentifierSource);
@@ -242,10 +239,10 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
                 }
             }
             if (sequential != null && StringUtils.isNotBlank(sequential.toString())) {
-                    identifierSource.setSequential(parseBoolean(sequential));
+                identifierSource.setSequential(parseBoolean(sequential));
             }
             if (refillWithScheduledTask != null && StringUtils.isNotBlank(refillWithScheduledTask.toString())) {
-                    identifierSource.setRefillWithScheduledTask(parseBoolean(refillWithScheduledTask));
+                identifierSource.setRefillWithScheduledTask(parseBoolean(refillWithScheduledTask));
             }
             if(errors.size() > 0) {
                 throw new ValidationException("The values of the following inputs are missing or invalid: " + errors.toString());
@@ -256,6 +253,178 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
             savedIdentifierSource =  save(identifierSource);
         }
         return ConversionUtil.convertToRepresentation(savedIdentifierSource, Representation.DEFAULT);         
+    }
+    
+    @Override
+    public Object update(String uuid, SimpleObject updateBody, RequestContext context) throws ResponseException {
+        Object updatedIdentifierSource = null;
+        Object batchSizeToUpload = updateBody.get("batchSizeToUpload");
+        Object reservedIdentifiersToUpload = updateBody.get("reservedIdentifiers");
+        Object identifiersToUpload = updateBody.get("identifiersToUpload");
+        Object generateIdentifiers = updateBody.get("generateIdentifiers");
+        Object identifierSourceToUpdate = Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(uuid);
+        SimpleObject output = new SimpleObject();
+        if (reservedIdentifiersToUpload != null) {
+            IdentifierSource source = Context.getService(IdentifierSourceService.class)
+                    .getIdentifierSourceByUuid(uuid);
+            List<String> reservedIdentifiersList = new ArrayList<String>(Arrays.asList(reservedIdentifiersToUpload.toString().split(",")));
+            if(source != null){
+               for (int counter = 0; counter < reservedIdentifiersList.size(); counter++) {
+                    if (StringUtils.isNotBlank(reservedIdentifiersList.get(counter))) {
+                        source.addReservedIdentifier(reservedIdentifiersList.get(counter));
+                    }
+                }
+                return ConversionUtil.convertToRepresentation(
+                        Context.getService(IdentifierSourceService.class)
+                                .saveIdentifierSource(source), Representation.DEFAULT); 
+            }
+        }
+        if (batchSizeToUpload != null) {
+            Object sourceUuid = updateBody.get("sourceUuid");
+            if(sourceUuid != null){
+                IdentifierPool pool = (IdentifierPool) Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(sourceUuid.toString());
+                if(pool != null){
+                    Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, Integer.parseInt(batchSizeToUpload.toString()));
+                }
+            }
+        }
+        if (identifiersToUpload != null) {
+            Object sourceUuid = updateBody.get("sourceUuid");
+            List<String> ids = new ArrayList<String>(Arrays.asList(identifiersToUpload.toString().split(",")));
+            if(sourceUuid != null){
+                IdentifierPool pool = (IdentifierPool) Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(sourceUuid.toString());
+                if(pool != null){
+                    Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);
+                } 
+            }
+        }
+        if (generateIdentifiers != null) {
+            Object comment = updateBody.get("comment");
+            Object numberToGenerate = updateBody.get("numberToGenerate");
+            Object sourceUuid = updateBody.get("sourceUuid");
+            if (comment == null) {
+                comment = "Batch Export of " + numberToGenerate + " to file";
+            }
+            if(numberToGenerate == null){
+                numberToGenerate = 0;
+            }
+            if(sourceUuid != null){
+                IdentifierSource source = Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(sourceUuid.toString());
+                if(source != null){
+                    List<String> batch = Context.getService(IdentifierSourceService.class).
+                        generateIdentifiers(source, Integer.parseInt(numberToGenerate.toString()), comment.toString());
+                    output.add("identifiers", batch.toString()); 
+                }
+            }
+            return output;
+        }
+        if(identifierSourceToUpdate instanceof SequentialIdentifierGenerator){
+            SequentialIdentifierGenerator identifierSource = (SequentialIdentifierGenerator) identifierSourceToUpdate;
+            Object firstIdentifierBase = updateBody.get("firstIdentifierBase");
+            Object baseCharacterSet = updateBody.get("baseCharacterSet");
+            Object prefix = updateBody.get("prefix");
+            Object suffix = updateBody.get("suffix");
+            Object minLength = updateBody.get("minLength");
+            Object maxLength = updateBody.get("maxLength");
+            Object name = updateBody.get("name");
+            Object description = updateBody.get("description");
+            
+            if (firstIdentifierBase != null && StringUtils.isNotBlank(firstIdentifierBase.toString())) { 
+                identifierSource.setFirstIdentifierBase(firstIdentifierBase.toString());
+            }
+            if (baseCharacterSet != null&& StringUtils.isNotBlank(baseCharacterSet.toString())) { 
+                identifierSource.setBaseCharacterSet(baseCharacterSet.toString());
+            }
+            if (name != null && StringUtils.isNotBlank(name.toString())) {
+                identifierSource.setName(name.toString());
+            }
+            if (description != null && StringUtils.isNotBlank(description.toString())) {
+                identifierSource.setDescription(description.toString());
+            }
+            if (prefix != null && StringUtils.isNotBlank(prefix.toString())) { 
+                identifierSource.setPrefix(prefix.toString()); 
+            }
+            if (suffix != null && StringUtils.isNotBlank(suffix.toString())) { 
+                identifierSource.setSuffix(suffix.toString()); 
+            }
+            if (minLength != null && StringUtils.isNotBlank(minLength.toString())) {
+                if(StringUtils.isNumeric(minLength.toString())) {
+                    identifierSource.setMinLength(Integer.parseInt(minLength.toString()));
+                }
+            }
+            if (maxLength != null && StringUtils.isNotBlank(maxLength.toString())) {
+                if(StringUtils.isNumeric(maxLength.toString())) {
+                    identifierSource.setMaxLength(Integer.parseInt(maxLength.toString()));
+                }
+            }
+            updatedIdentifierSource =  save(identifierSource);
+        }
+        if(identifierSourceToUpdate instanceof IdentifierPool){
+            IdentifierPool identifierSource = (IdentifierPool) identifierSourceToUpdate;
+            Object name = updateBody.get("name");
+            Object description = updateBody.get("description");
+            Object batchSize = updateBody.get("batchSize");
+            Object minPoolSize = updateBody.get("minPoolSize");
+            Object sourceUuid = updateBody.get("sourceUuid");
+            Object sequential = updateBody.get("sequential");
+            Object refillWithScheduledTask = updateBody.get("refillWithScheduledTask");
+            
+            if (sourceUuid != null && StringUtils.isNotBlank(sourceUuid.toString())) {
+                IdentifierSource poolIdentifierSource = Context.getService(IdentifierSourceService.class).getIdentifierSourceByUuid(sourceUuid.toString());
+                if(poolIdentifierSource != null){
+                    identifierSource.setSource(poolIdentifierSource);
+                }
+            }
+            if (name != null && StringUtils.isNotBlank(name.toString())) {
+                identifierSource.setName(name.toString());
+            }
+            if (description != null && StringUtils.isNotBlank(description.toString())) {
+                identifierSource.setDescription(description.toString());
+            }
+            if (batchSize != null && StringUtils.isNotBlank(batchSize.toString())) {
+                if(StringUtils.isNumeric(batchSize.toString())) {
+                    identifierSource.setBatchSize(Integer.parseInt(batchSize.toString()));
+                }
+            }
+            if (minPoolSize != null && StringUtils.isNotBlank(minPoolSize.toString())) {
+                if(StringUtils.isNumeric(minPoolSize.toString())) {
+                    identifierSource.setMinPoolSize(Integer.parseInt(minPoolSize.toString()));
+                }
+            }
+            if (sequential != null && StringUtils.isNotBlank(sequential.toString())) {
+                identifierSource.setSequential(parseBoolean(sequential));
+            }
+            if (refillWithScheduledTask != null && StringUtils.isNotBlank(refillWithScheduledTask.toString())) {
+                identifierSource.setRefillWithScheduledTask(parseBoolean(refillWithScheduledTask));
+            }
+            updatedIdentifierSource =  save(identifierSource);
+        }
+        if(identifierSourceToUpdate instanceof RemoteIdentifierSource){
+            RemoteIdentifierSource identifierSource = (RemoteIdentifierSource) identifierSourceToUpdate;
+            Object username = updateBody.get("user");
+            Object password = updateBody.get("password");
+            Object url = updateBody.get("url");
+            Object name = updateBody.get("name");
+            Object description = updateBody.get("description");
+
+            if (url != null && StringUtils.isNotBlank(url.toString())) { 
+                identifierSource.setUrl(url.toString());
+            }
+            if (name != null && StringUtils.isNotBlank(name.toString())) {
+                identifierSource.setName(name.toString());
+            }
+            if (description != null && StringUtils.isNotBlank(description.toString())) {
+                identifierSource.setDescription(description.toString());
+            }
+            if (username!= null && StringUtils.isNotBlank(username.toString())) { 
+                identifierSource.setUser(username.toString());
+            }
+            if (password != null && StringUtils.isNotBlank(password.toString())) {
+                identifierSource.setPassword(password.toString());
+            }
+            updatedIdentifierSource = save(identifierSource);         
+        }
+        return ConversionUtil.convertToRepresentation(updatedIdentifierSource, Representation.DEFAULT);
     }
 	
     @Override
@@ -276,6 +445,26 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
     @Override
     public void purge(IdentifierSource identifierSource, RequestContext context) throws ResponseException {
         Context.getService(IdentifierSourceService.class).purgeIdentifierSource(identifierSource);
+    }
+    
+    @Override
+    protected PageableResult doGetAll(RequestContext context) throws ResponseException {
+        return new NeedsPaging<IdentifierSource>(Context.getService(IdentifierSourceService.class).getAllIdentifierSources(false), context);
+    }
+    
+    @Override
+    protected PageableResult doSearch(RequestContext context) throws ResponseException {
+        String identifierType = context.getRequest().getParameter("identifierType");
+        if(identifierType != null){
+            PatientIdentifierType requestedPatientIdentifierType = Context.getPatientService().getPatientIdentifierTypeByUuid(identifierType);
+            if(requestedPatientIdentifierType == null){
+              return new EmptySearchResult();  
+            }
+            List<IdentifierSource> requestedIdentifierSources = Context.getService(IdentifierSourceService.class)
+                    .getIdentifierSourcesByType(requestedPatientIdentifierType);
+            return new NeedsPaging<IdentifierSource>(requestedIdentifierSources, context);
+        }
+        return new NeedsPaging<IdentifierSource>(Context.getService(IdentifierSourceService.class).getAllIdentifierSources(false), context);
     }
     
     private Boolean parseBoolean(Object value) {
