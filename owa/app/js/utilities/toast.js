@@ -16,6 +16,7 @@ export default class Toast extends Component {
         this.state={
             show: false,
             title: '',
+            type: 'info',
             message: '' 
         }
         this.toastSuccess = this.toastSuccess.bind(this);
@@ -23,16 +24,16 @@ export default class Toast extends Component {
         this.addAlert = this.addAlert.bind(this);
     }
 
-    addAlert(title, message){
-        this.setState({title: title, message: message, show: true});
+    addAlert(title, message, type){
+        this.setState({title: title, message: message, type:type, show: true});
     };
 
     toastSuccess(message) {
-        this.addAlert("Success", message);
+        this.addAlert("Success", message, "success");
     }
 
     toastError(message) {
-        this.addAlert("Error", message);
+        this.addAlert("Error", message, "error");
     }
 
     render() {
@@ -40,6 +41,7 @@ export default class Toast extends Component {
             <div>
                 <SweetAlert
                 show={this.state.show}
+                type={this.state.type}
                 title={this.state.title}
                 text={this.state.message}
                 onConfirm={() => this.setState({ show: false })}

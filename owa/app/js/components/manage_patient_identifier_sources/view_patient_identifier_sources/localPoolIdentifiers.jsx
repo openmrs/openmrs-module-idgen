@@ -60,21 +60,26 @@ export default class ViewLocalPoolIdentifiers extends Component {
   }
 
   handleAddIdentifiersFromFile(){
-    try {
-      let parsedJson = JSON.parse(this.state.fileContent);
-      let data = {
-        identifiersToUpload: parsedJson.identifiers.substr(1).slice(0, -1),
-        sourceUuid: this.state.uuid
-      }
-      apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-        if( !response["error"] ) {
-          this.props.handleAlerts("success", "Identifiers successfully added"); 
-        }else{
-          this.props.handleAlerts("error", response["error"]["message"]);
+    if(this.state.fileContent.length === 0){
+      this.props.handleAlerts("error", "No file selected.");
+    }else{
+      try {
+        let parsedJson = JSON.parse(this.state.fileContent);
+        console.log(parsedJson.identifiers.join());
+        let data = {
+          identifiersToUpload: parsedJson.identifiers.join(),
+          sourceUuid: this.state.uuid
         }
-      });
-    } catch (exception) {
-      this.props.handleAlerts("error", "Invalid file content");
+        apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
+          if( !response["error"] ) {
+            this.props.handleAlerts("success", "Identifiers successfully added"); 
+          }else{
+            this.props.handleAlerts("error", response["error"]["message"]);
+          }
+        });
+      } catch (exception) {
+        this.props.handleAlerts("error", "Invalid file content: " + this.state.fileContent);
+      }
     }
   }
 
@@ -134,7 +139,7 @@ export default class ViewLocalPoolIdentifiers extends Component {
             </tr>
             <tr>
               <td colSpan="2">
-                Fill identifiers using manual upload from file: 
+                Fill identifiers using manual upload from file: <span className="requiredField">(Format: {'{ "identifiers": ["1","2","3"] }'})</span> 
                 <div className="dropzone">
                   <Dropzone
                   accept="text/plain"  
