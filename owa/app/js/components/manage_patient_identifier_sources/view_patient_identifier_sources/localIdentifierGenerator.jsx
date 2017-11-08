@@ -46,39 +46,41 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
 }
 
   handleAddReservedIdentifiers(){
+    if(this.state.fileContent.length === 0){
+      this.props.handleAlerts("error", "No file selected.");
+    }else{
+      let reservedIdentifiers = this.state.fileContent.split('\n');
 
-    let reservedIdentifiers = this.state.fileContent.split('\n');
-
-    try {
-      let data = {
-        reservedIdentifiers: reservedIdentifiers.join()
-      }
-      apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-        if( !response["error"] ) {
-          let found = 0;
-          let currentReservedIdentifiers = this.state.reservedIdentifiers;
-          for(var counter in reservedIdentifiers){
-            if(currentReservedIdentifiers.indexOf(reservedIdentifiers[counter]) === -1){
-              currentReservedIdentifiers.push(reservedIdentifiers[counter]);
-              found = 1;
-            }
-          }
-          if(found === 0){
-            this.props.handleAlerts("error", "Reserved identifier(s) already exist!");
-          }else{
-            this.setState({
-              reservedIdentifiers: currentReservedIdentifiers
-            });
-            this.props.handleAlerts("success", "Identifiers successfully added");
-          }
-        }else{
-          this.props.handleAlerts("error", response["error"]["message"]);
+      try {
+        let data = {
+          reservedIdentifiers: reservedIdentifiers.join()
         }
-      });
-    } catch (exception) {
-      this.props.handleAlerts("error", "Invalid file content");
-    }
-    
+        apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
+          if( !response["error"] ) {
+            let found = 0;
+            let currentReservedIdentifiers = this.state.reservedIdentifiers;
+            for(var counter in reservedIdentifiers){
+              if(currentReservedIdentifiers.indexOf(reservedIdentifiers[counter]) === -1){
+                currentReservedIdentifiers.push(reservedIdentifiers[counter]);
+                found = 1;
+              }
+            }
+            if(found === 0){
+              this.props.handleAlerts("error", "Reserved identifier(s) already exist!");
+            }else{
+              this.setState({
+                reservedIdentifiers: currentReservedIdentifiers
+              });
+              this.props.handleAlerts("success", "Identifiers successfully added");
+            }
+          }else{
+            this.props.handleAlerts("error", response["error"]["message"]);
+          }
+        });
+      } catch (exception) {
+        this.props.handleAlerts("error", "Invalid file content: " + this.state.fileContent);
+      }
+    } 
   }
 
   handleDownloadReservedIdentifiers(){
@@ -168,7 +170,7 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
           <td>Reserved Identifiers: <a href="javascript:void(0)" onClick={this.handleDownloadReservedIdentifiers}>
             {this.state.reservedIdentifiers.length} defined. 
             </a>
-            <span style={{marginLeft: '1%'}}>Upload from file: (One identifier per line)</span>
+            <span style={{marginLeft: '1%'}}>Upload from file: <span className="requiredField">(Format: One identifier per line)</span></span>
             <br/>
             <div className="dropzone">
               <Dropzone

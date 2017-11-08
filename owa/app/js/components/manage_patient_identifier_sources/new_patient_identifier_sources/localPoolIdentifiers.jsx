@@ -116,7 +116,7 @@ export default class LocalPoolIdentifiers extends Component {
               <td>None</td>
             </tr>
             <tr>
-              <td className="newPatientIdentifierSourcesTitle"><span className="requiredField">*</span> Pool Identifier Source:</td>
+              <td className="newPatientIdentifierSourcesTitle">Pool Identifier Source:</td>
               <td>
                 <Input id="poolIdentifier" name="poolIdentifier" className="newPatientIdentifierSourcesInput" size="sm" type="select">
                 {
