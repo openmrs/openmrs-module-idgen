@@ -86,8 +86,7 @@ select#identifierSelect {
   margin: 0px !important;
 }
 
-.table th,
-.table td {
+#mago_table th, #mago_table td {
   border: none !important;
   height: 50px !important;
   vertical-align: middle;

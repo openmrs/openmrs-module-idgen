@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import { Table, Input, Button, Form, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import LocalIdentifierGenerator from './new_patient_identifier_sources/localIdentifierGenerator'
-import LocalPoolIdentifiers from './new_patient_identifier_sources/localPoolIdentifiers'
-import RemoteIdentifierSource from './new_patient_identifier_sources/remoteIdentifierSource'
+import LocalIdentifierGenerator from './new_patient_identifier_sources/localIdentifierGenerator';
+import LocalPoolIdentifiers from './new_patient_identifier_sources/localPoolIdentifiers';
+import RemoteIdentifierSource from './new_patient_identifier_sources/remoteIdentifierSource';
+import apiCall from '../../utilities/apiHelper';
+import Toast from '../../utilities/toast';
 
 export default class NewPatientIdentifierSources extends Component {
 
@@ -10,14 +12,18 @@ export default class NewPatientIdentifierSources extends Component {
     super(props);
     this.state = {
       modal: false,
-      modalContent: 'Please select a Source Type',
+      modalContent: 1,
       title: 'New Patient Identifier Source',
-      identifierType: 'Please select an identifier Type'
+      identifierType: 'Please select an identifier Type',
+      identifierTypes: [],
+      identifierTypeValidator: '',
+      identifierTypeUuid: ''
     };
 
     this.toggle = this.toggle.bind(this);
     this.getSource = this.getSource.bind(this);
     this.getIdentifier = this.getIdentifier.bind(this);
+    this.handleSave = this.handleSave.bind(this);
   }
 
   toggle() {
@@ -26,11 +32,50 @@ export default class NewPatientIdentifierSources extends Component {
     }});
   }
 
+  componentDidMount(){
+    this.fetchIdentifierTypes();
+  }
+
+  handleAlerts(alertType, message){
+    if(alertType === "success"){
+      this.toast.toastSuccess(message);
+    }else{
+      this.toast.toastError(message);
+    }
+  }
+
+  handleSave(){
+    this.saveForm.handleSubmit();
+    this.toggle();
+  }
+
+  handleNewIdentifierSource(identifierSource){
+    this.props.handleNewIdentifierSource(identifierSource);
+  }
+
+  fetchIdentifierTypes(){
+    apiCall(null, 'get', '/patientidentifiertype?v=full').then((response) => {
+      this.setState({
+        identifierTypes: response.results, 
+        identifierType: response.results[0].display,
+        identifierTypeValidator: response.results[0].validator,
+        identifierTypeUuid: response.results[0].uuid});
+    });
+  }
+
   getIdentifier(){
     let options = document.getElementById("identifierType").options
     let selectedIndex = document.getElementById("identifierType").selectedIndex
+    Object.keys(this.state.identifierTypes).map(index => {
+      if(this.state.identifierTypes[index].uuid === options[selectedIndex].value){
+        this.setState({
+          identifierTypeValidator: this.state.identifierTypes[index].validator
+        });
+      }
+    })
     this.setState({
-      identifierType: options[selectedIndex].text
+      identifierType: options[selectedIndex].text,
+      identifierTypeUuid: options[selectedIndex].value
     }, () => {
       this.getSource()
     });
@@ -70,13 +115,31 @@ export default class NewPatientIdentifierSources extends Component {
     let modalComponent;
     switch(this.state.modalContent){
       case 1:
-        modalComponent = <LocalIdentifierGenerator title={this.state.identifierType} />
+        modalComponent = <LocalIdentifierGenerator 
+        ref={saveForm => (this.saveForm = saveForm)}
+        handleNewIdentifierSource={this.handleNewIdentifierSource.bind(this)} 
+        identifierTypeUuid={this.state.identifierTypeUuid} 
+        validator={this.state.identifierTypeValidator}
+        handleAlerts={this.handleAlerts.bind(this)}  
+        title={this.state.identifierType} />
         break;
       case 2:
-        modalComponent = <RemoteIdentifierSource title={this.state.identifierType} />
+        modalComponent = <RemoteIdentifierSource 
+        ref={saveForm => (this.saveForm = saveForm)}
+        handleNewIdentifierSource={this.handleNewIdentifierSource.bind(this)} 
+        identifierTypeUuid={this.state.identifierTypeUuid} 
+        validator={this.state.identifierTypeValidator}
+        handleAlerts={this.handleAlerts.bind(this)}  
+        title={this.state.identifierType} />
         break;
       case 3:
-        modalComponent = <LocalPoolIdentifiers title={this.state.identifierType} />
+        modalComponent = <LocalPoolIdentifiers 
+        ref={saveForm => (this.saveForm = saveForm)}
+        handleNewIdentifierSource={this.handleNewIdentifierSource.bind(this)} 
+        identifierTypeUuid={this.state.identifierTypeUuid} 
+        validator={this.state.identifierTypeValidator}
+        handleAlerts={this.handleAlerts.bind(this)}  
+        title={this.state.identifierType} />
         break;
       default:
         modalComponent = this.state.modalContent
@@ -87,6 +150,7 @@ export default class NewPatientIdentifierSources extends Component {
 
       <div className="managePatientIdentifierSourcesContainer">
         <div className="managePatientIdentifierSourcesHeader">Add a new Patient Identifier Source</div>
+        <Toast ref={toast => (this.toast = toast)} />
         <div>
           <Table size="sm" responsive>
             <thead>
@@ -101,10 +165,11 @@ export default class NewPatientIdentifierSources extends Component {
                 <td>
                   <Input type="select" className="managePatientIdentifierSourcesSelect" name="identifierType" id="identifierType"
                          onChange={this.getIdentifier}>
-                    <option value=""></option>
-                    <option value="3">OpenMRS ID</option>
-                    <option value="2">Old Identification Number</option>
-                    <option value="1">OpenMRS Identification Number</option>
+                    {
+                      Object.keys(this.state.identifierTypes).map(index => {
+                        return(<option key={index} value={this.state.identifierTypes[index].uuid}>{this.state.identifierTypes[index].display}</option>);
+                      })
+                    } 
                   </Input>
                 </td>
               </tr>
@@ -113,7 +178,6 @@ export default class NewPatientIdentifierSources extends Component {
                 <td>
                   <Input type="select" className="managePatientIdentifierSourcesSelect" name="sourceType" id="sourceType"
                          onChange={this.getSource}>
-                    <option value=""></option>
                     <option value="org.openmrs.module.idgen.SequentialIdentifierGenerator">Local Identifier
                       Generator
                     </option>
@@ -136,7 +200,7 @@ export default class NewPatientIdentifierSources extends Component {
             {modalComponent}
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.toggle}>Save</Button>{' '}
+            <Button color="primary" onClick={this.handleSave}>Save</Button>{' '}
             <Button color="secondary" onClick={this.toggle}>Cancel</Button>
           </ModalFooter>
         </Modal>
