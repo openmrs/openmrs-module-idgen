@@ -9,13 +9,14 @@
 
 import React from 'react';
 import ReactTable from 'react-table';
-import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-table/react-table.css';
 import {FaSearch} from 'react-icons/lib/fa';
 import {Input} from 'reactstrap';
 import apiCall from '../../utilities/apiHelper';
+
+const moment = require('moment');
 
 export default class LogEntries extends React.Component {
   constructor() {
@@ -172,7 +173,7 @@ export default class LogEntries extends React.Component {
                   onChange={this.handleSearch}>
                   <option value="">--Select Source Name--</option>
                   {this.state.identifierSources
-                  .map(identifierSource => <option>{identifierSource.name}</option>)}
+                  .map((identifierSource,index) => <option key={index}>{identifierSource.name}</option>)}
                 </Input>
               </div>
               <div className="col-sm-6 col-md-4">

@@ -416,7 +416,7 @@ class ManageAutoGenerationOption extends Component {
             </Col>
 
             <Col className="tableContent" sm="12">
-              <Row sm="12">
+              <Row>
                 <Table size="sm" striped responsive hover>
                   <thead>
                     <tr>
