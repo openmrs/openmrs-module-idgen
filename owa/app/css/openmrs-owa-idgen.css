@@ -188,6 +188,10 @@ li.breadcrumb-item.active {
     font-size: .9em;
 }
 
+li.breadcrumb-item+.breadcrumb-item::before {
+    content: ">"
+}
+
 /*--------------View Logs Tab ------------*/
 .center {
     text-align: center
