@@ -23,12 +23,11 @@ export default class LogEntries extends React.Component {
     super();
     this.state = {
       logEntries: [],
-      buttonBorder: true,
       identifierSources: [],
+      allLogEntries:[],
       filteredLogEntries: '',
       startDate: '',
-      endDate: moment(new Date()),
-      dateChanged: false,
+      endDate: '',
       generatedByValue: '',
       generatedBy: '',
       sourceValue: '',
@@ -39,6 +38,7 @@ export default class LogEntries extends React.Component {
         comment: ''
       }
     };
+    this.getAllLogEntries = this.getAllLogEntries.bind(this);
     this.getIdentifierSources = this.getIdentifierSources.bind(this);
     this.advancedSearch = this.advancedSearch.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
@@ -52,56 +52,73 @@ export default class LogEntries extends React.Component {
       this.setState({identifierSources: response.results});
     });
   }
+  getAllLogEntries() {
+    apiCall(null, 'get', '/idgen/logentry?v=full').then((response) => {
+      this.setState({allLogEntries: response.results});
+    });
+  }
 
   advancedSearch() {
     this.setState({loading: true})
     const {identifier, comment} = this.state.searchFilters;
-    const endDate = this.state.endDate.toISOString();
+    const endDate = this.state.endDate;
+    const startDate = this.state.startDate;
     const generatedBy = this.state.generatedBy;
     const source = this.state.source;
-    let requestUrl = '/idgen/logentry?v=full&identifier=' + identifier + '&comment=' + comment + 
-                      '&source=' + source + '&generatedBy=' + generatedBy + '&toDate=' + endDate;
-    if (!this.state.startDate) {
-      apiCall(null, 'get', requestUrl).then((response) => {
-        this.setState({
-          logEntries: response.results,
-          loading: false
-        });
-      });
-    } else {
-      const startDate = this.state.startDate.toISOString();
-      apiCall(null, 'get', requestUrl + '&fromDate=' + startDate).then((response) => {
+    let requestUrl = '/idgen/logentry?v=full';
+    location.href = "#tableArea";
+
+    if (identifier){
+      requestUrl += '&identifier=' + encodeURIComponent(identifier.trim());
+    }
+    if (comment){
+      requestUrl += '&comment=' + encodeURIComponent(comment.trim());
+    }
+    if (source){
+      requestUrl += '&source=' + source;
+    }
+    if (generatedBy){
+      requestUrl += '&generatedBy=' + generatedBy;
+    }
+    if (endDate){
+      requestUrl += '&toDate=' + endDate.toISOString();
+    }
+    if (startDate){
+      requestUrl += '&fromDate=' + startDate.toISOString();
+    } 
+
+     apiCall(null, 'get', requestUrl).then((response) => {
         this.setState({
           logEntries: response.results, 
           loading: false
         });
       });
-    }
+      
   }
 
   handleSearch(event) {
     const {name, value} = event.target;
     if (name === "generatedBy") {
       this.setState({generatedByValue: value});
-      for (var index = 0; index < this.state.logEntries.length; index++) {
-        if (this.state.logEntries[index].generatedBy.username === value) {
-          this.setState({generatedBy: this.state.logEntries[index].generatedBy.uuid});
+      for (var index = 0; index < this.state.allLogEntries.length; index++) {
+        if (this.state.allLogEntries[index].generatedBy.display === value) {
+          this.setState({generatedBy: this.state.allLogEntries[index].generatedBy.uuid});
           break;
         } 
         else {
-          this.setState({generatedBy: value});
+          this.setState({generatedBy: encodeURIComponent(value.trim())});
         }
       }
     } 
     else if (name === "source") {
       this.setState({sourceValue: value});
-      for (var index = 0; index < this.state.logEntries.length; index++) {
-        if (this.state.logEntries[index].source.name === value) {
-          this.setState({source: this.state.logEntries[index].source.uuid});
+      for (var index = 0; index < this.state.allLogEntries.length; index++) {
+        if (this.state.allLogEntries[index].source.name === value) {
+          this.setState({source: this.state.allLogEntries[index].source.uuid});
           break;
         } 
         else {
-          this.setState({source: value});
+          this.setState({source: encodeURIComponent(value.trim())});
         }
       }
     } 
@@ -117,30 +134,26 @@ export default class LogEntries extends React.Component {
   }
 
   handleChangeEnd(date) {
-    this.setState({
-      endDate: date,
-      dateChanged: !this.state.dateChanged
-    });
+    this.setState({endDate: date});
   }
 
   componentDidMount() {
+    this.getAllLogEntries();
     this.getIdentifierSources();
   }
 
   resetSearchForm() {
     this.setState({
       startDate: '',
-      endDate: moment(new Date()),
+      endDate: '',
       generatedByValue: '',
       generatedBy: '',
       sourceValue: '',
       source: '',
-      buttonBorder: false,
       searchFilters: {
         identifier: '',
         comment: ''
-      },
-      dateChanged: false
+      }
     });
   }
 
@@ -151,9 +164,9 @@ export default class LogEntries extends React.Component {
         let formattedDate = moment(LogEntry.dateGenerated).format('DD/MM/YYYY')
         return LogEntry.source.name.toLowerCase().includes(this.state.filteredLogEntries.toLowerCase())||
              LogEntry.identifier.toLowerCase().includes(this.state.filteredLogEntries.toLowerCase()) || 
-             LogEntry.comment.toLowerCase().includes(this.state.filteredLogEntries.toLowerCase()) || 
+             LogEntry.comment && LogEntry.comment.toLowerCase().includes(this.state.filteredLogEntries.toLowerCase()) || 
              formattedDate.includes(this.state.filteredLogEntries) || 
-             (LogEntry.generatedBy.username.toLowerCase()).includes(this.state.filteredLogEntries.toLowerCase())
+             (LogEntry.generatedBy.display.toLowerCase()).includes(this.state.filteredLogEntries.toLowerCase())
       })
     }
 
@@ -244,7 +257,7 @@ export default class LogEntries extends React.Component {
                 onClick={this.advancedSearch}/> 
               {(this.state.sourceValue || this.state.searchFilters.identifier ||
               this.state.generatedByValue || this.state.searchFilters.comment ||
-              this.state.startDate || this.state.dateChanged) &&
+              this.state.startDate || this.state.endDate) &&
               < input type = "button" className = "col-sm-6 cancelbtn"
               value = "Clear Form" onClick = {this.resetSearchForm} 
               />
@@ -252,61 +265,63 @@ export default class LogEntries extends React.Component {
             </div>
           </form>
         </div>
-        <div className="input-group logs_filter">
-          <input
-            type="text"
-            placeholder="Filter Log Entries"
-            className="log_searchbox"
-            defaultValue={this.state.filteredLogEntries}
-            onChange={event => this.setState({filteredLogEntries: event.target.value})}/>
-          <span className="input-group-btn">
-            <button className="btn btn-secondary" type="button">< FaSearch/></button>
-          </span>
-        </div>
-        <div className="table-responsive logs_table">
-          <ReactTable
-            data={logEntries}
-            noDataText='No Log Entries to Display'
-            minRows={5}
-            showPageJump={true}
-            showPageSizeOptions={false}
-            pageSize={(logEntries.length < 20) ? logEntries.length : 20}
-            filterAll={true}
-            loading={this.state.loading}
-            columns={[
-            {
-              accessor: 'source.name',
-              Header: 'Source Name',
-              width: undefined,
-              minWidth: 110
-            }, {
-              accessor: 'identifier',
-              Header: 'Identifier',
-              width: undefined,
-              minWidth: 100,
-              maxWidth: 100,
-              className: 'center'
-            }, {
-              accessor: date => moment(date.dateGenerated).format('DD/MM/YYYY'),
-              Header: 'Date Generated',
-              width: undefined,
-              minWidth: 135,
-              maxWidth: 160,
-              id: 'dateGenerated',
-              className: 'center'
-            }, {
-              accessor: 'generatedBy[username]',
-              Header: 'Generated By',
-              width: undefined,
-              minWidth: 100,
-              maxWidth: 150,
-              className: 'center'
-            }, {
-              accessor: 'comment',
-              Header: 'Comments',
-              minWidth: 140
-            }
-          ]}/>
+        <div  >
+          <div className="input-group logs_filter" >
+            <input
+              type="text"
+              placeholder="Filter Log Entries"
+              className="log_searchbox"
+              defaultValue={this.state.filteredLogEntries}
+              onChange={event => this.setState({filteredLogEntries: event.target.value})}/>
+            <span className="input-group-btn">
+              <button className="btn btn-secondary" type="button">< FaSearch/></button>
+            </span>
+          </div>
+          <div id="tableArea" className="table-responsive logs_table">
+            <ReactTable
+              data={logEntries}
+              noDataText='No Log Entries to Display'
+              minRows={5}
+              showPageJump={true}
+              showPageSizeOptions={false}
+              pageSize={(logEntries.length < 20) ? logEntries.length : 20}
+              filterAll={true}
+              loading={this.state.loading}
+              columns={[
+              {
+                accessor: 'source.name',
+                Header: 'Source Name',
+                width: undefined,
+                minWidth: 110
+              }, {
+                accessor: 'identifier',
+                Header: 'Identifier',
+                width: undefined,
+                minWidth: 100,
+                maxWidth: 100,
+                className: 'center'
+              }, {
+                accessor: date => moment(date.dateGenerated).format('DD/MM/YYYY'),
+                Header: 'Date Generated',
+                width: undefined,
+                minWidth: 135,
+                maxWidth: 160,
+                id: 'dateGenerated',
+                className: 'center'
+              }, {
+                accessor: 'generatedBy[display]',
+                Header: 'Generated By',
+                width: undefined,
+                minWidth: 100,
+                maxWidth: 150,
+                className: 'center'
+              }, {
+                accessor: 'comment',
+                Header: 'Comments',
+                minWidth: 140
+              }
+            ]}/>
+          </div>
         </div>
       </div>
     )
