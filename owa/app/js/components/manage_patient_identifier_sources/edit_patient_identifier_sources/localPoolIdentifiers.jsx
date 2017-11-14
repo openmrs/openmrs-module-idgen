@@ -28,7 +28,7 @@ export default class EditLocalPoolIdentifiers extends Component {
     this.handleSelectChange = this.handleSelectChange.bind(this);
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.createSelectOptions();
   }
 
@@ -83,11 +83,11 @@ export default class EditLocalPoolIdentifiers extends Component {
     };
 
     apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-      if( !response["error"] ) {
+      if( !response.error ) {
         this.props.handleUpdateName(this.state.index, this.state.name);
         this.props.handleAlerts("success", "Successfull Updated " + this.state.name); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }
@@ -126,10 +126,18 @@ export default class EditLocalPoolIdentifiers extends Component {
             <tr>
               <td className="editPatientIdentifierSourcesTitle">Pool Identifier Source:</td>
               <td>
-                <Input id="sourceUuid" name="sourceUuid" value={this.state.sourceUuid} onChange={this.handleSelectChange} className="editPatientIdentifierSourcesInput" size="sm" type="select">
+                <Input 
+                id="sourceUuid" 
+                name="sourceUuid" 
+                value={this.state.sourceUuid ? this.state.sourceUuid : ""} 
+                onChange={this.handleSelectChange} 
+                className="editPatientIdentifierSourcesInput" 
+                size="sm" 
+                type="select">
+                  <option  value=""></option>
                   {
                     this.state.sources.map((options, index) => {
-                      return(<option key={index} value={options.uuid}>{options.display}</option>);
+                      return(<option key={index} value={options.uuid ? options.uuid : ""}>{options.display}</option>);
                     })
                   }
                 </Input>

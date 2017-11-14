@@ -43,12 +43,12 @@ export default class RemoteIdentifierSource extends Component {
     };
 
     apiCall(data, 'post', '/idgen/identifiersource?v=full').then((response) => {
-      if( !response["error"] ) {
+      if( !response.error ) {
         this.props.handleAlerts("success", "Successfull Created: " + this.state.name);
         response.class = "org.openmrs.module.idgen.RemoteIdentifierSource";
         this.props.handleNewIdentifierSource(response); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }

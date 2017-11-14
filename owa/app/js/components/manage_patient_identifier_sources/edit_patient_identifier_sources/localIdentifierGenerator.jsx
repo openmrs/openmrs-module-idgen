@@ -58,11 +58,11 @@ export default class EditLocalIdentifierGenerator extends Component {
     };
 
     apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-      if( !response["error"]) {
+      if( !response.error) {
         this.props.handleUpdateName(this.state.index, this.state.name);
         this.props.handleAlerts("success", "Successfull Updated " + this.state.name); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }  
     });
   }
