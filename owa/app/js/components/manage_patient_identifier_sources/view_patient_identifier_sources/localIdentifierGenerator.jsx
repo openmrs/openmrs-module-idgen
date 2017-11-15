@@ -56,7 +56,7 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
           reservedIdentifiers: reservedIdentifiers.join()
         }
         apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-          if( !response["error"] ) {
+          if( !response.error ) {
             let found = 0;
             let currentReservedIdentifiers = this.state.reservedIdentifiers;
             for(var counter in reservedIdentifiers){
@@ -74,7 +74,7 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
               this.props.handleAlerts("success", "Identifiers successfully added");
             }
           }else{
-            this.props.handleAlerts("error", response["error"]["message"]);
+            this.props.handleAlerts("error", response.error.message);
           }
         });
       } catch (exception) {
@@ -100,12 +100,13 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
       comment: this.state.comment,
       sourceUuid: this.state.uuid
     }
-    apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-      if( !response["error"] ) {
+    
+    apiCall(data, 'post', '/idgen/identifiersource/').then((response) => {
+      if( !response.error ) {
         download("identifiers.txt", JSON.stringify(response));
         this.props.handleAlerts("success", "Identifiers successfully generated"); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }
@@ -175,18 +176,12 @@ export default class ViewLocalIdentifierGenerator extends React.Component {
             <div className="dropzone">
               <Dropzone
               accept="text/plain"  
-              style={{
-                textAlign: 'center', 
-                height: '60px', 
-                width: '100%', 
-                padding: '5px', 
-                margin: '5px', 
-                border: '2px dashed #000'}} 
+              className="viewPatientIdentifierSourcesUpload" 
               onDrop={this.onDrop.bind(this)}>
                 <p>{this.state.fileName}</p>
               </Dropzone>
             </div>
-            <input type="submit" onClick={this.handleAddReservedIdentifiers} value="Upload" />
+            <input type="submit" style={{marginLeft: '40%'}} onClick={this.handleAddReservedIdentifiers} value="Upload" />
           </td>
         </tr>
         </tbody>

@@ -31,12 +31,13 @@ export default class ViewRemoteIdentifierSource extends Component {
       comment: this.state.comment,
       sourceUuid: this.state.uuid
     }
-    apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-      if( !response["error"] ) {
+    
+    apiCall(data, 'post', '/idgen/identifiersource/').then((response) => {
+      if( !response.error ) {
         download("identifiers.txt", JSON.stringify(response));
         this.props.handleAlerts("success", "Identifiers successfully generated"); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }

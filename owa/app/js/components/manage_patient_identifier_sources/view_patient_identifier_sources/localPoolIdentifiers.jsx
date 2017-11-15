@@ -12,6 +12,8 @@ export default class ViewLocalPoolIdentifiers extends Component {
     this.state={
       uuid: props.identifierSource.uuid,
       sourceUuid: props.identifierSource.sourceUuid,
+      usedIdentifiers: this.props.identifierSource.usedIdentifiers,
+      availableIdentifiers: this.props.identifierSource.availableIdentifiers,
       numberToGenerate: '',
       comment: '',
       batchSize: '',
@@ -46,17 +48,28 @@ export default class ViewLocalPoolIdentifiers extends Component {
 }
 
   handleAddIdentifiersFromSource(){
+    if(!this.state.batchSize || !this.state.batchSize.trim()){
+      this.props.handleAlerts("error", "The batch size cannot be empty.");
+    }else{
     let data = {
-      batchSizeToUpload: this.state.batchSize,
-      sourceUuid: this.state.uuid
+      batchSize: this.state.batchSize,
+      operation: "uploadFromSource"
     }
     apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-      if( !response["error"] ) {
+      if( !response.error ) {
+        this.setState((prevState) =>{
+          return {availableIdentifiers: parseInt(prevState.availableIdentifiers) + parseInt(this.state.batchSize)}
+        });
         this.props.handleAlerts("success", "Identifiers successfully added"); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        if(response.error.message === "[null]"){
+          this.props.handleAlerts("error", "Please select a source for the Pool.");
+        }else{
+          this.props.handleAlerts("error", response.error.message);
+        }
       }
     });
+  }
   }
 
   handleAddIdentifiersFromFile(){
@@ -65,16 +78,15 @@ export default class ViewLocalPoolIdentifiers extends Component {
     }else{
       try {
         let parsedJson = JSON.parse(this.state.fileContent);
-        console.log(parsedJson.identifiers.join());
         let data = {
-          identifiersToUpload: parsedJson.identifiers.join(),
-          sourceUuid: this.state.uuid
+          identifiers: parsedJson.identifiers.join(),
+          operation: "uploadFromFile"
         }
         apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
-          if( !response["error"] ) {
+          if( !response.error ) {
             this.props.handleAlerts("success", "Identifiers successfully added"); 
           }else{
-            this.props.handleAlerts("error", response["error"]["message"]);
+            this.props.handleAlerts("error", response.error.message);
           }
         });
       } catch (exception) {
@@ -88,14 +100,15 @@ export default class ViewLocalPoolIdentifiers extends Component {
       generateIdentifiers: true,
       numberToGenerate: this.state.numberToGenerate,
       comment: this.state.comment,
-      sourceUuid: this.state.sourceUuid
+      sourceUuid: this.state.uuid
     }
-    apiCall(data, 'post', '/idgen/identifiersource/' + this.state.uuid).then((response) => {
+    
+    apiCall(data, 'post', '/idgen/identifiersource/').then((response) => {
       if( response["error"] === undefined ) {
         download("identifiers.txt", JSON.stringify(response));
         this.props.handleAlerts("success", "Identifiers successfully generated"); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }
@@ -134,7 +147,10 @@ export default class ViewLocalPoolIdentifiers extends Component {
             <tr>
               <td  colSpan="2">
                 <p>This Identifier Source manages a pool of pre-generated identifiers.</p>
-                <p>Quantity Consumed: <br /> Quantity Available: </p>   
+                <p>
+                  Quantity Consumed: {this.state.usedIdentifiers}<br /> 
+                  Quantity Available: {this.state.availableIdentifiers}
+                </p>   
               </td>
             </tr>
             <tr>
@@ -143,18 +159,12 @@ export default class ViewLocalPoolIdentifiers extends Component {
                 <div className="dropzone">
                   <Dropzone
                   accept="text/plain"  
-                  style={{
-                    textAlign: 'center', 
-                    height: '60px', 
-                    width: '100%', 
-                    padding: '5px', 
-                    margin: '5px', 
-                    border: '2px dashed #000'}} 
+                  className="viewPatientIdentifierSourcesUpload" 
                   onDrop={this.onDrop.bind(this)}>
                     <p>{this.state.fileName}</p>
                   </Dropzone>
                 </div>
-                <input type="submit" onClick={this.handleAddIdentifiersFromFile} value="Upload" />
+                <input type="submit" style={{marginLeft: '38%'}} onClick={this.handleAddIdentifiersFromFile} value="Upload" />
               </td>
             </tr>
             <tr>

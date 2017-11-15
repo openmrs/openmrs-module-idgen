@@ -166,7 +166,9 @@ export default class ExistingIdentifierSources extends Component {
       apiCall(
         null,
         'get', 
-        '/idgen/identifiersource/'+identifierSource.uuid+'/?v=custom:uuid,name,identifierType,description,source,sequential,refillWithScheduledTask,batchSize,minPoolSize'
+        '/idgen/identifiersource/' + 
+        identifierSource.uuid + 
+        '/?v=custom:uuid,name,identifierType,description,source,sequential,refillWithScheduledTask,batchSize,minPoolSize,usedIdentifiers,availableIdentifiers'
       ).then((response) => {
         response.identifierTypeName = response.identifierType.name;
         response.identifierTypeValidator = response.identifierType.validator;

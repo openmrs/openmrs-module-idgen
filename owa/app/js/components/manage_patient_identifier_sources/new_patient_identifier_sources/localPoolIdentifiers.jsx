@@ -12,8 +12,8 @@ export default class LocalPoolIdentifiers extends Component {
       description: '',
       sequential: '',
       refillWithScheduledTask: '',
-      batchSize: '',
-      minPoolSize: '',
+      batchSize: '1000',
+      minPoolSize: '500',
       poolIdentifier: '',
       identifierType: props.identifierTypeUuid,
       sources: []
@@ -74,12 +74,12 @@ export default class LocalPoolIdentifiers extends Component {
     };
 
     apiCall(data, 'post', '/idgen/identifiersource?v=full').then((response) => {
-      if( !response["error"] ) {
+      if( !response.error ) {
         this.props.handleAlerts("success", "Successfull Updated " + this.state.name);
         response.class = "org.openmrs.module.idgen.IdentifierPool";
         this.props.handleNewIdentifierSource(response); 
       }else{
-        this.props.handleAlerts("error", response["error"]["message"]);
+        this.props.handleAlerts("error", response.error.message);
       }
     });
   }
@@ -119,6 +119,7 @@ export default class LocalPoolIdentifiers extends Component {
               <td className="newPatientIdentifierSourcesTitle">Pool Identifier Source:</td>
               <td>
                 <Input id="poolIdentifier" name="poolIdentifier" className="newPatientIdentifierSourcesInput" size="sm" type="select">
+                  <option  value=""></option>
                 {
                   Object.keys(this.state.sources).map(index => {
                     return(<option key={index} value={this.state.sources[index].uuid}>{this.state.sources[index].display}</option>);
