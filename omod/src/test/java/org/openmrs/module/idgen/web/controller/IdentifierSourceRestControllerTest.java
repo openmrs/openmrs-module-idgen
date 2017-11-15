@@ -101,7 +101,11 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         MockHttpServletRequest getRequestAfterUpload = newGetRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID);
         getRequestAfterUpload.addParameter("v", "custom:(reservedIdentifiers)");
         SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
-        assertEquals("[1, 2, 3, 4]", identifiersAfterUpload.get("reservedIdentifiers").toString());
+        assertThat(identifiersAfterUpload.get("reservedIdentifiers").toString(), allOf(
+                containsString("1"),
+                containsString("2"),
+                containsString("3"),
+                containsString("4")));
     }
     
     @Test
