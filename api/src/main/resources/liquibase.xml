@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="43889130-55c2-49e9-b72b-a9eae9a31da7" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_identifier_source"/></not>
+		</preConditions>
+		<createTable tableName="idgen_identifier_source">
+			<column name="id" type="int(11)" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" unique="true"/>
+			</column>
+			<column name="uuid" type="char(38)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="name" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="description" type="varchar(1000)" />
+			<column name="identifier_type" type="int(11)">
+				<constraints nullable="false" foreignKeyName="identifier_type for idgen_identifier_source" references="patient_identifier_type(patient_identifier_type_id)"/>
+			</column>
+			<column name="creator" type="int(11)">
+				<constraints nullable="false" foreignKeyName="creator for idgen_identifier_source" references="users(user_id)"/>
+			</column>
+			<column name="date_created" type="datetime">
+				<constraints nullable="false"/>
+			</column>
+			<column name="changed_by" type="int(11)">
+				<constraints nullable="true" foreignKeyName="changed_by for idgen_identifier_source" references="users(user_id)"/>
+			</column>
+			<column name="date_changed" type="datetime">
+				<constraints nullable="true"/>
+			</column>
+			<column name="retired" type="tinyint(1)" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+			<column name="retired_by" type="int(11)">
+				<constraints nullable="true" foreignKeyName="retired_by for idgen_identifier_source" references="users(user_id)"/>
+			</column>
+			<column name="date_retired" type="datetime">
+				<constraints nullable="true"/>
+			</column>
+			<column name="retire_reason" type="varchar(255)">
+				<constraints nullable="true"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="a7a39c84-cb48-427e-9141-ee851c283132" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_seq_id_gen" /></not>
+		</preConditions>
+		<createTable tableName="idgen_seq_id_gen">
+			<column name="id" type="int(11)">
+				<constraints nullable="false" primaryKey="true" foreignKeyName="id for idgen_seq_id_gen" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="next_sequence_value" type="int(11)" defaultValue="-1">
+				<constraints nullable="false"/>
+			</column>
+			<column name="base_character_set" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="first_identifier_base" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="prefix" type="varchar(20)"/>
+			<column name="suffix" type="varchar(20)"/>
+			<column name="length" type="int(11)"/>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="a92f91c0-162b-42d9-a33b-c1412dc2948d" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_remote_source" /></not>
+		</preConditions>
+		<createTable tableName="idgen_remote_source">
+			<column name="id" type="int(11)">
+				<constraints nullable="false" primaryKey="true" foreignKeyName="id for idgen_remote_source" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="url" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="b50c8351-3c6c-40eb-be40-bbdaed78c5a0" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_id_pool" /></not>
+		</preConditions>
+		<createTable tableName="idgen_id_pool">
+			<column name="id" type="int(11)">
+				<constraints nullable="false" primaryKey="true" foreignKeyName="id for idgen_id_pool" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="source" type="int(11)">
+				<constraints nullable="true" foreignKeyName="source for idgen_id_pool" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="batch_size" type="int(11)">
+				<constraints nullable="true"/>
+			</column>
+			<column name="min_pool_size" type="int(11)">
+				<constraints nullable="true"/>
+			</column>
+			<column name="sequential" type="tinyint(1)" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="9b1eb03d-bd27-428b-8359-5877797b0fb8" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_pooled_identifier" /></not>
+		</preConditions>
+		<createTable tableName="idgen_pooled_identifier">
+			<column name="id" type="int(11)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="uuid" type="char(38)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="pool_id" type="int(11)">
+				<constraints nullable="false" foreignKeyName="pool_id for idgen_pooled_identifier" references="idgen_id_pool(id)"/>
+			</column>
+			<column name="identifier" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date_used" type="datetime">
+				<constraints nullable="true"/>
+			</column>
+			<column name="comment" type="varchar(255)">
+				<constraints nullable="true"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="82b51fe1-e6ad-423c-80a0-d2a48a3efe6c" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_auto_generation_option" /></not>
+		</preConditions>
+		<createTable tableName="idgen_auto_generation_option">
+			<column name="id" type="int(11)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="identifier_type" type="int(11)">
+				<constraints nullable="false" unique="true" foreignKeyName="identifier_type for idgen_auto_generation_option" references="patient_identifier_type(patient_identifier_type_id)"/>
+			</column>
+			<column name="source" type="int(11)">
+				<constraints nullable="false" foreignKeyName="source for idgen_auto_generation_option" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="manual_entry_enabled" type="tinyint(1)" defaultValue="1">
+				<constraints nullable="false"/>
+			</column>
+			<column name="automatic_generation_enabled" type="tinyint(1)" defaultValue="1">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="4b4ee08c-262f-48f0-a37e-2372614e1a58" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_log_entry" /></not>
+		</preConditions>
+		<createTable tableName="idgen_log_entry">
+			<column name="id" type="int(11)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" unique="true"/>
+			</column>
+			<column name="source" type="int(11)">
+				<constraints nullable="false" foreignKeyName="source for idgen_log" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="identifier" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date_generated" type="datetime">
+				<constraints nullable="false"/>
+			</column>
+			<column name="generated_by" type="int(11)">
+				<constraints nullable="false" foreignKeyName="generated_by for idgen_log" references="users(user_id)"/>
+			</column>
+			<column name="comment" type="varchar(255)">
+				<constraints nullable="true"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="17a1d838-bf40-45d0-9e2b-6d177ff7ad62" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="idgen_reserved_identifier" /></not>
+		</preConditions>
+		<createTable tableName="idgen_reserved_identifier">
+			<column name="id" type="int(11)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" unique="true"/>
+			</column>
+			<column name="source" type="int(11)">
+				<constraints nullable="false" foreignKeyName="source for idgen_reserved_identifier" references="idgen_identifier_source(id)"/>
+			</column>
+			<column name="identifier" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet id="e931b3c1-94b6-4169-90f4-1c6bf49d4883" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_id_pool" />
+			<not><columnExists tableName="idgen_id_pool" columnName="refill_with_scheduled_task"/></not>
+		</preConditions>
+		<addColumn tableName="idgen_id_pool">
+			<column name="refill_with_scheduled_task" type="tinyint(1)" defaultValue="1">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="3e32c214-9f9a-4424-8590-43ca68396aa6" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_remote_source" />
+			<not><columnExists tableName="idgen_remote_source" columnName="user"/></not>
+		</preConditions>
+		<addColumn tableName="idgen_remote_source">
+			<column name="user" type="varchar(50)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="1df31052-65ce-4b81-8a9c-86c58c87c042" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_remote_source" />
+			<not><columnExists tableName="idgen_remote_source" columnName="password"/></not>
+		</preConditions>
+		<addColumn tableName="idgen_remote_source">
+			<column name="password" type="varchar(20)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="aea80abc-8e1b-44f2-9574-c64741750cec" author="Jeremy Keiper">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="idgen_seq_id_gen" columnName="length"/>
+		</preConditions>
+		<renameColumn tableName="idgen_seq_id_gen" oldColumnName="length" columnDataType="int(11)" newColumnName="min_length"/>
+	</changeSet>
+
+	<changeSet id="f3244825-c3d1-4789-99bd-03a014ae56a4" author="Jeremy Keiper">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_seq_id_gen" />
+			<not><columnExists tableName="idgen_seq_id_gen" columnName="max_length"/></not>
+		</preConditions>
+		<addColumn tableName="idgen_seq_id_gen">
+			<column name="max_length" type="int(11)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="a5b34ba3-2cb0-46b5-bb47-4e07da4a7acd" author="Jeremy Keiper">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="idgen_seq_id_gen" columnName="max_length"/>
+			<columnExists tableName="idgen_seq_id_gen" columnName="min_length"/>
+		</preConditions>
+		<sql>UPDATE `idgen_seq_id_gen` SET `max_length` = `min_length`</sql>
+	</changeSet>
+
+	<changeSet id="d5bc38a3-35e3-4a16-b1b2-df6f4c32ec7a" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_auto_generation_option" />
+			<not><columnExists tableName="idgen_auto_generation_option" columnName="location"/></not>
+		</preConditions>
+		<addColumn tableName="idgen_auto_generation_option">
+			<column name="location" type="int(11)">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet id="02fb6cc1-d45c-4985-8117-0d313975fd81" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="idgen_auto_generation_option" />
+			<not><foreignKeyConstraintExists foreignKeyName="location_for_auto_generation_option" /></not>
+		</preConditions>
+		<addForeignKeyConstraint
+				baseTableName="idgen_auto_generation_option"
+				constraintName="location_for_auto_generation_option"
+				baseColumnNames="location"
+				referencedTableName="location"
+				referencedColumnNames="location_id"
+		/>
+	</changeSet>
+
+	<changeSet id="4dce863f-bb66-4aa3-9663-22a23be24689" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" />
+		</preConditions>
+		<dropForeignKeyConstraint baseTableName="idgen_auto_generation_option" constraintName="identifier_type for idgen_auto_generation_option"/>
+ 	</changeSet>
+
+	<changeSet id="e8258234-2133-4270-9370-301c908f1e2b" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="identifier_type" />
+		</preConditions>
+		<dropIndex tableName="idgen_auto_generation_option" indexName="identifier_type"/>
+ 	</changeSet>
+
+	<changeSet id="0f79a646-4f62-4fef-b035-421ad8f73ba2" author="Partners In Health">
+		<preConditions onFail="MARK_RAN">
+			<not><foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" /></not>
+		</preConditions>
+		<addForeignKeyConstraint
+				constraintName="identifier_type for idgen_auto_generation_option"
+				baseTableName="idgen_auto_generation_option"
+				baseColumnNames="identifier_type"
+				referencedTableName="patient_identifier_type"
+				referencedColumnNames="patient_identifier_type_id"/>
+ 	</changeSet>
+</databaseChangeLog>
