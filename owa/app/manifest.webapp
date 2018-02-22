@@ -1,0 +1,19 @@
+{
+  "version": "0.1.0",
+  "name": "openmrs-owa-idgen",
+  "description": "The IDGEN module   uses an old school legacy UI which we are migrating from to a more client side suite technology that interact with the back end using REST.  The new design will use react js in it&#39;s implementation to create an OWA that interacts with the backend using openMRS  REST API.",
+  "launch_path": "index.html",
+  "icons": {
+    "48": "/img/omrs-button.png"
+  },
+  "developer": {
+    "name": "kwahalf, adamsdenniskariuki, cnagadya, andela-dbamidele",
+    "url": "https://github.com/openmrs/openmrs-module-idgen"
+  },
+  "default_locale": "en",
+    "activities": {
+      "openmrs": {
+        "href": "*"
+      }
+    }
+}

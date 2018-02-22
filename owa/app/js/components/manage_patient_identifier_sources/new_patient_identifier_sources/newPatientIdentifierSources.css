@@ -1,0 +1,12 @@
+.requiredField{
+    color: red;
+}
+
+.newPatientIdentifierSourcesInput{
+    width: 350px;
+    border: 1px solid #dcdcdc;
+}
+
+.newPatientIdentifierSourcesTitle{
+    font-weight: bold;
+}

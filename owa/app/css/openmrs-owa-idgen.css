@@ -1,0 +1,452 @@
+/* * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
+
+body {
+    font-family: "OpenSans", Arial, sans-serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+    max-width: 1000px;
+    margin: 10px auto;
+    background: #eeeeee !important;
+    color: #363463;
+    font-size: 16px;
+}
+
+html body {
+    margin: 0px auto
+}
+
+nav img {
+    width: 120px !important;
+}
+
+#body-wrapper {
+    position: relative;
+    padding: 10px;
+    background-color: white;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    min-height: 500px;
+    justify-content: center;
+}
+
+.app-title {
+    display: block;
+    float: right;
+    color: #eeeeee;
+    font-size: 32px;
+    margin: 4px;
+    height: 100%;
+    padding-top: 12px;
+    padding-right: 5px;
+}
+
+.instructions {
+    align-self: center;
+}
+
+.nav-header li {
+    color: #eeeeee;
+    font-size: 15px;
+    padding-right: 20px;
+    display: inline;
+    list-style: none;
+}
+
+li>a:hover {
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid gold;
+}
+
+li>a:focus {
+    color: gold;
+}
+
+.table thead {
+    position: -webkit-sticky;
+    position: -moz-sticky;
+    position: -ms-sticky;
+    position: -o-sticky;
+    position: sticky;
+    top: 0;
+    background-color: #FFF;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.dropdown-large {
+    position: static !important;
+}
+
+.dropdown-menu-large {
+    margin-left: 16px;
+    margin-right: 16px;
+    padding: 20px 0px;
+}
+
+.dropdown-menu-large>li>a:hover {
+    background-color: transparent;
+    margin-right: 0px;
+    border-bottom: 0px;
+    color: purple;
+}
+
+nav {
+    position: relative;
+    background-color: #00463f;
+    color: #CCC;
+    line-height: 1em;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    display: block;
+    padding: 0 !important;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #eeeeee !important;
+    font-size: 15px;
+    padding-right: 20px;
+    display: inline;
+    list-style: none;
+}
+
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
+    color: #eceeef !important;
+    background-color: #009384 !important;
+    border-color: #ddd #ddd #fff;
+}
+
+
+/*General Styles */
+
+button,
+input,
+select,
+textarea {
+    font-family: "OpenSans", Arial, sans-serif;
+    font-size: 100%;
+    margin: 0;
+}
+
+select {
+    border-radius: 0;
+}
+
+textarea:focus,
+input:focus,
+button:focus,
+select:focus {
+    outline: none!important;
+}
+
+a,
+a:visited,
+a:hover,
+a:active {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+/*-------------Bread Crumbs---------------*/
+ol.breadcrumb {
+    padding: 5px 0px;
+    margin-bottom: 1rem;
+    list-style: none;
+    background-color: #eceeef;
+    border-radius: 0;
+    border-bottom: 1px solid #fff;
+    margin-bottom: 10px;
+}
+
+.breadcrumb-item {
+    text-decoration: underline;
+    color: #555;
+    font-size: .9em
+}
+
+li.breadcrumb-item.active {
+    color: #363463;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .9em;
+}
+
+li.breadcrumb-item+.breadcrumb-item::before {
+    content: ">"
+}
+
+/*--------------View Logs Tab ------------*/
+.center {
+    text-align: center
+}
+
+.noborder.searchlink,
+.noborder.searchlink:hover {
+    border: 0px;
+    margin: 0px;
+    font-size: 23px;
+    color: #3f3d74;
+    background: #ffffff
+}
+
+.logLabel.logSearch {
+    background: #fff
+}
+
+.logwrapper .ReactTable {
+    margin: 20px;
+}
+
+.filterLabels {
+    padding: 0px 20px;
+    font-size: 12px
+}
+
+.filterLabels span {
+    margin: 3px;
+}
+
+.filteredBy {
+    border: 1px solid #b9b9b9;
+    background: #e2e2e2;
+    color: #717171;
+    padding: 3px 5px;
+    font-style: italic;
+    display: inline-block;
+    font-size: 10px;
+}
+
+.filteredBy:hover {
+    color: #545454
+}
+
+.ReactTable .rt-resizable-header.-cursor-pointer.rt-th {
+    border-bottom: 1px solid #dddddd;
+    background: #f3f3f3;
+    width: auto;
+    text-align: left;
+    word-break: normal;
+    font-weight: bold;
+    padding: 10px 9px;
+}
+
+.rt-tr.-even {
+    background: #fffdf7;
+}
+
+.logwrapper .form-control,
+select.form-control {
+    border-radius: 0px;
+    line-height: 1.7em;
+}
+
+.logSearchTitle {
+    background-color: #00463f;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 5px;
+    font-size: 15px;
+    text-align: left
+}
+
+.logs_filter.input-group {
+    margin: 20px auto 10px;
+    float: right;
+    width: auto
+}
+
+#advancedSearchForm {
+    border: 1px solid #00463f;
+    padding-bottom: 20px
+}
+
+.advanced_wrapper .react-datepicker__input-container,
+.advanced_wrapper .react-datepicker-wrapper {
+    display: block
+}
+
+.advanced_wrapper .input-group .form-control {
+    width: 100%;
+    font-size: 13px;
+}
+
+.input-group.date {
+    width: 49%;
+    float: left;
+}
+
+.dateSeparator.input-group {
+    width: 2%;
+    float: left;
+    display: block;
+    line-height: 2em;
+}
+
+.advanced_wrapper .input-group.date>div {
+    width: 100%
+}
+
+.search_label {
+    color: #363463;
+    text-align: center;
+    line-height: 2em;
+    font-size: 1.2em;
+}
+
+input.log_searchbox {
+    margin-top: 0px;
+    font-size: 100%;
+    font-family: inherit;
+    line-height: 1.7em;
+    width: 100%;
+    padding: 5px 10px;
+}
+
+.searchlink {
+    background: #3f3d74;
+    color: #fffdf7;
+    border: 1px solid #fffdf7;
+    padding: 10px;
+    margin: 10px auto 10px;
+}
+
+.searchlink:hover {
+    color: #e8e4d8;
+    background: #3f3d74;
+}
+
+.advanced_wrapper fieldset>div {
+    float: left;
+    margin-bottom: 10px;
+}
+
+.advanced_wrapper select option:first-child {
+    color: #666
+}
+
+.advanced_wrapper fieldset input,
+select {
+    width: 100%
+}
+
+.logs_table_area {
+    font-size: 13px;
+    color: rgb(111, 123, 138);
+}
+
+.advanced_wrapper,
+.logs_table {
+    left: 0;
+    width: 100%
+}
+
+.advanced_wrapper {
+    text-align: center;
+    margin: 15px 0px
+}
+
+#advancedSearchForm .react-datepicker__day--selected,
+#advancedSearchForm .react-datepicker__day--in-selecting-range,
+#advancedSearchForm .react-datepicker__day--in-range,
+#advancedSearchForm .react-datepicker__day--keyboard-selected {
+    background-color: #403e75;
+}
+
+#advancedSearchForm .react-datepicker__day--today {
+    color: #403e75;
+    border: 1px solid #403e75
+}
+
+#advancedSearchForm .react-datepicker__day--today.react-datepicker__day--keyboard-selected,
+#advancedSearchForm .react-datepicker__day--today.react-datepicker__day--selected {
+    color: #fbe5e5
+}
+
+label.search_lbl {
+    margin: 10px 0px 5px;
+}
+
+.cancelbtn {
+    background-color: #dddddd;
+    border: #dddddd 1px solid;
+    padding: 8px 20px;
+    display: inline-block;
+    line-height: 1.2em;
+    color: #363463;
+    cursor: pointer;
+    min-width: 0;
+    max-width: 300px;
+    text-decoration: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #dddddd));
+    background: -webkit-linear-gradient(top, #ffffff, #dddddd);
+    background: -moz-linear-gradient(top, #ffffff, #dddddd);
+    background: -o-linear-gradient(top, #ffffff, #dddddd);
+    background: -ms-linear-gradient(top, #ffffff, #dddddd);
+    background: linear-gradient(top, #ffffff, #dddddd);
+}
+
+.cancelbtn:hover {
+    background: #e2e2e2;
+    border-color: #d0d0d0;
+}
+
+.button.confirm,
+button.confirm,
+input[type="submit"],
+a.button.confirm {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #a1d030), color-stop(100%, #88af28));
+    background: -webkit-linear-gradient(top, #a1d030, #88af28);
+    background: -moz-linear-gradient(top, #a1d030, #88af28);
+    background: -o-linear-gradient(top, #a1d030, #88af28);
+    background: -ms-linear-gradient(top, #a1d030, #88af28);
+    background: linear-gradient(top, #a1d030, #88af28);
+    background-color: #88af28;
+    border: #88af28 1px solid;
+    color: #fffdf7;
+    max-width: 250px;
+    min-width: 150px;
+    font-size: 1.2em;
+    padding: 8px 20px;
+    margin-right: 10px;
+}
+
+.button.confirm:hover,
+button.confirm:hover,
+input[type="submit"]:hover,
+a.button.confirm:hover {
+    background: #8eb82a;
+    border-color: #779b23;
+}
+
+.advanced_wrapper .rdt {
+    margin-bottom: 10px;
+}

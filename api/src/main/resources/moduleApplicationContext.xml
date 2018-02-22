@@ -12,7 +12,7 @@
            http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
     <bean id="IdentifierSourceDAO" class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
-        <property name="sessionFactory"><ref bean="sessionFactory"/></property>
+        <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
     </bean>
 
 	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">

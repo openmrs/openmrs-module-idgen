@@ -1,0 +1,169 @@
+#formCont,
+#tableCont {
+  margin-bottom: 20px;
+  border: thin solid #dddddd;
+}
+select#identifierSelect {
+  display: inline;
+  height: 35px;
+  max-width: 300px !important;
+  margin: 0px 20px;
+}
+
+#addNewCont {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#addBtn {
+  height: 35px;
+  width: 100px;
+  background-color: #009384;
+  color: #fff;
+  border-color: #009384;
+  cursor: pointer;
+  transition: margin-left 0.5s ease, transform 0.5s ease;
+}
+
+.color-green {
+  background-color: #009384;
+  color: #fff;
+  border-color: #009384;
+}
+
+.color-green:hover {
+  background-color: #fff;
+  color: #009384;
+  border-color: #009384 !important;
+}
+
+#addBtn:hover {
+  margin-left: 5px;
+  transform: scale(1.1);
+}
+
+#tableTitle,
+#formTitle {
+  height: 50px;
+  padding: 15px;
+  background-color: #fff;
+  color: rgb(85, 84, 88);
+  border-bottom: thin solid #dddddd;
+}
+
+#tableTitle h2,
+#formTitle h2 {
+  font-size: 16px;
+}
+
+#tableDiv {
+  padding: 15px 0px 0px 0px;
+}
+
+#tableDiv .col.col-sm-6 {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+}
+
+#tableDiv select {
+  max-width: 70px;
+  height: 35px;
+}
+
+#formWrapper {
+  padding: 10px;
+}
+
+.form-group {
+  margin-bottom: 0px !important;
+}
+
+#tableCont {
+  background-color: #fff;
+}
+
+#tableCont .row {
+  margin: 0px !important;
+}
+
+#mago_table th, #mago_table td {
+  border: none !important;
+  height: 50px !important;
+  vertical-align: middle;
+  padding-left: 7px !important;
+  font-size: 13px;
+  text-align: center;
+  color: rgb(111, 123, 138);
+}
+
+.table svg {
+  font-size: 18px !important;
+  cursor: pointer;
+  color: red;
+}
+
+.table th {
+  text-transform: uppercase !important;
+}
+
+.pointer {
+  cursor: pointer;
+  /* color: #009384 !important; */
+}
+
+.table tr {
+  cursor: pointer;
+}
+
+/* .table tr:hover {
+  background-color: #f8f8f8;
+} */
+
+.tableContent {
+  padding: 20px;
+}
+
+.searchDiv {
+  text-align: right;
+}
+
+.searchDiv label {
+  max-width: 100%;
+  width: 100%;
+  float: right;
+  text-align: right;
+  font-size: 12px;
+  color: rgb(111, 123, 138);
+}
+
+.searchDiv label span {
+  margin-right: 5px;
+}
+
+.searchInput {
+  max-width: 165px;
+  display: inline-block;
+  height: 35px;
+}
+select.myselect {
+  height: 35px !important;
+  margin-bottom: 15px !important;
+}
+
+select.myselect option {
+  padding: 5px !important;
+}
+
+.optionsCont {
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.modal-title span {
+  font-size: 15px !important;
+}
+
+.modal-title span h3 {
+  display: inline !important;
+  font-size: 22px !important;
+}

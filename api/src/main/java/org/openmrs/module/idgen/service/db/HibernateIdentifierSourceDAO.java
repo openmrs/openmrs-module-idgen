@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -27,6 +26,8 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -51,7 +52,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	
 	//***** PROPERTIES *****
 	
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 	
 	//***** INSTANCE METHODS *****
 
@@ -81,8 +82,11 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceService#saveIdentifierSource(IdentifierSource)
 	 */
 	@Transactional
-	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {		
-		sessionFactory.getCurrentSession().saveOrUpdate(identifierSource);
+	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
+		DbSession currentSession = sessionFactory.getCurrentSession();
+		currentSession.saveOrUpdate(identifierSource);
+		currentSession.flush();
+		refreshIdentifierSource(identifierSource);
 		return identifierSource;
 	}
 
@@ -244,6 +248,17 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
         criteria.add(Restrictions.eq("uuid", uuid));
         return (IdentifierSource) criteria.uniqueResult();
     }
+    
+    /**
+     * @see IdentifierSourceDAO#getIdentifierSourcesByType(PatientIdentifierType)
+     */
+    @Override
+    public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
+        criteria.add(Expression.eq("identifierType", patientIdentifierType));
+        criteria.add(Expression.like("retired", false));
+        return (List<IdentifierSource>) criteria.list();
+    }    
 
     /**
 	 * @see org.openmrs.module.idgen.service.db.IdentifierSourceDAO#saveLogEntry(LogEntry)
@@ -291,14 +306,14 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/**
 	 * @return the sessionFactory
 	 */
-	public SessionFactory getSessionFactory() {
+	public DbSessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
 	/**
 	 * @param sessionFactory the sessionFactory to set
 	 */
-	public void setSessionFactory(SessionFactory sessionFactory) {
+	public void setSessionFactory(DbSessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 }

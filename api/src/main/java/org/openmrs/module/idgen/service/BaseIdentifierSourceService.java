@@ -369,7 +369,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	}
 
 	/**
-	 * ADDS, doesn't simply set
+	 * Adds to processors, rather than replacing.
 	 * @param processorsToAdd the processors to add
 	 */
 	public void setProcessors(Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processorsToAdd) {
@@ -425,6 +425,14 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     public IdentifierSource getIdentifierSourceByUuid(String uuid) {
         return dao.getIdentifierSourceByUuid(uuid);
     }
+    
+    /**
+     * @see IdentifierSourceService#getIdentifierSourcesByType(PatientIdentifierType)
+     */
+    @Override
+    public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType){
+        return dao.getIdentifierSourcesByType(patientIdentifierType);
+    }
 
     /**
      * @see IdentifierSourceService#saveSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator, long)
@@ -441,5 +449,15 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     public Long getSequenceValue(SequentialIdentifierGenerator seq) {
         return dao.getSequenceValue(seq);
     }
+
+    /**
+     * @see IdentifierSourceService#retireIdentifierSource(org.openmrs.module.idgen.IdentifierSource, String)
+     */
+	@Override
+	public void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException {
+		identifierSource.setRetired(true);
+		identifierSource.setRetireReason(reason);
+		dao.saveIdentifierSource(identifierSource);		
+	}
 
 }

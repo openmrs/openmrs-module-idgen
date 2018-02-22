@@ -14,7 +14,7 @@
 package org.openmrs.module.idgen;
 
 /**
- * Constants useful for this module
+ * Constants that are useful for this module
  */
 public class IdgenConstants {
 	

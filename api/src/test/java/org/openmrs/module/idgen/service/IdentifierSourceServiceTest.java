@@ -33,8 +33,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import java.util.*;
 
 public class IdentifierSourceServiceTest extends IdgenBaseTest {
-	
-	private BaseIdentifierSourceService iss;
+
+	@Autowired
+	IdentifierSourceService identifierSourceService;
 
     @Autowired
     IdentifierSourceDAO dao;
@@ -51,16 +52,6 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void beforeEachTest() throws Exception {
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-
-        iss = new BaseIdentifierSourceServiceStub();
-        iss.setDao(dao);
-
-        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
-        processor.setIdentifierSourceService(iss);
-
-        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>, IdentifierSourceProcessor>();
-        processors.put(SequentialIdentifierGenerator.class, processor);
-        iss.setProcessors(processors);
     }
 	
 	/**
@@ -69,8 +60,8 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return batch of ID of correct size", method = "generateIdentifiers(IdentifierSource, integer, String)")
 	public void generateIdentifiers_shouldReturnIdentifiersOfCorrectSize() throws Exception {
-		IdentifierSource is = iss.getIdentifierSource(1);
-		List<String>  sig = iss.generateIdentifiers(is, 7, "hello");
+		IdentifierSource is = identifierSourceService.getIdentifierSource(1);
+		List<String>  sig = identifierSourceService.generateIdentifiers(is, 7, "hello");
 		Assert.assertEquals(sig.toString(), "[G-0, H-8, I-5, J-3, K-1, L-9, M-7]");
 	}
 
@@ -80,7 +71,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
-		List<IdentifierSource>  sig = iss.getAllIdentifierSources(false);
+		List<IdentifierSource>  sig = identifierSourceService.getAllIdentifierSources(false);
 		Assert.assertTrue(sig.size() == 6);
 	}
 
@@ -90,7 +81,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return a saved sequential identifier generator", method = "getIdentifierSource(Integer)")
 	public void getIdentifierSource_shouldReturnASavedSequentialIdentifierGenerator() throws Exception {
-		SequentialIdentifierGenerator sig = (SequentialIdentifierGenerator)iss.getIdentifierSource(1);
+		SequentialIdentifierGenerator sig = (SequentialIdentifierGenerator)identifierSourceService.getIdentifierSource(1);
 		Assert.assertEquals(sig.getName(), "Test Sequential Generator");
 		Assert.assertNotNull(sig.getBaseCharacterSet());
 	}
@@ -101,7 +92,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return a saved remote identifier source", method = "getIdentifierSource(Integer)")
 	public void getIdentifierSource_shouldReturnASavedRestIdentifierGenerator() throws Exception {
-		RemoteIdentifierSource rig = (RemoteIdentifierSource)iss.getIdentifierSource(2);
+		RemoteIdentifierSource rig = (RemoteIdentifierSource)identifierSourceService.getIdentifierSource(2);
 		Assert.assertEquals(rig.getName(), "Test Remote Source");
 		Assert.assertNotNull(rig.getUrl());
 	}
@@ -113,11 +104,24 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return a saved identifier pool", method = "getIdentifierSource(Integer)")
 	public void getIdentifierSource_shouldReturnASavedIdentifierPool() throws Exception {
-		IdentifierPool idpool = (IdentifierPool)iss.getIdentifierSource(3);
+		IdentifierPool idpool = (IdentifierPool)identifierSourceService.getIdentifierSource(3);
 		Assert.assertEquals(idpool.getName(), "Test Identifier Pool");
 		Assert.assertEquals(idpool.getBatchSize(), 1000);
 		Assert.assertEquals(5, idpool.getAvailableIdentifiers().size());
 		Assert.assertEquals(idpool.getUsedIdentifiers().size(), 0);
+	}
+	
+	/**
+	 * @see {@link IdentifierSourceService#retireIdentifierSource(IdentifierSource, String)}
+	 * 
+	 */
+	@Test
+	@Verifies(value = "should retire an IdentifierSource from the system", method = "retireIdentifierSource(IdentifierSource, String)")
+	public void retireIdentifierSource_shouldRetireAnIdentifierSourceFromTheSystem() throws Exception {
+		IdentifierSource identifierSource = identifierSourceService.getIdentifierSource(2);
+		Assert.assertFalse(identifierSourceService.getIdentifierSource(2).isRetired());
+		identifierSourceService.retireIdentifierSource(identifierSource, "testing");
+		Assert.assertTrue(identifierSourceService.getIdentifierSource(2).isRetired());
 	}
 
 	/**
@@ -127,9 +131,9 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should delete an IdentifierSource from the system", method = "purgeIdentifierSource(IdentifierSource)")
 	public void purgeIdentifierSource_shouldDeleteAnIdentifierSourceFromTheSystem() throws Exception {
-		IdentifierSource s = iss.getIdentifierSource(2);
-		iss.purgeIdentifierSource(s);
-		Assert.assertNull(iss.getIdentifierSource(2));
+		IdentifierSource identifierSource = identifierSourceService.getIdentifierSource(2);
+		identifierSourceService.purgeIdentifierSource(identifierSource);
+		Assert.assertNull(identifierSourceService.getIdentifierSource(2));
 	}
 
 	/**
@@ -148,10 +152,10 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		sig.setBaseCharacterSet(baseChars);
 		sig.setFirstIdentifierBase("1");
 		sig.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
-		IdentifierSource source = iss.saveIdentifierSource(sig);
+		IdentifierSource source = identifierSourceService.saveIdentifierSource(sig);
 		
 		Assert.assertNotNull(source.getId());
-		IdentifierSource s = iss.getIdentifierSource(source.getId());
+		IdentifierSource s = identifierSourceService.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getClass(), SequentialIdentifierGenerator.class);
 		Assert.assertEquals(s.getName(), name);
 		Assert.assertEquals(((SequentialIdentifierGenerator) s).getBaseCharacterSet(), baseChars);
@@ -171,10 +175,10 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		idgen.setName(name);
 		idgen.setUrl(url);
 		idgen.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
-		IdentifierSource source = iss.saveIdentifierSource(idgen);
+		IdentifierSource source = identifierSourceService.saveIdentifierSource(idgen);
 		
 		Assert.assertNotNull(source.getId());
-		IdentifierSource s = iss.getIdentifierSource(source.getId());
+		IdentifierSource s = identifierSourceService.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getClass(), RemoteIdentifierSource.class);
 		Assert.assertEquals(s.getName(), name);
 		Assert.assertEquals(((RemoteIdentifierSource) s).getUrl(), url);
@@ -202,10 +206,10 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		pooledIdentifiers.add(new PooledIdentifier(pool, "ABC03"));
 		pool.setIdentifiers(pooledIdentifiers);
 		
-		IdentifierSource source = iss.saveIdentifierSource(pool);
+		IdentifierSource source = identifierSourceService.saveIdentifierSource(pool);
 		
 		Assert.assertNotNull(source.getId()); 
-		IdentifierPool s = (IdentifierPool)iss.getIdentifierSource(source.getId());
+		IdentifierPool s = (IdentifierPool)identifierSourceService.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getName(), name);
 		Assert.assertEquals(s.getBatchSize(), batchSize);
 		Assert.assertEquals(4, s.getAvailableIdentifiers().size());
@@ -213,14 +217,21 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
     @Test
     public void getIdentifierSourceByUuid_shouldGetSource() {
-        IdentifierSource identifierSource = iss.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
+        IdentifierSource identifierSource = identifierSourceService.getIdentifierSourceByUuid("0d47284f-9e9b-4a81-a88b-8bb42bc0a903");
         Assert.assertEquals(3, identifierSource.getId().intValue());
+    }
+    
+    @Test
+    public void getIdentifierSourcesByPatientIdentifierType_shouldGetIdentifierSourcesByPatientIdentifierType() {
+        PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
+        List<IdentifierSource> identifierSource = identifierSourceService.getIdentifierSourcesByType(patientIdentifierType);
+        Assert.assertEquals(2, identifierSource.size());
     }
 
     @Test
     public void getAutoGenerationOptionByPatientIdentifier_shouldGetAutoGenerationOptionByIdentifier() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
-        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType);
+        AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOption(patientIdentifierType);
         Assert.assertEquals(1, autoGenerationOption.getId().intValue());
     }
 
@@ -228,7 +239,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldGetAutoGenerationOptionByIdentifier() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
         Location location = locationService.getLocation(2);
-        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOption(patientIdentifierType, location);
         Assert.assertEquals(3, autoGenerationOption.getId().intValue());
     }
 
@@ -236,28 +247,28 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldReturnNullIfNoOptionForLocation() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
         Location location = locationService.getLocation(4);
-        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOption(patientIdentifierType, location);
         Assert.assertNull(autoGenerationOption);
     }
 
     @Test(expected = NonUniqueResultException.class)
     public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldFailWhenTryingToFetchOptionByJustPatientIdentifierIfConfiguredByLocation() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
-        iss.getAutoGenerationOption(patientIdentifierType);
+        identifierSourceService.getAutoGenerationOption(patientIdentifierType);
     }
 
     @Test
     public void getAutoGenerationOptionByPatientIdentifierAndLocation_shouldReturnOptionsNotConfiguredByLocation() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
         Location location = locationService.getLocation(4);
-        AutoGenerationOption autoGenerationOption = iss.getAutoGenerationOption(patientIdentifierType, location);
+        AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOption(patientIdentifierType, location);
         Assert.assertEquals(1, autoGenerationOption.getId().intValue());
     }
 
     @Test
     public void getAutoGenerationOptionsByPatientIdentifier_shouldReturnAllAutoGenerationOptions() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(2);
-        List<AutoGenerationOption> autoGenerationOptions = iss.getAutoGenerationOptions(patientIdentifierType);
+        List<AutoGenerationOption> autoGenerationOptions = identifierSourceService.getAutoGenerationOptions(patientIdentifierType);
         Assert.assertEquals(2, autoGenerationOptions.size());
         // poor man's check that the list contains both options
         Assert.assertTrue( (autoGenerationOptions.get(0).getId().equals(2) && autoGenerationOptions.get(1).getId().equals(3))
@@ -266,26 +277,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
     @Test
     public void getAutoGenerationOptionById_shouldFetchAutoGenerationOptionByPrimaryKey() {
-        AutoGenerationOption option = iss.getAutoGenerationOption(2);
+        AutoGenerationOption option = identifierSourceService.getAutoGenerationOption(2);
         Assert.assertEquals(2, option.getId().intValue());
-    }
-
-    private class BaseIdentifierSourceServiceStub extends BaseIdentifierSourceService {
-
-        // we need to override the functionality to get and set sequential values since we are now
-        // bypassing Hibernate and going directly to the DB to do this
-
-        private long sequenceValue = 6;
-
-        @Override
-        public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
-            this.sequenceValue = sequenceValue;
-        }
-
-        @Override
-        public Long getSequenceValue(SequentialIdentifierGenerator seq) {
-            return sequenceValue;
-        }
-
     }
 }

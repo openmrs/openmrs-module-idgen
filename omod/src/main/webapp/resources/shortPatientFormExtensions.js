@@ -48,7 +48,7 @@ jQuery(document).ready(function() {
 		// Create and insert select list for adding new identifiers
 		jQuery("#identifiers").parent().append('<select id="newIdentifierTypeSelector" name="newIdentifierTypeSelector"><option value="">'+data.translations.add+'</option></select>');
 		jQuery.each(data.allIdentifiers, function(i, item) {
-			jQuery("#newIdentifierTypeSelector").append('<option value="' + item.typeId + '">'+item.typeName+'</option>');
+			jQuery("#newIdentifierTypeSelector").append('<option value="' + item.typeId + '">'+sanitizeHtml(item.typeName)+'</option>');
 		});
 		jQuery("#newIdentifierTypeSelector").change(function(event) {
 			var v = jQuery(this).val();

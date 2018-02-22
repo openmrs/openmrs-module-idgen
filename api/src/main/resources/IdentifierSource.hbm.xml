@@ -26,6 +26,9 @@
 		
 		<joined-subclass name="SequentialIdentifierGenerator" table="idgen_seq_id_gen">
 			<key column="id"/>
+			<property name="nextSequenceValue" type="long" access="field" insert="false" update="false">
+				<column name="next_sequence_value" default="-1" not-null="true"/>
+			</property>
 			<property name="baseCharacterSet" type="string" column="base_character_set" not-null="true" />
 			<property name="firstIdentifierBase" type="string" column="first_identifier_base" not-null="true" />
 			<property name="prefix" type="string" />

@@ -44,13 +44,13 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
-        long sequenceValue = identifierSourceService.getSequenceValue(seq);
-    	if (sequenceValue < 0) {
+        Long sequenceValue = identifierSourceService.getSequenceValue(seq);
+    	if (sequenceValue == null || sequenceValue < 0) {
     		if (seq.getFirstIdentifierBase() != null) {
     			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
     		}
     		else {
-    			sequenceValue = 1;
+    			sequenceValue = 1L;
     		}
     	}
 

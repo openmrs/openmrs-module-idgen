@@ -24,7 +24,7 @@ import org.openmrs.patient.IdentifierValidator;
 public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 
 	//***** PROPERTIES *****
-
+	private Long nextSequenceValue; //not used: declared only so that Hibernate creates the column when running tests
     private String prefix; // Optional prefix
     private String suffix; // Optional suffix
     private String firstIdentifierBase; // First identifier to start at
