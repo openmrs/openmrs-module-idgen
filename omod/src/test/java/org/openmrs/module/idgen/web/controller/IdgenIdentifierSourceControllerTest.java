@@ -1,65 +1,50 @@
+/**
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
 package org.openmrs.module.idgen.web.controller;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.IdentifierSource;
-import org.openmrs.module.idgen.SequentialIdentifierGenerator;
-import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.openmrs.module.idgen.web.request.GenerateIdentifierRequest;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.openmrs.module.idgen.web.services.IdentifierSourceServiceWrapper;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class IdgenIdentifierSourceControllerTest {
-
-    @Mock
-    private SequentialIdentifierGenerator identifierSource;
-    @Mock
-    private IdentifierSourceService identifierSourceService;
-
+    @InjectMocks
     private IdgenIdentifierSourceController controller;
 
-    @Before
-    public void before() throws Exception {
-        initMocks(this);
-        mockStatic(Context.class);
-        controller = new IdgenIdentifierSourceController();
-    }
+    @Mock
+    private IdentifierSourceServiceWrapper identifierSourceServiceWrapper;
 
     @Test
-    public void shouldGenerateIdentifier() throws Exception {
-        when(Context.getService(IdentifierSourceService.class)).thenReturn(identifierSourceService);
-        when(identifierSource.getPrefix()).thenReturn("OPD");
-        when(identifierSourceService.getAllIdentifierSources(false)).thenReturn(new ArrayList<IdentifierSource>() {{
-            this.add(identifierSource);
-        }});
-        controller.generateIdentifier(new GenerateIdentifierRequest("OPD", "New HIV Patient"));
-        verify(identifierSourceService).generateIdentifier(identifierSource, "New HIV Patient");
-    }
-
-    @Test
-    public void shouldReturnAllIdentifierSources() throws Exception {
-        when(Context.getService(IdentifierSourceService.class)).thenReturn(identifierSourceService);
-        ArrayList<IdentifierSource> identifierSources = new ArrayList<IdentifierSource>() {{
-            this.add(new SequentialIdentifierGenerator());
+    public void shouldGetAllIdentifierSourcesOfPrimaryIdentifierType() throws Exception {
+        List<org.openmrs.module.idgen.contract.IdentifierSource> identifierSources = new ArrayList<org.openmrs.module.idgen.contract.IdentifierSource>() {{
+            this.add(new org.openmrs.module.idgen.contract.IdentifierSource("uuid", "name", "GAN"));
         }};
-        when(identifierSourceService.getAllIdentifierSources(false)).thenReturn(identifierSources);
-        String resultIdentifierResources = controller.getAllIdentifierSources();
+        when(identifierSourceServiceWrapper.getAllIdentifierSourcesOfPrimaryIdentifierType()).thenReturn(identifierSources);
 
-        System.out.println(resultIdentifierResources);
-        assertThat(resultIdentifierResources, notNullValue());
+        String resultIdentifierResources = controller.getAllIdentifierSourcesOfPrimaryIdentifierType();
+
+        assertTrue(resultIdentifierResources.contains("\"uuid\":\"uuid\""));
+        assertTrue(resultIdentifierResources.contains("\"name\":\"name\""));
+        assertTrue(resultIdentifierResources.contains("\"prefix\":\"GAN\""));
     }
 }
