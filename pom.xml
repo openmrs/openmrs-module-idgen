@@ -29,6 +29,12 @@
 			<version>${openMRSVersion}</version>
 			<type>jar</type>
 			<scope>provided</scope>
+			<exclusions>
+			    <exclusion>
+				<groupId>javassist</groupId>
+				<artifactId>javassist</artifactId>
+			    </exclusion>
+			</exclusions>			
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
@@ -44,6 +50,12 @@
 			<classifier>tests</classifier>
 			<type>jar</type>
 			<scope>test</scope>
+			<exclusions>
+			    <exclusion>
+				<groupId>javassist</groupId>
+				<artifactId>javassist</artifactId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.web</groupId>

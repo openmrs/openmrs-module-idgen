@@ -12,5 +12,38 @@
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<context:component-scan base-package="org.openmrs.module.idgen" />
+	
+	<bean id="identifierSourceServiceWrapperTarget"
+	    class="org.openmrs.module.idgen.web.services.IdentifierSourceServiceWrapperImpl">
+	</bean>
 
+	<bean id="identifierSourceServiceWrapper" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	    <property name="transactionManager">
+		<ref bean="transactionManager"/>
+	    </property>
+	    <property name="target" ref="identifierSourceServiceWrapperTarget"/>
+	    <property name="preInterceptors">
+		<ref bean="serviceInterceptors"/>
+	    </property>
+	    <property name="transactionAttributeSource">
+		<ref bean="transactionAttributeSource"/>
+	    </property>
+	</bean>
+
+	<bean id="identifierTypeServiceWrapperTarget"
+	      class="org.openmrs.module.idgen.web.services.IdentifierTypeServiceWrapperImpl">
+	</bean>
+
+	<bean id="identifierTypeServiceWrapper" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	    <property name="transactionManager">
+		<ref bean="transactionManager"/>
+	    </property>
+	    <property name="target" ref="identifierTypeServiceWrapperTarget"/>
+	    <property name="preInterceptors">
+		<ref bean="serviceInterceptors"/>
+	    </property>
+	    <property name="transactionAttributeSource">
+		<ref bean="transactionAttributeSource"/>
+	    </property>
+	</bean>
 </beans>
