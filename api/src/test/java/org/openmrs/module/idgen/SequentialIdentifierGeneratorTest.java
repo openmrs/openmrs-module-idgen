@@ -1,7 +1,17 @@
+/* * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.idgen;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -61,5 +71,20 @@ public class SequentialIdentifierGeneratorTest {
 
 		generator.getIdentifierForSeed(1);
 	}
+	
+	@Test
+	public void shouldSetNextSequenceValueToNegative() throws Exception {
+		Integer minLength = 11;
+		Integer maxLength = 13;
 
+		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
+		generator.setBaseCharacterSet("0123456789");
+		generator.setPrefix("FOO-");
+		generator.setSuffix("-ACK");
+		generator.setFirstIdentifierBase("000");
+		generator.setMinLength(minLength);
+		generator.setMaxLength(maxLength);
+
+		assertThat(generator.getNextSequenceValue(), is(new Long(-1)));
+	}
 }

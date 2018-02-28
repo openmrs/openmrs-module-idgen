@@ -36,7 +36,8 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
 	@Autowired
 	IdentifierSourceService identifierSourceService;
-
+    private BaseIdentifierSourceService iss;
+    
     @Autowired
     IdentifierSourceDAO dao;
 
@@ -52,6 +53,17 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void beforeEachTest() throws Exception {
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+	
+        iss = new BaseIdentifierSourceService();
+        iss.setDao(dao);
+
+        SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
+        processor.setIdentifierSourceService(iss);
+
+        Map<Class<? extends IdentifierSource>, IdentifierSourceProcessor> processors = new HashMap<Class<? extends IdentifierSource>,
+                IdentifierSourceProcessor>();
+        processors.put(SequentialIdentifierGenerator.class, processor);
+        iss.setProcessors(processors);
     }
 	
 	/**
@@ -104,9 +116,10 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	@Verifies(value = "should return a saved identifier pool", method = "getIdentifierSource(Integer)")
 	public void getIdentifierSource_shouldReturnASavedIdentifierPool() throws Exception {
+		Integer batchSize = 1000;
 		IdentifierPool idpool = (IdentifierPool)identifierSourceService.getIdentifierSource(3);
 		Assert.assertEquals(idpool.getName(), "Test Identifier Pool");
-		Assert.assertEquals(idpool.getBatchSize(), 1000);
+		Assert.assertEquals(idpool.getBatchSize(), batchSize);
 		Assert.assertEquals(5, idpool.getAvailableIdentifiers().size());
 		Assert.assertEquals(idpool.getUsedIdentifiers().size(), 0);
 	}
@@ -192,7 +205,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Verifies(value = "should save an identifier pool for later retrieval", method = "saveIdentifierSource(IdentifierSource)")
 	public void saveIdentifierSource_shouldSaveAnIdentifierPoolForLaterRetrieval() throws Exception {
 		String name = "Sample Id Gen";
-		int batchSize = 500;
+		Integer batchSize = 500;
 		
 		IdentifierPool pool = new IdentifierPool();
 		pool.setName(name);
