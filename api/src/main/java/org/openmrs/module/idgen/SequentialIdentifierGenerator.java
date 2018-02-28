@@ -173,4 +173,19 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	public void setBaseCharacterSet(String baseCharacterSet) {
 		this.baseCharacterSet = baseCharacterSet;
 	}
+	
+	/**
+	 * @return the nextSequenceValue
+	 */
+	public Long getNextSequenceValue() {
+	    if(nextSequenceValue == null) return new Long(- 1);
+	    return nextSequenceValue;
+	}
+
+	/**
+	 * @param nextSequenceValue : set the next identifier to be generated for this SequentialIdentifierGenerator
+	 */
+	public void setNextSequenceValue(Long nextSequenceValue) {
+		this.nextSequenceValue = nextSequenceValue;
+	}
 }

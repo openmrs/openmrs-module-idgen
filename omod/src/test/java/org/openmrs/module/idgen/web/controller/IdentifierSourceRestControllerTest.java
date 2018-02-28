@@ -281,7 +281,9 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     @Test
     public void shouldSaveAnIdentifierPool() throws Exception {
         long initialIdentifierSourceCount = getAllCount();
-
+	Integer batchSize =  50;
+	Integer minPoolSize  = 5;
+	
         SimpleObject identifierSource = new SimpleObject();
         identifierSource.add("name", "test identifier pool");
         identifierSource.add("description", "This is a test description for the identifier pool");
@@ -303,8 +305,8 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         assertEquals(newIdentifierSourceUuid, generatedIdentifierSource.getUuid());
         assertEquals(generatedIdentifierSource.getName(), "test identifier pool");
         assertEquals(generatedIdentifierSource.getDescription(), "This is a test description for the identifier pool");
-        assertEquals(generatedIdentifierSource.getBatchSize(), Integer.parseInt("50"));
-        assertEquals(generatedIdentifierSource.getMinPoolSize(), Integer.parseInt("5"));
+        assertEquals(generatedIdentifierSource.getBatchSize(), batchSize);
+        assertEquals(generatedIdentifierSource.getMinPoolSize(), minPoolSize);
         assertEquals(generatedIdentifierSource.getSource().getUuid(), getUuid());
         assertEquals(initialIdentifierSourceCount + 1, getAllCount());
     }
