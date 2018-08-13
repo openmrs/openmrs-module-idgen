@@ -63,7 +63,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("source", LOG_ENTRY_SOURCE_UUID);
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertNotNull(result);
-		Assert.assertEquals(3, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("identifier", "H9");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
 		req.addParameter("toDate", "2017-09-30T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -113,7 +113,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -129,7 +129,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("generatedBy", USER_UUID);
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -141,7 +141,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
 		req.addParameter("toDate", "2017-10-04T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test

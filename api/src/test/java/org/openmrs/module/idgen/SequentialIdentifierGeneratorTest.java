@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * test class for {@link SequentialIdentifierGenerator}
@@ -62,4 +64,17 @@ public class SequentialIdentifierGeneratorTest {
 		generator.getIdentifierForSeed(1);
 	}
 
+	@Test	
+	public void shouldSetNextSequenceValueToNegative() throws Exception {	
+		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();	
+		Integer minLength = 11;
+		Integer maxLength = 13;
+		generator.setBaseCharacterSet("0123456789");	
+		generator.setPrefix("FOO-");	
+		generator.setSuffix("-ACK");	
+		generator.setFirstIdentifierBase("000");	
+		generator.setMinLength(minLength);	
+		generator.setMaxLength(maxLength);	
+ 		assertThat(generator.getNextSequenceValue(), is (new Long(-1)));	
+	}
 }

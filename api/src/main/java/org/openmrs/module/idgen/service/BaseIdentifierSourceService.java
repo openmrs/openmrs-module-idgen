@@ -397,7 +397,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     public void checkAndRefillIdentifierPool(IdentifierPool pool){
         if (pool.getSource() != null && (pool.getSource() instanceof SequentialIdentifierGenerator || pool.getSource() instanceof RemoteIdentifierSource)) {
             while (pool.getMinPoolSize() > getQuantityInPool(pool, true, false)){
-                addIdentifiersToPool(pool, Integer.valueOf(pool.getBatchSize()));
+                addIdentifiersToPool(pool, pool.getBatchSize());
             }
         }
     }
