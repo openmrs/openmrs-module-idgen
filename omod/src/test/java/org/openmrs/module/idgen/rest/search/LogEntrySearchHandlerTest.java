@@ -55,7 +55,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("source", LOG_ENTRY_SOURCE_UUID);
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertNotNull(result);
-		Assert.assertEquals(3, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("identifier", "H9");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2016-10-01T12:00:00.433");
 		req.addParameter("toDate", "2017-09-30T12:00:00.433");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("generatedBy", USER_UUID);
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("generatedBy", USER_UUID);
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 	@Test
 	public void getSearchConfig_shouldReturnLogEntryByGeneratedByAndCommentAndIdentifier() throws Exception {
@@ -107,7 +107,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("comment", "New");
 		req.addParameter("identifier", "100");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertNotNull(result);
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 
@@ -129,7 +129,7 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 		req.addParameter("identifier", "100");
 		SimpleObject result = deserialize(handle(req));
 		Assert.assertNotNull(result);
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test

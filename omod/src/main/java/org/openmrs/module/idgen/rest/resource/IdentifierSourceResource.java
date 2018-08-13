@@ -14,6 +14,7 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.idgen.web.controller.IdgenRestController;
+import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,9 +45,12 @@ import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOp
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE + "/identifiersource", supportedClass = IdentifierSource.class, supportedOpenmrsVersions = {
-        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" })
+        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*","2.2.*" })
 public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierSource>{
-	
+	 public static final String IDENTIFIER_POOL = "identifierPool";
+	 public static final String REMOTE_IDENTIFIER_SOURCE = "remoteIdentifierSource";
+	 public static final String SEQUENTIAL_IDENTIFIER_GENERATOR = "sequentialIdentifierGenerator";
+	 
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 
@@ -505,5 +509,13 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
             return Boolean.FALSE;
         }
         return null;
+    }
+    @Override
+    public boolean hasTypesDefined() {
+        return true;
+    }
+     private <T extends IdentifierSource> T saveIdentifierSource(IdentifierSource identifierSource, DelegatingResourceHandler<T> resourceHandler) {
+        resourceHandler.save((T) identifierSource);
+        return (T) identifierSource;
     }
 }

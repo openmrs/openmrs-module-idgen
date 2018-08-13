@@ -176,7 +176,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     public void shouldSearchByPatientIdentifierType() throws Exception {
         MockHttpServletRequest request = newGetRequest(getURI());
         request.addParameter("identifierType", PATIENT_IDENTIFIER_TYPE_UUID);
-        List<Object> result = deserialize(handle(request)).get("results");
+        List<Object> result = (List<Object>) deserialize(handle(request)).get("results");
         assertNotNull(result);
         assertEquals(REMOTE_IDENTIFIER_SOURCE_UUID, PropertyUtils.getProperty(result.get(0), "uuid"));
     }
@@ -281,6 +281,8 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     @Test
     public void shouldSaveAnIdentifierPool() throws Exception {
         long initialIdentifierSourceCount = getAllCount();
+        Integer batchSize =  50;
+    	Integer minPoolSize  = 5;
 
         SimpleObject identifierSource = new SimpleObject();
         identifierSource.add("name", "test identifier pool");
@@ -303,8 +305,8 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         assertEquals(newIdentifierSourceUuid, generatedIdentifierSource.getUuid());
         assertEquals(generatedIdentifierSource.getName(), "test identifier pool");
         assertEquals(generatedIdentifierSource.getDescription(), "This is a test description for the identifier pool");
-        assertEquals(generatedIdentifierSource.getBatchSize(), Integer.parseInt("50"));
-        assertEquals(generatedIdentifierSource.getMinPoolSize(), Integer.parseInt("5"));
+        assertEquals(generatedIdentifierSource.getBatchSize(), batchSize);
+        assertEquals(generatedIdentifierSource.getMinPoolSize(), minPoolSize);
         assertEquals(generatedIdentifierSource.getSource().getUuid(), getUuid());
         assertEquals(initialIdentifierSourceCount + 1, getAllCount());
     }
