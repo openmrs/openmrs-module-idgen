@@ -303,8 +303,8 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         assertEquals(newIdentifierSourceUuid, generatedIdentifierSource.getUuid());
         assertEquals(generatedIdentifierSource.getName(), "test identifier pool");
         assertEquals(generatedIdentifierSource.getDescription(), "This is a test description for the identifier pool");
-        assertEquals(generatedIdentifierSource.getBatchSize(), Integer.parseInt("50"));
-        assertEquals(generatedIdentifierSource.getMinPoolSize(), Integer.parseInt("5"));
+        assertEquals(generatedIdentifierSource.getBatchSize().intValue(), Integer.parseInt("50"));
+        assertEquals(generatedIdentifierSource.getMinPoolSize().intValue(), Integer.parseInt("5"));
         assertEquals(generatedIdentifierSource.getSource().getUuid(), getUuid());
         assertEquals(initialIdentifierSourceCount + 1, getAllCount());
     }

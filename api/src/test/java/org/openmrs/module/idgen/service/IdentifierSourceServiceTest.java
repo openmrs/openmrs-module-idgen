@@ -72,7 +72,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
 		List<IdentifierSource>  sig = identifierSourceService.getAllIdentifierSources(false);
-		Assert.assertTrue(sig.size() == 6);
+		Assert.assertTrue(sig.size() == 7);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	public void getIdentifierSource_shouldReturnASavedIdentifierPool() throws Exception {
 		IdentifierPool idpool = (IdentifierPool)identifierSourceService.getIdentifierSource(3);
 		Assert.assertEquals(idpool.getName(), "Test Identifier Pool");
-		Assert.assertEquals(idpool.getBatchSize(), 1000);
+		Assert.assertEquals(idpool.getBatchSize().intValue(), 1000);
 		Assert.assertEquals(5, idpool.getAvailableIdentifiers().size());
 		Assert.assertEquals(idpool.getUsedIdentifiers().size(), 0);
 	}
@@ -211,7 +211,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		Assert.assertNotNull(source.getId()); 
 		IdentifierPool s = (IdentifierPool)identifierSourceService.getIdentifierSource(source.getId());
 		Assert.assertEquals(s.getName(), name);
-		Assert.assertEquals(s.getBatchSize(), batchSize);
+		Assert.assertEquals(s.getBatchSize().intValue(), batchSize);
 		Assert.assertEquals(4, s.getAvailableIdentifiers().size());
 	}
 
