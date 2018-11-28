@@ -36,7 +36,7 @@ import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOp
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE
 		+ "/logentry", supportedClass = LogEntry.class, supportedOpenmrsVersions = { "1.9.*", "1.10.*", "1.11.*",
-				"1.12.*", "2.0.*", "2.1.*" })
+				"1.12.*", "2.0.*", "2.1.*","2.2.*" })
 public class LogEntryResource extends DelegatingCrudResource<LogEntry> {
 
 	@Override
