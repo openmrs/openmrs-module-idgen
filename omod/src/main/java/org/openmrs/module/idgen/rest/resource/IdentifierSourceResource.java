@@ -46,7 +46,13 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE + "/identifiersource", supportedClass = IdentifierSource.class, supportedOpenmrsVersions = {
         "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" })
 public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierSource>{
-	
+	/*
+	 * Names for Types
+	 * */
+	public final String IDENTIFIER_POOL="Pool Identifier";
+	public final String SEQUENTIAL_IDENTIFIER_GENERATOR="Local Sequential Identifier Generator";
+	public final String REMOTE_IDENTIFIER_SOURCE="Remote Identifier Source";
+  
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 
