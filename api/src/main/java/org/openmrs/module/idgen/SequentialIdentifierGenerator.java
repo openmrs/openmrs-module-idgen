@@ -177,12 +177,12 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	/**
 	 * @return the nextSequenceValue
 	 */
-	public Long getNextSequenceValue() {
-		if(nextSequenceValue == null) return -1l;
-		return nextSequenceValue;
+	public Long getNextSequenceValue() {	
+		return nextSequenceValue == null ? -1l : nextSequenceValue;
 	}
+	
  	/**
-	 * @param nextSequenceValue : set the next identifier to be generated for this SequentialIdentifierGenerator
+	 * @param nextSequenceValue set the next identifier to be generated for this SequentialIdentifierGenerator
 	 */
 	public void setNextSequenceValue(Long nextSequenceValue) {
 		this.nextSequenceValue = nextSequenceValue;
