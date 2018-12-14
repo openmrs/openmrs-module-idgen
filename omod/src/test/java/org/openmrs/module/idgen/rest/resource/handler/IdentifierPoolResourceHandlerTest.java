@@ -1,117 +1,133 @@
+/**
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
 package org.openmrs.module.idgen.rest.resource.handler;
 
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
-import org.openmrs.module.idgen.rest.resource.IdentifierSourceResource;
+import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
-import org.openmrs.test.BaseContextMockTest;
+import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription.Property;
+import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class IdentifierPoolResourceHandlerTest extends BaseContextMockTest{
-	public static final String SAMPLE_ID = "0d47284f-9e33-4a81-a88b-8bb42bc0a901";
-	public static final String RESERVED_ID = "0d73784f-9e0b-4a81-a99b-7bC45bc0a922";
-	@InjectMocks
-	IdentifierPoolResourceHandler idpoolhandler;
-	@Mock
-	IdentifierPool pool;
-	@Mock
-	Representation rep;
-	@Mock
-	DelegatingResourceDescription representationDescription;
+public class IdentifierPoolResourceHandlerTest extends BaseModuleWebContextSensitiveTest {
+	
+	@Autowired
+	IdentifierSourceService service;
+	
+	@Autowired
+	private IdentifierPoolResourceHandler handler;
+	
+	private IdentifierPool pool;
+	
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		pool = new IdentifierPool();
 	}
-	@Test
-	public void getResourceVersion_shouldReturnResourceVersion() {
-		String resourceVersion="2.2";
-		when(idpoolhandler.getResourceVersion()).thenReturn(resourceVersion);
-		assertThat(idpoolhandler.getResourceVersion(), is(new IdentifierPoolResourceHandler().getResourceVersion()));
-	}
+	
 	@Test
 	public void newDelegate_shouldReturnIdentifierPoolDelegateInstance() throws Exception {
-		Object obj = idpoolhandler.newDelegate();
-		if(obj!=null) 
-			obj=true;
-		assertTrue(true);
+		assertTrue(handler.newDelegate().getClass().isAssignableFrom(IdentifierPool.class));
 	}
+	
 	@Test
 	public void save_shouldSaveIdentifierToPool() throws Exception {
-		pool.setId(0);
-		pool.setSource(pool);
 		pool.setBatchSize(100);
 		pool.setSequential(true);
 		pool.setRefillWithScheduledTask(true);
-		when(idpoolhandler.save(pool)).thenReturn(pool);
-	    assertThat(idpoolhandler.save(pool),is(equalTo(pool)));
-		}
-	@Test
-	public void getRepresentationDescription_shouldReturnRepresentationDescription_GivenRepresentation()throws Exception  {
-		if(rep.DEFAULT != null) {
-		representationDescription.addProperty("uuid");
-        representationDescription.addProperty("name");
-        representationDescription.addProperty("identifierType", Representation.REF);
-        }
-        else if(rep.FULL != null) {
-        	representationDescription.addProperty("uuid");
-        representationDescription.addProperty("name");
-        representationDescription.addProperty("identifierType", Representation.FULL);
-        representationDescription.addProperty("password");
-        representationDescription.addProperty("url");
-        representationDescription.addProperty("user");
-        }
-        else if(rep.REF != null) {
-        	 representationDescription.addProperty("uuid");
-	         representationDescription.addProperty("name");
-        }
-        	
-        
-		when(idpoolhandler.getRepresentationDescription(rep.DEFAULT)).thenReturn(representationDescription);
-		when(idpoolhandler.getRepresentationDescription(rep.FULL)).thenReturn(representationDescription);
-		when(idpoolhandler.getRepresentationDescription(rep.REF)).thenReturn(representationDescription);
-		assertThat(representationDescription, is(idpoolhandler.getRepresentationDescription(rep.DEFAULT)));
-		assertThat(representationDescription, is(idpoolhandler.getRepresentationDescription(rep.FULL)));
-		assertThat(representationDescription, is(idpoolhandler.getRepresentationDescription(rep.REF)));
+		pool.setName("Sample Pool");
+		pool.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
+		int savedIdentifierSourceId = handler.save(pool).getId();
+		IdentifierSource src = service.getIdentifierSource(savedIdentifierSourceId);
+		assertTrue(src.getClass().isAssignableFrom(IdentifierPool.class));
+		assertEquals("Sample Pool", src.getName());
+
 	}
+	
 	@Test
-	public void getCreatableProperties_shouldReturnCreatableProperties()throws Exception  {
-		representationDescription.addProperty("name");
-		representationDescription.addProperty("identifierType");
-		representationDescription.addProperty("sequential");
-		representationDescription.addProperty("refillWithScheduledTask");
-		representationDescription.addProperty("source");
-		representationDescription.addProperty("batchSize");
-		representationDescription.addProperty("minPoolSize");	
-		when(idpoolhandler.getCreatableProperties()).thenReturn(representationDescription);
+	public void getRepresentationDescription_shouldReturnRepresentationDescriptionFromRepresentation() throws Exception  {
+		Representation defaultRep = new DefaultRepresentation();
+		Map<String, Property> properties = handler.getRepresentationDescription(defaultRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("name"));
+		assertNotNull(properties.get("display"));
+		assertNull(properties.get("url"));
+		assertEquals(DefaultRepresentation.class, properties.get("identifierType").getRep().getClass());
 		
-	    assertThat(representationDescription, is(idpoolhandler.getCreatableProperties()));
+		Representation fullRep = new FullRepresentation();
+		properties = handler.getRepresentationDescription(fullRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("name"));
+		assertNotNull(properties.get("display"));
+		assertNotNull(properties.get("url"));
+		assertNotNull(properties.get("user"));
+		assertNotNull(properties.get("password"));
+		assertEquals(FullRepresentation.class, properties.get("identifierType").getRep().getClass());
+		
+		Representation refRep = new RefRepresentation();
+		properties = handler.getRepresentationDescription(refRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("display"));
+		assertNull(properties.get("url"));
+		assertNull(properties.get("user"));
+		assertNull(properties.get("password"));
+		assertEquals(RefRepresentation.class, properties.get("identifierType").getRep().getClass());
 	}
+	
 	@Test
-	public void getUpdatableProperties_shouldReturnUpdatableProperties()throws Exception  {
-		representationDescription.addProperty("sequential");
-        representationDescription.addProperty("refillWithScheduledTask");
-        representationDescription.addProperty("source");
-        representationDescription.addProperty("batchSize");
-        representationDescription.addProperty("minPoolSize");
-        when(idpoolhandler.getUpdatableProperties()).thenReturn(representationDescription);
-        assertThat(representationDescription, is(idpoolhandler.getUpdatableProperties()));
+	public void getCreatableProperties_shouldReturnCreatableProperties() throws Exception  {
+		Map<String, Property> properties = handler.getCreatableProperties().getProperties();
+		assertThat(properties.size(), is(7));
+		assertTrue(properties.keySet().contains("name"));
+		assertTrue(properties.keySet().contains("identifierType"));
+		assertTrue(properties.keySet().contains("sequential"));
+		assertTrue(properties.keySet().contains("refillWithScheduledTask"));
+		assertTrue(properties.keySet().contains("source"));
+		assertTrue(properties.keySet().contains("batchSize"));
+		assertTrue(properties.keySet().contains("minPoolSize"));
 	}
+	
+	@Test
+	public void getUpdatableProperties_shouldReturnUpdatableProperties() throws Exception  {
+		Map<String, Property> properties = handler.getUpdatableProperties().getProperties();
+		assertThat(properties.size(), is(5));
+		assertTrue(properties.keySet().contains("sequential"));
+		assertTrue(properties.keySet().contains("refillWithScheduledTask"));
+		assertTrue(properties.keySet().contains("source"));
+		assertTrue(properties.keySet().contains("batchSize"));
+		assertTrue(properties.keySet().contains("minPoolSize"));
+		
+	}
+	
 	@Test 
-	public void getTypeName_shouldReturnTypeName()throws Exception  {
-		String typeName="Pool Identifier";
-		when(idpoolhandler.getTypeName()).thenReturn(typeName);
-		assertThat(idpoolhandler.getTypeName(), is(new IdentifierSourceResource().IDENTIFIER_POOL));
+	public void getTypeName_shouldReturnTypeName() throws Exception  {
+		assertEquals("Pool Identifier", handler.getTypeName());
 	}
-	//public void getAllByType_shouldReturnAllTypes()throws Exception  {}
+	
 }

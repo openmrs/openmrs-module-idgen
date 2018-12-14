@@ -1,120 +1,122 @@
 package org.openmrs.module.idgen.rest.resource.handler;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
+import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
-import org.openmrs.module.idgen.rest.resource.IdentifierSourceResource;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
-import org.openmrs.test.BaseContextMockTest;
+import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription.Property;
+import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class RemoteIdentifierSourceResourceHandlerTest extends BaseContextMockTest{
-
-	public static final String SAMPLE_ID = "0d43034f-8f33-4a02-a33b-0bb42cd0a357";
-	public static final String URL = "https://www.journaldev.com/21866/mockito-mock-examples";
-	public static final String NAME = "ugandaemr";
-	public static final String PASSWORD = "Uganda123EmR";
+public class RemoteIdentifierSourceResourceHandlerTest extends BaseModuleWebContextSensitiveTest {
 	
-	@InjectMocks
-	RemoteIdentifierSourceResourceHandler handler;
-	@Mock
-	RemoteIdentifierSource remoteid;
-	@Mock
-	DelegatingResourceDescription representationDescription;
-	@Mock
-	Representation rep;
+	@Autowired
+	private RemoteIdentifierSourceResourceHandler handler;
+	
+	@Autowired
+	private IdentifierSourceService service;
+	
+	private static final String URL = "https://www.journaldev.com/21866/mockito-mock-examples";
+	
+	private static final String NAME = "Sample Name";
+	
+	private static final String PASSWORD = "Some password";
+	
+	private RemoteIdentifierSource remoteid;
+	
+	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
+		remoteid = new RemoteIdentifierSource();
 	}
-	@Test
-	public void getResourceVersion_shouldReturnResourceVersion() {
-		String resourceVersion="2.2";
-		when(handler.getResourceVersion()).thenReturn(resourceVersion);
-		assertThat(handler.getResourceVersion(), is(new RemoteIdentifierSourceResourceHandler().getResourceVersion()));
-	}
-	//@Test
-	public void newDelegate_shouldReturnRemoteIdentifierSourceDelegateInstance()throws Exception  {
-		when(handler.newDelegate()).thenReturn(new RemoteIdentifierSourceResourceHandler().newDelegate());
-		assertThat(handler.newDelegate(), is(not(null)));
-	}
-	//@Test
-	public void save_shouldSaveRemoteIdentifierSource()throws Exception  {
-		//remoteid.addReservedIdentifier(SAMPLE_ID);
-		remoteid.setId(0);
-		remoteid.setUrl("https://www.journaldev.com/21866/mockito-mock-examples");
-		remoteid.setName("UgandaEMR");
-		remoteid.setPassword("Uganda123EmR");
-		handler.save(remoteid);
 	
-		when(handler.save(remoteid)).thenReturn(remoteid);
-		assertThat(remoteid.getUrl(), is(URL));
-		assertThat(remoteid.getPassword(), is(PASSWORD));
-		assertThat(remoteid.getName(), is(NAME));
+	@Test
+	public void newDelegate_shouldReturnRemoteIdentifierSourceDelegateInstance() throws Exception  {
+		assertTrue(handler.newDelegate().getClass().isAssignableFrom(RemoteIdentifierSource.class));
 	}
+	
+	@Test
+	public void save_shouldSaveRemoteIdentifierSource() throws Exception  {
+		remoteid.setUrl(URL);
+		remoteid.setName(NAME);
+		remoteid.setPassword(PASSWORD);
+		remoteid.setIdentifierType(Context.getPatientService().getPatientIdentifierType(1));
+		handler.save(remoteid);
+		int savedIdentifierSourceId = handler.save(remoteid).getId();
+		RemoteIdentifierSource src = (RemoteIdentifierSource)service.getIdentifierSource(savedIdentifierSourceId);
+		assertTrue(src.getClass().isAssignableFrom(RemoteIdentifierSource.class));
+		assertEquals(NAME, src.getName());
+		assertEquals(PASSWORD, src.getPassword());
+		assertEquals(URL, src.getUrl());
+		
+	}
+	
 	@Test
 	public void getRepresentationDescription_shouldReturnRepresentationDescription_GivenType()throws Exception  {
-		if(rep.DEFAULT != null) {
-			representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("identifierType", Representation.REF);
-            representationDescription.addSelfLink();
-			
-        }
-        else if(rep.FULL != null) {
-        	representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("identifierType", Representation.FULL);
-            representationDescription.addProperty("password");
-            representationDescription.addProperty("url");
-            representationDescription.addSelfLink();
-			
-        }
-        else if(rep.REF != null) {
-        	representationDescription.addProperty("uuid");
-	         representationDescription.addProperty("name");
-	         representationDescription.addSelfLink();
-			
-        }
-        	
-        
-		when(handler.getRepresentationDescription(rep.DEFAULT)).thenReturn(representationDescription);
-		when(handler.getRepresentationDescription(rep.FULL)).thenReturn(representationDescription);
-		when(handler.getRepresentationDescription(rep.REF)).thenReturn(representationDescription);
-		assertThat(representationDescription, is(handler.getRepresentationDescription(rep.DEFAULT)));
-		assertThat(representationDescription, is(handler.getRepresentationDescription(rep.FULL)));
-		assertThat(representationDescription, is(handler.getRepresentationDescription(rep.REF)));
+		Representation defaultRep = new DefaultRepresentation();
+		Map<String, Property> properties = handler.getRepresentationDescription(defaultRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("name"));
+		assertNotNull(properties.get("display"));
+		assertNull(properties.get("url"));
+		assertEquals(DefaultRepresentation.class, properties.get("identifierType").getRep().getClass());
+		
+		Representation fullRep = new FullRepresentation();
+		properties = handler.getRepresentationDescription(fullRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("name"));
+		assertNotNull(properties.get("display"));
+		assertNotNull(properties.get("url"));
+		assertNotNull(properties.get("user"));
+		assertNotNull(properties.get("password"));
+		assertEquals(FullRepresentation.class, properties.get("identifierType").getRep().getClass());
+		
+		Representation refRep = new RefRepresentation();
+		properties = handler.getRepresentationDescription(refRep).getProperties();
+		assertNotNull(properties.get("uuid"));
+		assertNotNull(properties.get("display"));
+		assertNull(properties.get("url"));
+		assertNull(properties.get("user"));
+		assertNull(properties.get("password"));
+		assertEquals(RefRepresentation.class, properties.get("identifierType").getRep().getClass());
 	}
+	
     @Test
 	public void getCreatableProperties_shouldReturnCreatableProperties()throws Exception  {
-		representationDescription.addProperty("uuid");
-		representationDescription.addProperty("name");
-        representationDescription.addProperty("password");
-        representationDescription.addProperty("url");	
-		when(handler.getCreatableProperties()).thenReturn(representationDescription);
-		
-	    assertThat(representationDescription, is(handler.getCreatableProperties()));
+    	Map<String, Property> properties = handler.getCreatableProperties().getProperties();
+		assertThat(properties.size(), is(4));
+		assertTrue(properties.keySet().contains("name"));
+		assertTrue(properties.keySet().contains("url"));
+		assertTrue(properties.keySet().contains("password"));
+		assertTrue(properties.keySet().contains("uuid"));
+
 	}
+    
     @Test
 	public void getUpdatableProperties_shouldReturnUpdatableProperties()throws Exception  {
-		representationDescription.addProperty("name");
-        representationDescription.addProperty("password");
-        representationDescription.addProperty("url");
-        when(handler.getUpdatableProperties()).thenReturn(representationDescription);
-        assertThat(representationDescription, is(handler.getUpdatableProperties()));
+    	Map<String, Property> properties = handler.getUpdatableProperties().getProperties();
+		assertThat(properties.size(), is(3));
+		assertTrue(properties.keySet().contains("name"));
+		assertTrue(properties.keySet().contains("password"));
+		assertTrue(properties.keySet().contains("url"));
+		
 	}
+    
     @Test
 	public void getTypeName_shouldReturnTypeName()throws Exception  {
-    	String typeName="Remote Identifier Source";
-		when(handler.getTypeName()).thenReturn(typeName);
-		assertThat(handler.getTypeName(), is(new IdentifierSourceResource().REMOTE_IDENTIFIER_SOURCE));
+    	assertEquals("Remote Identifier Source", handler.getTypeName());
 	}
-	public void getAllByType_shouldReturnAllTypes()throws Exception  {}
+    
 }

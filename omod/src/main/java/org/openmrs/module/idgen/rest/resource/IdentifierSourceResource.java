@@ -49,9 +49,9 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
 	/*
 	 * Names for Types
 	 * */
-	public final String IDENTIFIER_POOL="Pool Identifier";
-	public final String SEQUENTIAL_IDENTIFIER_GENERATOR="Local Sequential Identifier Generator";
-	public final String REMOTE_IDENTIFIER_SOURCE="Remote Identifier Source";
+	public final static String IDENTIFIER_POOL="Pool Identifier";
+	public final static String SEQUENTIAL_IDENTIFIER_GENERATOR="Local Sequential Identifier Generator";
+	public final static String REMOTE_IDENTIFIER_SOURCE="Remote Identifier Source";
   
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
