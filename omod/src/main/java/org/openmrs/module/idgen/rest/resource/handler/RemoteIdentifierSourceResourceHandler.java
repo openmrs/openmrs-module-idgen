@@ -46,30 +46,30 @@ implements DelegatingSubclassHandler<IdentifierSource, RemoteIdentifierSource> {
 		DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 		if (representation instanceof DefaultRepresentation) {
 			representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("display");
-            representationDescription.addProperty("identifierType", Representation.DEFAULT);
-            representationDescription.addSelfLink();
+            		representationDescription.addProperty("name");
+            		representationDescription.addProperty("display");
+            		representationDescription.addProperty("identifierType", Representation.DEFAULT);
+            		representationDescription.addSelfLink();
 			return representationDescription;
 		}
 		if (representation instanceof FullRepresentation) {
 			representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("display");
-            representationDescription.addProperty("identifierType", Representation.FULL);
-            representationDescription.addProperty("password");
-            representationDescription.addProperty("user");
-            representationDescription.addProperty("url");
-            representationDescription.addSelfLink();
+            		representationDescription.addProperty("name");
+            		representationDescription.addProperty("display");
+            		representationDescription.addProperty("identifierType", Representation.FULL);
+            		representationDescription.addProperty("password");
+            		representationDescription.addProperty("user");
+            		representationDescription.addProperty("url");
+            		representationDescription.addSelfLink();
 			return representationDescription;
 		}
 		if (representation instanceof RefRepresentation) {
-			 representationDescription.addProperty("uuid");
-	         representationDescription.addProperty("name");
-	         representationDescription.addProperty("display");
-	         representationDescription.addProperty("identifierType", Representation.REF);
-	         representationDescription.addSelfLink();
-	         return representationDescription;
+			representationDescription.addProperty("uuid");
+	         	representationDescription.addProperty("name");
+	         	representationDescription.addProperty("display");
+	         	representationDescription.addProperty("identifierType", Representation.REF);
+	         	representationDescription.addSelfLink();
+	         	return representationDescription;
 		}
 		return null;
 	}
@@ -79,17 +79,17 @@ implements DelegatingSubclassHandler<IdentifierSource, RemoteIdentifierSource> {
 		DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 		representationDescription.addProperty("uuid");
 		representationDescription.addProperty("name");
-        representationDescription.addProperty("password");
-        representationDescription.addProperty("url");
+        	representationDescription.addProperty("password");
+        	representationDescription.addProperty("url");
 		return representationDescription;
 	}
 	
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
-        representationDescription.addProperty("name");
-        representationDescription.addProperty("password");
-        representationDescription.addProperty("url");
+        	representationDescription.addProperty("name");
+        	representationDescription.addProperty("password");
+        	representationDescription.addProperty("url");
 		return representationDescription;
 	}
 
