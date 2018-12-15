@@ -47,41 +47,41 @@ implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
 		return new IdentifierPool();
 	}
 	
-    @Override
-    public IdentifierPool save(IdentifierPool delegate) {
-          service.saveIdentifierSource(delegate);
-	      return delegate;
-    }
+    	@Override
+    	public IdentifierPool save(IdentifierPool delegate) {
+          	service.saveIdentifierSource(delegate);
+	      	return delegate;
+    	}
     
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation representation) {
 		if (representation instanceof DefaultRepresentation) {
 			DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 			representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("identifierType", Representation.DEFAULT);
-            representationDescription.addSelfLink();
-            representationDescription.addProperty("display");
+            		representationDescription.addProperty("name");
+            		representationDescription.addProperty("identifierType", Representation.DEFAULT);
+            		representationDescription.addSelfLink();
+            		representationDescription.addProperty("display");
 			return representationDescription;	
 		}
 		if (representation instanceof FullRepresentation) {
 			DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 			representationDescription.addProperty("uuid");
-            representationDescription.addProperty("name");
-            representationDescription.addProperty("identifierType", Representation.FULL);
-            representationDescription.addProperty("password");
-            representationDescription.addProperty("url");
-            representationDescription.addProperty("user");
-            representationDescription.addProperty("display");
-            representationDescription.addSelfLink();
+		    	representationDescription.addProperty("name");
+		    	representationDescription.addProperty("identifierType", Representation.FULL);
+		    	representationDescription.addProperty("password");
+		    	representationDescription.addProperty("url");
+		    	representationDescription.addProperty("user");
+		    	representationDescription.addProperty("display");
+		    	representationDescription.addSelfLink();
 			return representationDescription;
 		}
 		if (representation instanceof RefRepresentation) {
 			DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 			representationDescription.addProperty("uuid");
-	        representationDescription.addProperty("display");
-	        representationDescription.addProperty("identifierType", Representation.REF);
-	        representationDescription.addSelfLink();
+	        	representationDescription.addProperty("display");
+	        	representationDescription.addProperty("identifierType", Representation.REF);
+	        	representationDescription.addSelfLink();
 			return representationDescription;
 		}
 		
@@ -105,10 +105,10 @@ implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();
 		representationDescription.addProperty("sequential");
-        representationDescription.addProperty("refillWithScheduledTask");
-        representationDescription.addProperty("source");
-        representationDescription.addProperty("batchSize");
-        representationDescription.addProperty("minPoolSize");
+        	representationDescription.addProperty("refillWithScheduledTask");
+        	representationDescription.addProperty("source");
+        	representationDescription.addProperty("batchSize");
+        	representationDescription.addProperty("minPoolSize");
 		return representationDescription;
 	}
 	
