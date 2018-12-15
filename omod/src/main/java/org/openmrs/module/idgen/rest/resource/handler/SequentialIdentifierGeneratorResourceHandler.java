@@ -48,7 +48,7 @@ implements DelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGener
 			representationDescription.addProperty("firstIdentifierBase");
 			representationDescription.addProperty("minLength");
 			representationDescription.addProperty("maxLength");
-            representationDescription.addProperty("identifierType", Representation.DEFAULT);
+            		representationDescription.addProperty("identifierType", Representation.DEFAULT);
 			representationDescription.addSelfLink();
 			return representationDescription;
 		}
@@ -60,13 +60,13 @@ implements DelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGener
 			representationDescription.addProperty("firstIdentifierBase");
 			representationDescription.addProperty("minLength");
 			representationDescription.addProperty("maxLength");
-            representationDescription.addProperty("identifierType", Representation.FULL);
+            		representationDescription.addProperty("identifierType", Representation.FULL);
 			representationDescription.addSelfLink();
 			return representationDescription;
 		}
 		if (representation instanceof RefRepresentation) {
 			representationDescription.addProperty("baseCharacterSet");
-            representationDescription.addProperty("identifierType", Representation.REF);
+            		representationDescription.addProperty("identifierType", Representation.REF);
 			representationDescription.addSelfLink();
 			return representationDescription;
 		}
