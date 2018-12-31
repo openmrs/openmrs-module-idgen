@@ -63,4 +63,9 @@ public class IdentifierResource implements SubResource {
     public SimpleObject getAll(String parentUniqueId, RequestContext context) throws ResponseException {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void put(String parentUniqueId, SimpleObject post, RequestContext context) throws ResponseException {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -188,7 +188,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	public void shouldPurgeAnAutoGenerationOption() throws Exception {
 		assertNotNull(identifierSourceService.getAutoGenerationOption(getId()));
 		MockHttpServletRequest req = request(RequestMethod.DELETE, getURI() + "/" + getUuid());
-		req.addParameter("purge", "");
+		req.addParameter("purge", "true");
 		handle(req);
 		assertNull(identifierSourceService.getAutoGenerationOption(getId()));
 	}
