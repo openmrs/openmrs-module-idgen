@@ -14,12 +14,14 @@
 package org.openmrs.module.idgen;
 
 import java.util.Date;
+
+import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.User;
 
 /**
  * Component which encapsulates a Log entry
  */
-public class LogEntry {
+public class LogEntry extends BaseOpenmrsMetadata {
 	
 	//***** PROPERTIES *****
 	

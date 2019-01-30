@@ -12,7 +12,6 @@ package org.openmrs.module.idgen.rest.controller;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -29,7 +28,6 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
         return "idgen/identifiersource";
     }
 
-    @Ignore
     @Test
     public void shouldGetNewIdentifier_SequenceIdentifierGenerator() throws Exception {
         SimpleObject result = deserialize(handle(
@@ -39,7 +37,6 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
         assertEquals("MRS000011", result.get(IdentifierResource.IDENTIFIER_KEY));
     }
 
-    @Ignore
     @Test
     public void shouldGetNewIdentifier_PooledIdentifier() throws Exception {
         SimpleObject result = deserialize(handle(
@@ -48,7 +45,7 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
 
         assertEquals("0-0", result.get(IdentifierResource.IDENTIFIER_KEY));
     }
-
+    
 	@Override
 	public long getAllCount() {
 		return 7;

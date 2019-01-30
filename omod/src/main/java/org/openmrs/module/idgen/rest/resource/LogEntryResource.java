@@ -18,6 +18,7 @@ import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.idgen.web.controller.IdgenRestController;
+import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -28,16 +29,23 @@ import org.openmrs.module.webservices.rest.web.representation.FullRepresentation
 import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.EmptySearchResult;
+import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
+import org.openmrs.module.webservices.rest.web.response.ResponseException;
+
+import io.swagger.models.Model;
+import io.swagger.models.ModelImpl;
+import io.swagger.models.properties.DateProperty;
+import io.swagger.models.properties.RefProperty;
+import io.swagger.models.properties.StringProperty;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE
 		+ "/logentry", supportedClass = LogEntry.class, supportedOpenmrsVersions = { "1.9.*", "1.10.*", "1.11.*",
-				"1.12.*", "2.0.*", "2.1.*" })
-public class LogEntryResource extends DelegatingCrudResource<LogEntry> {
+				"1.12.*", "2.0.*", "2.1.*", "2.2.*" })
+public class LogEntryResource extends MetadataDelegatingCrudResource<LogEntry> {
 
 	@Override
 	protected NeedsPaging<LogEntry> doGetAll(RequestContext context) {
@@ -123,14 +131,50 @@ public class LogEntryResource extends DelegatingCrudResource<LogEntry> {
 	}
 
 	@Override
-	protected void delete(LogEntry delegate, String reason, RequestContext context)
-			throws ResourceDoesNotSupportOperationException {
-		throw new ResourceDoesNotSupportOperationException();
-	}
-
-	@Override
 	public void purge(LogEntry delegate, RequestContext context) throws ResourceDoesNotSupportOperationException {
 		throw new ResourceDoesNotSupportOperationException();
+	}
+	
+	@Override
+	public Model getGETModel(Representation rep) {
+		ModelImpl model = ((ModelImpl) super.getGETModel(rep));
+		
+		if (rep instanceof RefRepresentation) {
+			model   
+					.property("uuid", new StringProperty())
+					.property("identifier", new StringProperty())
+					.property("display", new StringProperty());
+		}	
+		if (!(rep instanceof FullRepresentation)) {
+			model
+					.property("uuid", new StringProperty())
+			        .property("name", new StringProperty())
+			        .property("identifier", new StringProperty())
+			        .property("comment", new StringProperty())
+			        .property("generatedBy", new RefProperty("#/definitions/UserGet"))
+			        .property("dateGenerated", new DateProperty())
+			        .property("description", new StringProperty());
+		}
+		if (rep instanceof DefaultRepresentation) {
+			model   
+					.property("full", new StringProperty());
+		}
+		return model;
+	}
+	
+	@Override
+    public Object update(String uuid, SimpleObject updateBody, RequestContext context) throws ResponseException {
+		throw new ResourceDoesNotSupportOperationException();
+	}
+	
+	@Override
+	public Model getCREATEModel(Representation rep) {
+		return null;
+	}
+	
+	@Override
+	public Model getUPDATEModel(Representation rep) {
+		return null;
 	}
 
 }
