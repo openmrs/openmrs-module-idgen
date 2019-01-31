@@ -25,6 +25,12 @@ import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.webservices.validation.ValidationException;
+
+import io.swagger.models.Model;
+import io.swagger.models.ModelImpl;
+import io.swagger.models.properties.RefProperty;
+import io.swagger.models.properties.StringProperty;
+
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -35,25 +41,29 @@ import org.openmrs.module.webservices.rest.web.representation.FullRepresentation
 import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
-import org.openmrs.module.webservices.rest.web.resource.impl.AlreadyPaged;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.EmptySearchResult;
+import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE + "/identifiersource", supportedClass = IdentifierSource.class, supportedOpenmrsVersions = {
-        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" })
-public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierSource>{
+        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" , "2.2.*"})
+public class IdentifierSourceResource extends MetadataDelegatingCrudResource<IdentifierSource> { 
 	
+	/*
+	 * Names for Types
+	 * */
+	public final static String IDENTIFIER_POOL = "identifierpool";
+	public final static String SEQUENTIAL_IDENTIFIER_GENERATOR = "sequentialidentifiergenerator";
+	public final static String REMOTE_IDENTIFIER_SOURCE = "remoteidentifiersource";
+  
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
-
         DelegatingResourceDescription description = null;
-
         if (rep instanceof RefRepresentation) {
-            description = new DelegatingResourceDescription();
+        	description = new DelegatingResourceDescription();
             description.addProperty("uuid");
             description.addProperty("display");
             description.addSelfLink();
@@ -75,9 +85,9 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
 	
     @Override
     public DelegatingResourceDescription getCreatableProperties() {
-        DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addProperty("name");
-        description.addProperty("description");
+    	 DelegatingResourceDescription description = new DelegatingResourceDescription();
+    	 description.addProperty("name");
+    	 description.addProperty("description");
         description.addProperty("identifierType");
         return description;
     }
@@ -465,7 +475,7 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
     }
 	
     @Override
-    protected void delete(IdentifierSource identifierSource, String reason, RequestContext context) throws ResponseException {
+    public void delete(IdentifierSource identifierSource, String reason, RequestContext context) throws ResponseException {
         Context.getService(IdentifierSourceService.class).retireIdentifierSource(identifierSource, reason);
     }
 	
@@ -493,6 +503,39 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
         return new EmptySearchResult();
     }
     
+    @Override
+    public boolean hasTypesDefined() {
+        return true;
+    }
+    
+    @Override
+	public Model getGETModel(Representation rep) {
+		ModelImpl model = new ModelImpl();
+		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
+        	model.property("uuid", new StringProperty());
+        	model.property("name", new StringProperty());
+        	model.property("description", new StringProperty());
+			model.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"));
+		} else {
+			model.property("uuid", new StringProperty());
+			model.property("display", new StringProperty());
+		}
+		return model;
+	}
+	
+	@Override
+	public Model getCREATEModel(Representation rep) {
+		return new ModelImpl()
+				.property("name", new StringProperty())
+				.property("description", new StringProperty())
+				.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"));
+	}
+	
+	@Override
+	public Model getUPDATEModel(Representation rep) {
+		return getCREATEModel(rep); //FIXME add impl
+	}
+
     private Boolean parseBoolean(Object value) {
         List<String> trueValues = Arrays.asList("true", "1", "on", "yes");
         List<String> falseValues = Arrays.asList("false", "0", "off", "no"); 
@@ -506,4 +549,5 @@ public class IdentifierSourceResource extends DelegatingCrudResource<IdentifierS
         }
         return null;
     }
+    
 }

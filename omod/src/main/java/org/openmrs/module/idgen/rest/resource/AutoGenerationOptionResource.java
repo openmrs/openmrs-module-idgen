@@ -28,11 +28,18 @@ import org.openmrs.module.webservices.rest.web.representation.FullRepresentation
 import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
+import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.response.ObjectNotFoundException;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import org.openmrs.module.webservices.validation.ValidationException;
+
+import io.swagger.models.Model;
+import io.swagger.models.ModelImpl;
+import io.swagger.models.properties.BooleanProperty;
+import io.swagger.models.properties.RefProperty;
+import io.swagger.models.properties.StringProperty;
+
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import java.util.ArrayList;
@@ -41,8 +48,8 @@ import java.util.List;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE
         + "/autogenerationoption", supportedClass = AutoGenerationOption.class, supportedOpenmrsVersions = { "1.9.*",
-                "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*" })
-public class AutoGenerationOptionResource extends DelegatingCrudResource<AutoGenerationOption> {
+                "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*" })
+public class AutoGenerationOptionResource extends MetadataDelegatingCrudResource<AutoGenerationOption> {
 	
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
@@ -239,5 +246,49 @@ public class AutoGenerationOptionResource extends DelegatingCrudResource<AutoGen
 			return Boolean.FALSE;
 		}
 		return null;
+	}
+	
+	@Override
+	public Model getGETModel(Representation rep) {
+		ModelImpl model = ((ModelImpl) super.getGETModel(rep));
+		
+		if (rep instanceof RefRepresentation) {
+			model   
+					.property("uuid", new StringProperty())
+					.property("display", new StringProperty());
+		}	
+		if (!(rep instanceof RefRepresentation)) {
+			model
+					.property("uuid", new StringProperty())
+			        .property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"))
+			        .property("location", new RefProperty("#/definitions/LocationGet"))
+			        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
+			        .property("manualEntryEnabled", new BooleanProperty())
+			        .property("automaticGenerationEnabled", new BooleanProperty());
+		}
+		if (rep instanceof DefaultRepresentation) {
+			model   
+					.property("full", new StringProperty());
+		}
+		return model;
+	}
+	
+	@Override
+	public Model getCREATEModel(Representation rep) {
+		return new ModelImpl()
+				.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"))
+				.property("location", new RefProperty("#/definitions/LocationGet"))
+		        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
+		        .property("manualEntryEnabled", new BooleanProperty())
+		        .property("automaticGenerationEnabled", new BooleanProperty());
+	}
+	
+	@Override
+	public Model getUPDATEModel(Representation rep) {
+		return new ModelImpl()
+				.property("location", new RefProperty("#/definitions/LocationGet"))
+		        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
+		        .property("manualEntryEnabled", new BooleanProperty())
+		        .property("automaticGenerationEnabled", new BooleanProperty());
 	}
 }

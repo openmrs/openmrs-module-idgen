@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 
@@ -202,6 +203,7 @@ public abstract class BaseIdentifierSource extends IdentifierSource {
 	/** 
 	 * @return the retired
 	 */
+	@JsonIgnore
 	public Boolean isRetired() {
 		return retired;
 	}

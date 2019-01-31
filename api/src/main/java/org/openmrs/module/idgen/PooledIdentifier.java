@@ -16,9 +16,12 @@ package org.openmrs.module.idgen;
 import java.util.Date;
 import java.util.UUID;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * Component which encapsulates an identifier that has been allocated to an Identifier Pool
  */
+@JsonIgnoreProperties("pool")
 public class PooledIdentifier {
 	
 	//***** PROPERTIES *****

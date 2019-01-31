@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.idgen.service;
 
-import junit.framework.Assert;
 import org.hibernate.NonUniqueResultException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -23,8 +23,6 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.*;
-import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
-import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;

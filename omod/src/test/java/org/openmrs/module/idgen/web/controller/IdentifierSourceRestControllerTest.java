@@ -33,7 +33,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
-import org.junit.Ignore;
 import org.openmrs.module.webservices.rest.test.Util;
 
 public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
@@ -141,8 +140,8 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
         assertThat(
                 identifiersAfterUpload.get("identifiers").toString(), allOf(
-                containsString("Test Identifier Pool: G-0"),
-                containsString("Test Identifier Pool: H-8")
+                containsString("G-0"),
+                containsString("H-8")
         ));
     }
     
@@ -164,10 +163,10 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
         assertThat(
                 identifiersAfterUpload.get("identifiers").toString(), allOf(
-                containsString("Test Identifier Pool: 1"),
-                containsString("Test Identifier Pool: 2"),
-                containsString("Test Identifier Pool: 3"),
-                containsString("Test Identifier Pool: 4")
+                containsString("1"),
+                containsString("2"),
+                containsString("3"),
+                containsString("4")
         ));
         
     }

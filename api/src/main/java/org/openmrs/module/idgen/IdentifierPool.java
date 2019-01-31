@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * Identifier Source which contains a pre-generated pool of identifiers,
  * and which typically is used in conjunction with another IdentifierSource 
@@ -131,6 +133,7 @@ public class IdentifierPool extends BaseIdentifierSource {
 	/**
 	 * @return boolean describing whether this is sequential
 	 */
+	@JsonIgnore
 	public Boolean isSequential() {
 		return sequential;
 	}
@@ -141,6 +144,14 @@ public class IdentifierPool extends BaseIdentifierSource {
 	public void setSequential(Boolean sequential) {
 		this.sequential = sequential;
 	}
+	
+	public Boolean getSequential() {
+		return this.sequential;
+	}
+	
+	public Boolean getRefillWithScheduledTask() {
+        return refillWithScheduledTask;
+    }
 
 	/**
 	 * @return the identifiers
@@ -162,6 +173,7 @@ public class IdentifierPool extends BaseIdentifierSource {
     /**
      * @return the refillWithScheduledTask
      */
+	@JsonIgnore
     public Boolean isRefillWithScheduledTask() {
         return refillWithScheduledTask;
     }

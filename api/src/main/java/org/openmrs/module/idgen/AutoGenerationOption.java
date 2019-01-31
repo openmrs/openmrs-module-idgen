@@ -13,13 +13,14 @@
  */
 package org.openmrs.module.idgen;
 
+import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 
 /**
  * Component which encapsulates the options for Auto-Generating a Patient Identifier
  */
-public class AutoGenerationOption {
+public class AutoGenerationOption extends BaseOpenmrsMetadata {
 	
 	//***** PROPERTIES *****
 	
