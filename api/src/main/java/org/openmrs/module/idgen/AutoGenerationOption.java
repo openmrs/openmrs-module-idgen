@@ -168,6 +168,6 @@ public class AutoGenerationOption extends BaseOpenmrsMetadata {
 	}
 	
 	public String getUuid() {
-		return this.getId().toString();
+		return getId() != null ? getId().toString() : null;
 	}
 }
