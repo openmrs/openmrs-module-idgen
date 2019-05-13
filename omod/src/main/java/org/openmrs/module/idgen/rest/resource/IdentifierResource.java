@@ -28,7 +28,7 @@ import io.swagger.models.properties.StringProperty;
 
 @org.openmrs.module.webservices.rest.web.annotation.SubResource(parent = IdentifierSourceResource.class, path =
         "identifier", supportedClass = Identifier.class, supportedOpenmrsVersions = {"1.8.*", "1.9.*", "1.10.*", "1.11.*", 
-        		"1.12.*", "2.0.*", "2.1.*", "2.2.*" })
+        		"1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*" })
 public class IdentifierResource extends DelegatingSubResource<Identifier, IdentifierSource, IdentifierSourceResource> {
 
     public static final String IDENTIFIER_KEY = "identifier";
