@@ -49,7 +49,7 @@ import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOp
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE + "/identifiersource", supportedClass = IdentifierSource.class, supportedOpenmrsVersions = {
-        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" , "2.2.*"})
+        "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*" , "2.1.*" , "2.2.*", "2.3.*"})
 public class IdentifierSourceResource extends MetadataDelegatingCrudResource<IdentifierSource> { 
 	
 	/*
