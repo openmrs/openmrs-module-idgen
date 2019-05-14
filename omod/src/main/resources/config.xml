@@ -67,7 +67,6 @@
 	
 	<globalProperty>
 		<property>${project.parent.artifactId}.prefixLocationAttributeType</property>
-		<defaultValue>Location Code</defaultValue>
 		<description>
 			Name of LocationAttribute type for PatientIdentifier Prefixes.
 		</description>
