@@ -7,21 +7,21 @@
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
-
+	
 	<url>https://wiki.openmrs.org/display/docs/Idgen+Module</url>
-
 	<scm>
 		<connection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</connection>
 		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-idgen/</url>
-	  <tag>2.8</tag>
-  </scm>
-
+		<tag>2.8</tag>
+	
+	</scm>
+	
 	<modules>
 		<module>api</module>
 		<module>omod</module>
 	</modules>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
@@ -29,6 +29,12 @@
 			<version>${openMRSVersion}</version>
 			<type>jar</type>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
@@ -36,6 +42,12 @@
 			<version>${openMRSVersion}</version>
 			<type>jar</type>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
@@ -44,6 +56,12 @@
 			<classifier>tests</classifier>
 			<type>jar</type>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.web</groupId>
@@ -52,6 +70,12 @@
 			<classifier>tests</classifier>
 			<type>jar</type>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.test</groupId>
@@ -59,35 +83,54 @@
 			<version>${openMRSVersion}</version>
 			<type>pom</type>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2</version>
-            <type>jar</type>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
-            <scope>test</scope>
-        </dependency>
-        
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2</version>
+			<type>jar</type>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.10.19</version>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.6.6</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>mockito-all</artifactId>
+					<groupId>org.mockito</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<properties>
 		<openMRSVersion>1.10.2</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+	
 	<build>
 		<resources>
 			<resource>
@@ -125,7 +168,7 @@
 				</includes>
 			</testResource>
 		</testResources>
-
+		
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -134,10 +177,9 @@
 					<configuration>
 						<target>1.6</target>
 						<source>1.6</source>
-                        <encoding>UTF-8</encoding>
+						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>
-
 				<plugin>
 					<groupId>org.openmrs.maven.plugins</groupId>
 					<artifactId>maven-openmrs-plugin</artifactId>
@@ -160,19 +202,17 @@
 						</execution>
 					</executions>
 				</plugin>
-
-                <!-- The 2.10 version of this plugin released in Sept 2014 leads to opaque errors and a lot of:
+				<!-- The 2.10 version of this plugin released in Sept 2014 leads to opaque errors and a lot of:
                  [ERROR] java.lang.ClassCastException: com.sun.tools.javadoc.ClassDocImpl cannot be cast to com.sun.javadoc.AnnotationTypeDoc
                  We manually override to use the prior version which works fine.
                  See: http://jira.codehaus.org/browse/MJAVADOC-406
                  -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
-                </plugin>
-
-                <plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.9.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<executions>
@@ -187,10 +227,10 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.5</version>
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <tagNameFormat>@{project.version}</tagNameFormat>
-                    </configuration>
+					<configuration>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<tagNameFormat>@{project.version}</tagNameFormat>
+					</configuration>
 				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
@@ -203,44 +243,36 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.openmrs.maven.plugins
+										<groupId>org.openmrs.maven.plugins
 										</groupId>
-										<artifactId>
-											maven-openmrs-plugin
+										<artifactId>maven-openmrs-plugin
 										</artifactId>
-										<versionRange>
-											[1.0.1,)
+										<versionRange>[1.0.1,)
 										</versionRange>
 										<goals>
-											<goal>
-												initialize-module
+											<goal>initialize-module
 											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
+										<groupId>org.apache.maven.plugins
 										</groupId>
-										<artifactId>
-											maven-dependency-plugin
+										<artifactId>maven-dependency-plugin
 										</artifactId>
-										<versionRange>
-											[2.1,)
+										<versionRange>[2.1,)
 										</versionRange>
 										<goals>
-											<goal>
-												unpack-dependencies
+											<goal>unpack-dependencies
 											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -249,6 +281,7 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
 	</build>
 	
 	<profiles>
@@ -272,7 +305,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
+						<version>2.9.1</version>
 						<configuration>
 							<tags>
 								<tag>
@@ -294,9 +327,8 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
-
+	
 	<repositories>
 		<repository>
 			<id>openmrs-repo</id>
@@ -304,7 +336,6 @@
 			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 		</repository>
 	</repositories>
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>openmrs-repo</id>
@@ -312,18 +343,18 @@
 			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
 		</pluginRepository>
 	</pluginRepositories>
-
+	
 	<distributionManagement>
 		<repository>
 			<id>openmrs-repo-modules</id>
 			<name>OpenMRS Modules</name>
 			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/modules</url>
 		</repository>
-        <snapshotRepository>
-            <id>openmrs-repo-snapshots</id>
-            <name>OpenMRS Snapshots</name>
-            <url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
+		<snapshotRepository>
+			<id>openmrs-repo-snapshots</id>
+			<name>OpenMRS Snapshots</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
 	</distributionManagement>
-
+	
 </project>

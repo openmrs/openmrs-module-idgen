@@ -26,6 +26,7 @@ import org.openmrs.module.idgen.IdgenConstants;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;

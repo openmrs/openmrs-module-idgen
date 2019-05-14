@@ -14,7 +14,10 @@
 package org.openmrs.module.idgen;
 
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.idgen.prefixprovider.ConstantPrefixProvider;
+import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.patient.IdentifierValidator;
 
@@ -25,16 +28,31 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 
 	//***** PROPERTIES *****
 	private Long nextSequenceValue; //not used: declared only so that Hibernate creates the column when running tests
-    private String prefix; // Optional prefix
+	
+	/**
+	 * A prefix can either be configurable or static. Configurable prefixes provide the
+	 * {@link PrefixProvider} bean name which will be used as a prefix source; Example:
+	 * <blockquote><pre>
+	 * "provider:LocationBasedPrefixProvider" // Configurable prefix
+	 * "LOC-" // Static prefix
+	 * </pre></blockquote>
+	 */
+	private String prefix;
     private String suffix; // Optional suffix
     private String firstIdentifierBase; // First identifier to start at
 	private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
 	private Integer maxLength; // If > 0, will always return identifiers no longer than this length
     private String baseCharacterSet; // Enables configuration in appropriate Base
-
+	
+	/**
+	 * A prefix expected in a configured {@code prefix}. If found in the prefix, it means it entails
+	 * a {@link PrefixProvider} Bean name.
+	 */
+	public static final String CONFIGURATION_PREFIX = "provider:";
+	
     //***** INSTANCE METHODS *****
 
-    /**
+	/**
      * Returns a boolean indicating whether this generator has already started producing identifiers
      */
     public boolean isInitialized() {
@@ -51,16 +69,18 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	 * @should throw an error if generated identifier is longer than maxLength
      */
     public String getIdentifierForSeed(long seed) {
-
     	// Convert the next sequence integer into a String with the appropriate Base characters
 		int seqLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
 
 		String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), seqLength);
-
-    	// Add optional prefix and suffix
-    	identifier = (prefix == null ? identifier : prefix + identifier);
+		
+		PrefixProvider prefixProvider = getPrefixProvider(prefix);
+		if (prefixProvider == null) {
+			prefixProvider = new ConstantPrefixProvider(prefix);
+		}
+		identifier = prefixProvider.getValue() + identifier;
     	identifier = (suffix == null ? identifier : identifier + suffix);
-
+    	
     	// Add check-digit, if required
     	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
     		try {
@@ -88,7 +108,7 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
     	return identifier;
     }
 
-    //***** PROPERTY ACCESS *****
+	//***** PROPERTY ACCESS *****
 
 	/**
 	 * @return the prefix
@@ -187,4 +207,38 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	public void setNextSequenceValue(Long nextSequenceValue) {
 		this.nextSequenceValue = nextSequenceValue;
 	}
+	
+	/**
+	 * Gets the {@link PrefixProvider} from a configured {@code prefix}
+	 * 
+	 * @should return {@link ConstantPrefixProvider} based on {@code prefix} if a static prefix is provided.
+	 * @should return {@link ConstantPrefixProvider} based on a blank prefix if an null or blank prefix is provided
+	 * @should return {@link ConstantPrefixProvider} if the configured prefix provider cannot be Spring wired.
+	 * @param prefix A string representing a prefix configuration or a static prefix value.
+	 * @return the {@link PrefixProvider}
+	 */
+	public PrefixProvider getPrefixProvider(String prefix) throws APIException {
+		
+		if (StringUtils.isBlank(prefix)) {
+			return new ConstantPrefixProvider("");
+		}
+		
+		if (prefix.startsWith(CONFIGURATION_PREFIX)) {
+			
+			String beanName = StringUtils.substringAfter(prefix, ":");
+			
+			try {
+				return Context.getRegisteredComponent(beanName, PrefixProvider.class);
+			}
+			catch (Exception e) {
+				throw new APIException(
+				    "Invalid prefix configuration. The " + PrefixProvider.class.getSimpleName() + " bean name ('" + beanName + "') could not be resolved.",
+				    e);
+			}
+			
+		}
+		
+		return new ConstantPrefixProvider(prefix);
+	}
+
 }

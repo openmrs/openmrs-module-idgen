@@ -315,4 +315,11 @@
 				referencedTableName="patient_identifier_type"
 				referencedColumnNames="patient_identifier_type_id"/>
  	</changeSet>
+ 	
+ 	<changeSet id="0h78646-4fef-b035-kj9gh8a2" author="Mekom Solutions">
+ 		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="idgen_seq_id_gen" columnName="prefix"/>
+		</preConditions>
+		<modifyDataType tableName="idgen_seq_id_gen" columnName="prefix" newDataType="varchar(100)"/>
+ 	</changeSet>
 </databaseChangeLog>
