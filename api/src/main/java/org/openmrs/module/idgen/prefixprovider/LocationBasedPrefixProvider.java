@@ -5,6 +5,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.api.APIException;
+import org.openmrs.api.GlobalPropertyListener;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
  * the prefix attribute. Then returns the location prefix found associated with that location.
  */
 @Component("idgen.locationBasedPrefixProvider")
-public class LocationBasedPrefixProvider implements GlobalPropertyListeningPrefixProvider {
+public class LocationBasedPrefixProvider implements GlobalPropertyListener, PrefixProvider {
 
 	public final static String PREFIX_LOCATION_ATTRIBUTE_TYPE_GP = "idgen.prefixLocationAttributeType";
 	
