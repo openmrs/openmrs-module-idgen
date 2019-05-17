@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
+   <patient_identifier_type patient_identifier_type_id="50" name="Location Prefixed Identification Number" description="Identifier generated from a location prefix" format="[A-Z]{3,5}\-[0]{3}\-[0-9]{3}" creator="1" date_created="2019-04-1 15:59:20.0" required="false" format_description="" validator="" CHECK_DIGIT="5" retired="false" uuid="b0d10dc0-d8ce-11e3-9c1a-0jhg89c9a66"/>
+   <global_property PROPERTY="idgen.prefixLocationAttributeType" PROPERTY_VALUE="Location Code" DESCRIPTION="" UUID="932ce5e6-5hj-443f-a6e3-6768421c17e9"/>
+   
+   <location location_id="10" name="Location 1" parent_location="[NULL]" description="test description" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f0f8ba64b-ea57-4a41-b33c-9dfc59b0c60a"/>
+   <location location_id="11" name="Location 2" parent_location="10" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="c9ae3a36-7466-4a56-8f06-3bfbc64103f4"/>
+   <location location_id="12" name="Location 3" parent_location="11" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="6f42abbc-caac-40ae-a94e-9277ea15c125"/>
+   <location location_id="13" name="Location 4" parent_location="12" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="400d343b-75ed-4243-af42-7b9b1b72f0a9"/>
+   
+   <location_attribute_type location_attribute_type_id="1" name="Location Code" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" uuid="9516cc50-6f9f-11e0-8414-00109n378eb67e" creator="1" date_created="2019-04-01 00:00:00.0" min_occurs="0" retired="false" />
+   
+   <location_attribute location_attribute_id="1" location_id="10" attribute_type_id="1" value_reference="LOC_1-" uuid="3a2bdb18-6faa-11e0-8414-001e378eb67e" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" />
+   <location_attribute location_attribute_id="2" location_id="12" attribute_type_id="1" value_reference="LOC_3-" uuid="3a2bdb18-6faa-11e0-8414-0jk2kj3b4k2h" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" />
+   
    <IDGEN_IDENTIFIER_SOURCE ID="1" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a901" NAME="Test Sequential Generator" IDENTIFIER_TYPE="1" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false" />
    <IDGEN_IDENTIFIER_SOURCE ID="2" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a902" NAME="Test Remote Source" IDENTIFIER_TYPE="2" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false" />
    <IDGEN_IDENTIFIER_SOURCE ID="3" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a903" NAME="Test Identifier Pool" IDENTIFIER_TYPE="1" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false" />
@@ -7,9 +20,11 @@
    <IDGEN_IDENTIFIER_SOURCE ID="5" UUID="0d42284f-9e9b-4a81-a88b-8bb42bc0a905" NAME="Id Pool Filled from Remote" IDENTIFIER_TYPE="4" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false" />
    <IDGEN_IDENTIFIER_SOURCE ID="6" UUID="0d42284f-9e9b-4a81-a88b-8bb42bc0a906" NAME="Remote to fill Id Pool" IDENTIFIER_TYPE="4" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false" />
    <IDGEN_IDENTIFIER_SOURCE ID="7" UUID="0d47284f-9e9b-4a81-a88b-8bb42bc0a907" NAME="Local Sequential Generator" IDENTIFIER_TYPE="2" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
+   <IDGEN_IDENTIFIER_SOURCE ID="8" UUID="0d90284f-9rtb-4a81-a88b-8bb42bvh8a97" NAME="Location Prefixed Sequential Identifier Source" IDENTIFIER_TYPE="50" CREATOR="1" DATE_CREATED="2009-11-30 11:28:30.489" RETIRED="false"/>
    	
    <IDGEN_SEQ_ID_GEN ID="1" first_identifier_base="1" NEXT_SEQUENCE_VALUE="6" base_character_set="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" PREFIX="" min_length="0" max_length="0" />
-   <IDGEN_SEQ_ID_GEN ID="7" first_identifier_base="200000" NEXT_SEQUENCE_VALUE="11" base_character_set="0123456789" PREFIX="MRS" min_length="4" max_length="9"  />
+   <IDGEN_SEQ_ID_GEN ID="7" first_identifier_base="200000" NEXT_SEQUENCE_VALUE="11" base_character_set="0123456789" PREFIX="MRS" min_length="4" max_length="9" />
+   <IDGEN_SEQ_ID_GEN ID="8" first_identifier_base="000000" NEXT_SEQUENCE_VALUE="5" base_character_set="0123456789" PREFIX="provider:idgen.locationBasedPrefixProvider" />
    
    <IDGEN_REMOTE_SOURCE ID="2" URL="http://localhost:8080/openmrs/module/idgen/getIdentifier" />
    <IDGEN_REMOTE_SOURCE ID="6" URL="http://localhost:8080/openmrs/module/idgen/getIdentifier" />

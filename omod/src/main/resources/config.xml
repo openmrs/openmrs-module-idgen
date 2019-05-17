@@ -65,5 +65,12 @@
 		IdentifierSource.hbm.xml
 	</mappingFiles>
 	
+	<globalProperty>
+		<property>${project.parent.artifactId}.prefixLocationAttributeType</property>
+		<description>
+			Name of LocationAttribute type for PatientIdentifier Prefixes.
+		</description>
+	</globalProperty>
+	
 </module>
 

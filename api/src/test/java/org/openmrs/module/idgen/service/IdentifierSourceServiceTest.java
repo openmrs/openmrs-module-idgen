@@ -13,6 +13,10 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.NonUniqueResultException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,13 +26,17 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.*;
+import org.openmrs.module.idgen.AutoGenerationOption;
+import org.openmrs.module.idgen.IdentifierPool;
+import org.openmrs.module.idgen.IdentifierSource;
+import org.openmrs.module.idgen.IdgenBaseTest;
+import org.openmrs.module.idgen.PooledIdentifier;
+import org.openmrs.module.idgen.RemoteIdentifierSource;
+import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.openmrs.test.Verifies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.util.*;
 
 public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
@@ -51,7 +59,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
     }
-	
+    
 	/**
 	 * @see {@link IdentifierSourceService#generateIdentifiers(IdentifierSource, Integer, String)}
 	 */
@@ -62,6 +70,18 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		List<String>  sig = identifierSourceService.generateIdentifiers(is, 7, "hello");
 		Assert.assertEquals(sig.toString(), "[G-0, H-8, I-5, J-3, K-1, L-9, M-7]");
 	}
+	
+	@Test
+	public void generateIdentifiers_shouldReturnLocationPrefixedIdentifiers() {
+		Context.getUserContext().setLocationId(13);
+		IdentifierSource is = identifierSourceService.getIdentifierSource(8);
+		List<String>  sig = identifierSourceService.generateIdentifiers(is, 4, null);
+		Assert.assertEquals(sig.toString(), "[LOC_3-000005, LOC_3-000006, LOC_3-000007, LOC_3-000008]");
+		// Change location
+		Context.getUserContext().setLocationId(11);
+		sig = identifierSourceService.generateIdentifiers(is, 4, null);
+		Assert.assertEquals(sig.toString(), "[LOC_1-000009, LOC_1-000010, LOC_1-000011, LOC_1-000012]");
+	}
 
 	/**
 	 * @see {@link IdentifierSourceService#getAllIdentifierSources(boolean)}
@@ -70,7 +90,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Verifies(value = "should return all identifier sources", method = "getAllIdentifierSources(boolean)")
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
 		List<IdentifierSource>  sig = identifierSourceService.getAllIdentifierSources(false);
-		Assert.assertTrue(sig.size() == 7);
+		Assert.assertTrue(sig.size() == 8);
 	}
 
 	/**

@@ -28,7 +28,6 @@ public class IdgenUtilTest {
 		char[] hexChars = "0123456789ABCDEF".toCharArray();
 		long numericValue = 43804337214L;
 		String hexValue = IdgenUtil.convertToBase(numericValue, hexChars, 0);
-		System.out.println("Converted from numeric: " + numericValue + " to hex: " + hexValue);
 		Assert.assertEquals("A32F1243E", hexValue);
 		long back = IdgenUtil.convertFromBase(hexValue, hexChars);
 		Assert.assertEquals(numericValue, back);	

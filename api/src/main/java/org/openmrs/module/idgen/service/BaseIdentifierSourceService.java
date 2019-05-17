@@ -28,6 +28,8 @@ import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
+import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
+import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.springframework.transaction.annotation.Propagation;

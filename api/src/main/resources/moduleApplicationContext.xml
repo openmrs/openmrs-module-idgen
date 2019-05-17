@@ -40,7 +40,7 @@
 			</map>
 		</property>
 	</bean>
-
+		
 	<!--  Configure the Service -->
    	<bean parent="serviceContext" id="identifierSourceService">
 		<property name="moduleService">
@@ -96,4 +96,13 @@
         </property>
     </bean>
 
+	<!-- Add global property listeners -->
+	<bean id="idgen.globalPropertyListeners" parent="openmrsEventListeners">
+	    <property name="globalPropertyListeners">
+	        <list value-type="org.openmrs.api.GlobalPropertyListener" merge="true">
+	            <bean class="org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider" />
+	        </list>
+	    </property>
+	</bean>
+	
 </beans>
