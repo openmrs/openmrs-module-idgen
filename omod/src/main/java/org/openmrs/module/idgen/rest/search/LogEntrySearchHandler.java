@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class LogEntrySearchHandler implements SearchHandler {
 
     private final SearchConfig searchConfig = new SearchConfig("default", RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE + "/logentry",
-            Arrays.asList("1.8.*", "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*"),
+            Arrays.asList("1.8.*", "1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*"),
             Arrays.asList(new SearchQuery.Builder(
                     "Allows you to find log of ID Generation Activities by Source Name, Identifier contents,Generated Date Range,Comment contents and User who generated the log entry")
                             .withOptionalParameters("source", "identifier", "fromDate", "toDate", "comment",
