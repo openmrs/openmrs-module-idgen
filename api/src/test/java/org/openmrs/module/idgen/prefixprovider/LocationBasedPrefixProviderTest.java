@@ -66,6 +66,21 @@ public class LocationBasedPrefixProviderTest {
 	}
 	
 	@Test
+	public void getValue_shouldReturnPrefixWithDashAsSeparator() {
+		// Setup
+		locationPrefixProvider = new DashSeparatedLocationBasedPrefixProvider();
+		when(userContext.getLocation()).thenReturn(locationB3);
+		LocationAttribute locationB3PrefixAtt = new LocationAttribute();
+		locationB3PrefixAtt.setAttributeType(createPrefixAttributeType());
+		locationB3PrefixAtt.setValue("LOC5");
+		locationB3.addAttribute(locationB3PrefixAtt);
+		
+		// Replay and verify
+		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC5-"));
+		
+	}
+	
+	@Test
 	public void getLocationPrefix_shouldPickTheNearestValidPrefixUpTheTree() {
 		Assert.assertEquals("LOC-A2", locationPrefixProvider.getLocationPrefix(locationA3));
 	}
