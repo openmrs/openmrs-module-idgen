@@ -247,6 +247,12 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     }
 
     @Test
+    public void getAutoGenerationOptionByUuid_shouldGetAutoGenerationOptionByUuid() {
+    	AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOptionByUuid("599c5a90-1937-42de-aa7d-79bd9f9acca7");
+    	Assert.assertEquals(1, autoGenerationOption.getId().intValue());
+    }
+    
+    @Test
     public void getAutoGenerationOptionByPatientIdentifier_shouldGetAutoGenerationOptionByIdentifier() {
         PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierType(1);
         AutoGenerationOption autoGenerationOption = identifierSourceService.getAutoGenerationOption(patientIdentifierType);

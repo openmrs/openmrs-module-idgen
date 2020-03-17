@@ -194,7 +194,15 @@ public interface IdentifierSourceService extends OpenmrsService {
     @Transactional(readOnly = true)
     public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException;
 
-
+    /**
+     * Gets an AutoGenerationOption by its UUID
+     * 
+     * @param uuid of auto generation option
+     * @return the AutoGenerationOption
+     */
+    @Transactional(readOnly = true)
+    public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
+    
     /**
 	 * @param patient identifier type
      * @param location location

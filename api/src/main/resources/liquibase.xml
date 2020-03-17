@@ -322,4 +322,54 @@
 		</preConditions>
 		<modifyDataType tableName="idgen_seq_id_gen" columnName="prefix" newDataType="varchar(100)"/>
  	</changeSet>
+ 	
+ 	<changeSet id="c7084acb-9cc5-4643-ad6d-6302acc76d69" author="Samuel Male">
+ 		<preConditions onFail="MARK_RAN">
+ 			<not><columnExists tableName="idgen_auto_generation_option" columnName="uuid"/></not>
+ 		</preConditions>
+ 		<comment>
+ 			Adding "uuid" column to the idgen_auto_generation_option table
+ 		</comment>
+ 		
+ 		<addColumn tableName="idgen_auto_generation_option">
+			<column name="uuid" type="UUID" />
+		</addColumn>
+ 	</changeSet>
+ 	
+ 	<changeSet id="daa579e7-b8de-4858-bfe5-c9ef2606db5e" author="Samuel Male">
+ 		<preConditions onFail="MARK_RAN">
+			<or>
+				<dbms type="mysql" />
+				<dbms type="oracle" />
+				<dbms type="mssql" />
+			</or>
+		</preConditions>
+		<comment>
+			Generating UUIDs for all rows in the idgen_auto_generation_option table
+		</comment>
+		
+		<update tableName="idgen_auto_generation_option" >
+			<column name="uuid" valueNumeric="name-of-uuid-function" />
+		</update>
+		<modifySql dbms="mysql">
+			<replace replace="name-of-uuid-function" with="UUID()"/>
+		</modifySql>
+		<modifySql dbms="oracle">
+			<replace replace="name-of-uuid-function" with="SYS_GUID()"/>
+		</modifySql>
+		<modifySql dbms="mssql">
+			<replace replace="name-of-uuid-function" with="NEWSEQUENTIALID()"/>
+		</modifySql>
+ 	</changeSet>
+ 	
+ 	<changeSet id="6b164990-ccd3-4508-9c08-11d27786da17" author="Samuel Male">
+ 		<comment>
+			Now that UUID generation is done, set the uuid columns to "NOT NULL" and create a unique index for the column 
+		</comment>
+		
+		<addNotNullConstraint tableName="idgen_auto_generation_option" columnName="uuid" columnDataType="UUID"/>
+		<createIndex tableName="idgen_auto_generation_option" unique="true" indexName="idgen_auto_generation_option_uuid_index" >
+			<column name="uuid" />
+		</createIndex>
+ 	</changeSet>
 </databaseChangeLog>

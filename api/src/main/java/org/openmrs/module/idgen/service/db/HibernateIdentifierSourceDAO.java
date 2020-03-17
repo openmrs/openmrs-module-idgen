@@ -150,6 +150,16 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     }
 
     /**
+	 * @see IdentifierSourceService#getAutoGenerationOptionByUuid(String)
+	 */
+    @Override
+	public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
+        criteria.add(Expression.eq("uuid", uuid));
+        return (AutoGenerationOption)criteria.uniqueResult();
+	}
+    
+    /**
 	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType,Location)
 	 */
 	@Transactional(readOnly=true)

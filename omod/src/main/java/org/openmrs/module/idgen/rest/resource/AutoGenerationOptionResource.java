@@ -153,15 +153,8 @@ public class AutoGenerationOptionResource extends MetadataDelegatingCrudResource
 	
 	@Override
 	public SimpleObject update(String uuid, SimpleObject postBody, RequestContext context) throws ResponseException {
-		int id = 0;
-		try {
-			id = Integer.parseInt(uuid);
-		}
-		catch (NumberFormatException e) {
-			throw new ValidationException("The uuid is either missing or not an integer");
-		}
 		AutoGenerationOption autoGenerationOption = Context.getService(IdentifierSourceService.class)
-		        .getAutoGenerationOption(id);
+		        .getAutoGenerationOptionByUuid(uuid);
 		if (autoGenerationOption == null) {
 			throw new ObjectNotFoundException();
 		}
@@ -210,7 +203,7 @@ public class AutoGenerationOptionResource extends MetadataDelegatingCrudResource
 	
 	@Override
 	public AutoGenerationOption getByUniqueId(String uniqueId) {
-		return Context.getService(IdentifierSourceService.class).getAutoGenerationOption(Integer.parseInt(uniqueId));
+		return Context.getService(IdentifierSourceService.class).getAutoGenerationOptionByUuid(uniqueId);
 	}
 	
 	@Override
