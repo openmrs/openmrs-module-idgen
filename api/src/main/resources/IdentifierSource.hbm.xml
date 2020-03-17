@@ -70,7 +70,7 @@
 	
 	<class name="AutoGenerationOption" table="idgen_auto_generation_option">
 		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
-		<property name="uuid" type="string" length="38" not-null="true" />
+		<property name="uuid" type="string" length="36" not-null="true" />
 		<many-to-one name="identifierType" class="org.openmrs.PatientIdentifierType" column="identifier_type" not-null="true" lazy="false" />
         <many-to-one name="location" class="org.openmrs.Location" column="location" />
 		<many-to-one name="source" class="IdentifierSource" column="source" not-null="true" lazy="false" />

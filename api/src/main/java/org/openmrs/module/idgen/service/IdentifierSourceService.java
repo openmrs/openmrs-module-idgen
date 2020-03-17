@@ -199,6 +199,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * 
      * @param uuid of auto generation option
      * @return the AutoGenerationOption
+     * @since 4.6.0
      */
     @Transactional(readOnly = true)
     public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
