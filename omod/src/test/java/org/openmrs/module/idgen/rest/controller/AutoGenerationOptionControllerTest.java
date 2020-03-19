@@ -47,7 +47,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	
 	public static final String SOURCE = "0d47284f-9e9b-4a81-a88b-8bb42bc0a902";
 	
-	public static final String AUTO_GENERATION_OPTION_UUID = "2";
+	public static final String AUTO_GENERATION_OPTION_UUID = "6d8230d1-34dc-445b-8f4e-5afa964df3fc";
 	
 	public static final String IDENTIFIER_TYPE_UUID = "2f470aa8-1d73-43b7-81b5-01f0c0dfa53c";
 	
@@ -64,10 +64,6 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	@Override
 	public String getUuid() {
 		return AUTO_GENERATION_OPTION_UUID;
-	}
-	
-	private int getId() {
-		return Integer.parseInt(getUuid());
 	}
 	
 	@Override
@@ -95,7 +91,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		assertEquals(originalCount + 1, getAllCount());
 		Object autogenerationOptionUuid = PropertyUtils.getProperty(response, "uuid");
 		AutoGenerationOption newAutoGenerationOption = identifierSourceService
-		        .getAutoGenerationOption(Integer.parseInt(autogenerationOptionUuid.toString()));
+		        .getAutoGenerationOptionByUuid((String)autogenerationOptionUuid);
 		assertEquals(SOURCE, newAutoGenerationOption.getSource().getUuid());
 		assertEquals(LOCATION, newAutoGenerationOption.getLocation().getUuid());
 		assertEquals(IDENTIFIER_TYPE_UUID, newAutoGenerationOption.getIdentifierType().getUuid());
@@ -118,7 +114,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		assertEquals(originalCount + 1, getAllCount());
 		Object autogenerationOptionUuid = PropertyUtils.getProperty(response, "uuid");
 		AutoGenerationOption newAutoGenerationOption = identifierSourceService
-		        .getAutoGenerationOption(Integer.parseInt(autogenerationOptionUuid.toString()));
+		        .getAutoGenerationOptionByUuid(autogenerationOptionUuid.toString());
 		assertEquals(SOURCE, newAutoGenerationOption.getSource().getUuid());
 		assertNull(newAutoGenerationOption.getLocation());
 		assertEquals(IDENTIFIER_TYPE_UUID, newAutoGenerationOption.getIdentifierType().getUuid());
@@ -137,7 +133,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	
 	@Test
 	public void shouldEditAnAutoGenerationOption() throws Exception {
-		AutoGenerationOption autogenerationOption = identifierSourceService.getAutoGenerationOption(getId());
+		AutoGenerationOption autogenerationOption = identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID);
 		assertEquals(LOCATION, autogenerationOption.getLocation().getUuid());
 		assertEquals(SOURCE, autogenerationOption.getSource().getUuid());
 		assertTrue(autogenerationOption.isAutomaticGenerationEnabled());
@@ -151,7 +147,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI() + "/" + getUuid());
 		req.setContent(json.getBytes());
 		handle(req);
-		AutoGenerationOption updatedAutogenerationOption = identifierSourceService.getAutoGenerationOption(getId());
+		AutoGenerationOption updatedAutogenerationOption = identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID);
 		assertEquals(NEW_LOCATION, updatedAutogenerationOption.getLocation().getUuid());
 		assertEquals(NEW_SOURCE, updatedAutogenerationOption.getSource().getUuid());
 		assertFalse(updatedAutogenerationOption.isAutomaticGenerationEnabled());
@@ -169,7 +165,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	
 	@Test
 	public void shouldEditAnAutoGenerationOptionByAnyNumberOFArguments() throws Exception {
-		AutoGenerationOption autogenerationOption = identifierSourceService.getAutoGenerationOption(getId());
+		AutoGenerationOption autogenerationOption = identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID);
 		assertTrue(autogenerationOption.isAutomaticGenerationEnabled());
 		assertTrue(autogenerationOption.isManualEntryEnabled());
 		SimpleObject autoGenerationOption = new SimpleObject();
@@ -179,17 +175,17 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI() + "/" + getUuid());
 		req.setContent(json.getBytes());
 		handle(req);
-		AutoGenerationOption updatedAutogenerationOption = identifierSourceService.getAutoGenerationOption(getId());
+		AutoGenerationOption updatedAutogenerationOption = identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID);
 		assertFalse(updatedAutogenerationOption.isAutomaticGenerationEnabled());
 		assertFalse(updatedAutogenerationOption.isManualEntryEnabled());
 	}
 	
 	@Test
 	public void shouldPurgeAnAutoGenerationOption() throws Exception {
-		assertNotNull(identifierSourceService.getAutoGenerationOption(getId()));
+		assertNotNull(identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID));
 		MockHttpServletRequest req = request(RequestMethod.DELETE, getURI() + "/" + getUuid());
 		req.addParameter("purge", "true");
 		handle(req);
-		assertNull(identifierSourceService.getAutoGenerationOption(getId()));
+		assertNull(identifierSourceService.getAutoGenerationOptionByUuid(AUTO_GENERATION_OPTION_UUID));
 	}
 }

@@ -166,8 +166,4 @@ public class AutoGenerationOption extends BaseOpenmrsMetadata {
 	public void setAutomaticGenerationEnabled(boolean automaticGenerationEnabled) {
 		this.automaticGenerationEnabled = automaticGenerationEnabled;
 	}
-	
-	public String getUuid() {
-		return getId() != null ? getId().toString() : null;
-	}
 }

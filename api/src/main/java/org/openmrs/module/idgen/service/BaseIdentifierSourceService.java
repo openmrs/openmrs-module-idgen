@@ -304,6 +304,14 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     }
 
     /**
+	 * @see IdentifierSourceService#getAutoGenerationOptionByUuid(String)
+	 */
+	@Override
+	public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid) {
+		return dao.getAutoGenerationOptionByUuid(uuid);
+	}
+	
+    /**
      * @see IdentifierSourceService#getAutoGenerationOption(PatientIdentifierType,Location)
      */
     @Transactional(readOnly=true)

@@ -83,6 +83,12 @@ public interface IdentifierSourceDAO {
     @Transactional(readOnly=true)
     public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws DAOException;
 
+    /**
+	 * @see IdentifierSourceService#getAutoGenerationOptionByUuid(String)
+	 */
+    @Transactional(readOnly = true)
+    public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
+    
 	/**
 	 * @param type
 	 * @param location
