@@ -17,7 +17,7 @@
 
 	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
 		<property name="dao">
-			<ref local="IdentifierSourceDAO" />
+			<ref bean="IdentifierSourceDAO" />
 		</property>
 		<property name="processors">
 			<map>
