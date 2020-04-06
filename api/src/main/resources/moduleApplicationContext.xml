@@ -49,7 +49,7 @@
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
-						<ref local="baseIdentifierSourceService"/>
+						<ref bean="baseIdentifierSourceService"/>
 					</property>
 					<property name="preInterceptors">
 						<list>
