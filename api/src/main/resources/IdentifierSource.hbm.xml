@@ -5,7 +5,11 @@
 
 	<class name="IdentifierSource" table="idgen_identifier_source" abstract="true">
 	
-		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native">
+				<param name="sequence">idgen_identifier_source_id_seq</param>
+			</generator>
+		</id>
 		<property name="uuid" type="string" length="38" not-null="true" />
 		<property name="name" type="string" not-null="true" />
 		<property name="description" type="string" />
@@ -60,7 +64,11 @@
 	</class>
 	
 	<class name="PooledIdentifier" table="idgen_pooled_identifier">
-		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native">
+				<param name="sequence">idgen_pooled_identifier_id_seq</param>
+			</generator>
+		</id>
 		<property name="uuid" type="string" length="38" not-null="true" />
 		<many-to-one name="pool" class="IdentifierPool" column="pool_id" not-null="true" />
 		<property name="identifier" type="string" not-null="true" />
@@ -69,7 +77,11 @@
 	</class>
 	
 	<class name="AutoGenerationOption" table="idgen_auto_generation_option">
-		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native">
+				<param name="sequence">idgen_auto_generation_option_id_seq</param>
+			</generator>
+		</id>
 		<property name="uuid" type="string" length="36" not-null="true" />
 		<many-to-one name="identifierType" class="org.openmrs.PatientIdentifierType" column="identifier_type" not-null="true" lazy="false" />
         <many-to-one name="location" class="org.openmrs.Location" column="location" />
@@ -79,7 +91,11 @@
 	</class>
 	
 	<class name="LogEntry" table="idgen_log_entry">
-		<id name="id" type="int" column="id" unsaved-value="0"><generator class="native" /></id>
+		<id name="id" type="int" column="id" unsaved-value="0">
+			<generator class="native">
+				<param name="sequence">idgen_log_entry_id_seq</param>
+			</generator>
+		</id>
 		<many-to-one name="source" class="IdentifierSource" column="source" not-null="true" lazy="false" />
 		<property name="identifier" type="string" not-null="true" />
 		<property name="dateGenerated" type="java.util.Date" column="date_generated" />
