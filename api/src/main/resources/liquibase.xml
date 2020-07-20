@@ -257,11 +257,13 @@
 	</changeSet>
 
 	<changeSet id="a5b34ba3-2cb0-46b5-bb47-4e07da4a7acd" author="Jeremy Keiper">
+		<validCheckSum>8:87d442ef15920fbbb282a63243b4d241</validCheckSum> <!-- old checksum without removing ` from sql-->
+		<validCheckSum>8:bf30ad2e0f1f88d6f04731aa96ae0367</validCheckSum> <!-- current checksum after removing ` from sql -->
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="idgen_seq_id_gen" columnName="max_length"/>
 			<columnExists tableName="idgen_seq_id_gen" columnName="min_length"/>
 		</preConditions>
-		<sql>UPDATE `idgen_seq_id_gen` SET `max_length` = `min_length`</sql>
+		<sql>UPDATE idgen_seq_id_gen SET max_length = min_length</sql>
 	</changeSet>
 
 	<changeSet id="d5bc38a3-35e3-4a16-b1b2-df6f4c32ec7a" author="Partners In Health">
