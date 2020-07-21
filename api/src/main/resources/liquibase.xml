@@ -5,6 +5,8 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
 	<changeSet id="43889130-55c2-49e9-b72b-a9eae9a31da7" author="Partners In Health">
+	    <validCheckSum>8:0670d889112552d0e75ea01b60d8d83d</validCheckSum> <!-- old checksum before changing retire type to boolean -->
+	    <validCheckSum>8:373516eb011f344c988f9f5c8c121ec9</validCheckSum> <!-- new checksum after changing retire type to boolean -->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_identifier_source"/></not>
 		</preConditions>
@@ -34,7 +36,7 @@
 			<column name="date_changed" type="datetime">
 				<constraints nullable="true"/>
 			</column>
-			<column name="retired" type="tinyint(1)" defaultValue="0">
+			<column name="retired" type="boolean" defaultValue="0">
 				<constraints nullable="false"/>
 			</column>
 			<column name="retired_by" type="int(11)">
@@ -344,6 +346,7 @@
 				<dbms type="mysql" />
 				<dbms type="oracle" />
 				<dbms type="mssql" />
+				<dbms type="postgresql" />
 			</or>
 		</preConditions>
 		<comment>
@@ -361,6 +364,9 @@
 		</modifySql>
 		<modifySql dbms="mssql">
 			<replace replace="name-of-uuid-function" with="NEWSEQUENTIALID()"/>
+		</modifySql>
+		<modifySql dbms="postgresql">
+			<replace replace="name-of-uuid-function" with="UUID()"/>
 		</modifySql>
  	</changeSet>
  	
