@@ -5,6 +5,8 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
 	<changeSet id="43889130-55c2-49e9-b72b-a9eae9a31da7" author="Partners In Health">
+	    <validCheckSum>8:0670d889112552d0e75ea01b60d8d83d</validCheckSum> <!-- old checksum before adding postgresql boolean type-->
+	    <validCheckSum>8:09c8c723a6708af174eb9240e6d84cd2</validCheckSum> <!-- new checksum after adding postgresql boolean type-->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_identifier_source"/></not>
 		</preConditions>
@@ -34,7 +36,7 @@
 			<column name="date_changed" type="datetime">
 				<constraints nullable="true"/>
 			</column>
-			<column name="retired" type="tinyint(1)" defaultValue="0">
+			<column name="retired" type="boolean-type-set" defaultValue="retired-default-value">
 				<constraints nullable="false"/>
 			</column>
 			<column name="retired_by" type="int(11)">
@@ -47,6 +49,15 @@
 				<constraints nullable="true"/>
 			</column>
 		</createTable>
+		<!-- To change to boolean column for PostgreSQL as liquibase converts tinyint to smallint in PostgreSQL --> 
+	    <modifySql dbms="postgresql">  
+	        <replace replace="BOOLEAN-TYPE-SET" with="BOOLEAN"/>
+	        <replace replace="retired-default-value" with="False"/>
+	    </modifySql> 
+ 		<modifySql dbms="!postgresql">
+			<replace replace="BOOLEAN-TYPE-SET" with="TINYINT(1)"/>
+			<replace replace="retired-default-value" with="0"/>
+		</modifySql>
 	</changeSet>
 
 	<changeSet id="a7a39c84-cb48-427e-9141-ee851c283132" author="Partners In Health">
@@ -344,6 +355,7 @@
 				<dbms type="mysql" />
 				<dbms type="oracle" />
 				<dbms type="mssql" />
+				<dbms type="postgresql" />
 			</or>
 		</preConditions>
 		<comment>
@@ -361,6 +373,9 @@
 		</modifySql>
 		<modifySql dbms="mssql">
 			<replace replace="name-of-uuid-function" with="NEWSEQUENTIALID()"/>
+		</modifySql>
+		<modifySql dbms="postgresql">
+			<replace replace="name-of-uuid-function" with="UUID()"/>
 		</modifySql>
  	</changeSet>
  	
