@@ -138,6 +138,8 @@
 	</changeSet>
 
 	<changeSet id="82b51fe1-e6ad-423c-80a0-d2a48a3efe6c" author="Partners In Health">
+		<validCheckSum>8:60a9e331320a501dcf5aa1517d207b80</validCheckSum> <!-- old checksum before changing tinyint(1) to boolean -->
+	    <validCheckSum>8:8180e375c265c002562bd651f27fde0e</validCheckSum> <!-- new checksum after changing tinyint(1) to boolean -->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_auto_generation_option" /></not>
 		</preConditions>
@@ -151,10 +153,10 @@
 			<column name="source" type="int(11)">
 				<constraints nullable="false" foreignKeyName="source for idgen_auto_generation_option" references="idgen_identifier_source(id)"/>
 			</column>
-			<column name="manual_entry_enabled" type="tinyint(1)" defaultValue="1">
+			<column name="manual_entry_enabled" type="boolean" defaultValue="1">
 				<constraints nullable="false"/>
 			</column>
-			<column name="automatic_generation_enabled" type="tinyint(1)" defaultValue="1">
+			<column name="automatic_generation_enabled" type="boolean" defaultValue="1">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
