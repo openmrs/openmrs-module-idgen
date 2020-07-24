@@ -330,6 +330,8 @@
  	</changeSet>
  	
  	<changeSet id="c7084acb-9cc5-4643-ad6d-6302acc76d69" author="Samuel Male">
+	    <validCheckSum>8:c36d1a93a37c8073f872d783eb3f7897</validCheckSum> <!-- old checksum before changing uuid to char(38) -->
+	    <validCheckSum>8:35b24b07f328933802389d347109f2ea</validCheckSum> <!-- new checksum after changing uuid to char(38) -->
  		<preConditions onFail="MARK_RAN">
  			<not><columnExists tableName="idgen_auto_generation_option" columnName="uuid"/></not>
  		</preConditions>
@@ -338,7 +340,7 @@
  		</comment>
  		
  		<addColumn tableName="idgen_auto_generation_option">
-			<column name="uuid" type="UUID" />
+			<column name="uuid" type="char(38)" />
 		</addColumn>
  	</changeSet>
  	
