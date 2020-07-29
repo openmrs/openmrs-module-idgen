@@ -5,7 +5,7 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
 	<changeSet id="43889130-55c2-49e9-b72b-a9eae9a31da7" author="Partners In Health">
-	    <validCheckSum>3:c90c282aae153f2b5a57b61a2a697fea</validCheckSum> <!-- old checksum before changing retire type to boolean on older liquibase version -->
+	    <validCheckSum>3:c90c282aae153f2b5a57b61a2a697fea</validCheckSum> <!-- old checksum before changing retire type to boolean -->
 	    <validCheckSum>3:663d815efe83d3ca0bc8d19e0a60c2aa</validCheckSum> <!-- new checksum after changing retire type to boolean -->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_identifier_source"/></not>
