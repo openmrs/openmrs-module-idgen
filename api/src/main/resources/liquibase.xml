@@ -5,8 +5,8 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
 	<changeSet id="43889130-55c2-49e9-b72b-a9eae9a31da7" author="Partners In Health">
-	    <validCheckSum>8:0670d889112552d0e75ea01b60d8d83d</validCheckSum> <!-- old checksum before changing retire type to boolean -->
-	    <validCheckSum>8:373516eb011f344c988f9f5c8c121ec9</validCheckSum> <!-- new checksum after changing retire type to boolean -->
+	    <validCheckSum>3:c90c282aae153f2b5a57b61a2a697fea</validCheckSum> <!-- old checksum before changing retire type to boolean -->
+	    <validCheckSum>3:663d815efe83d3ca0bc8d19e0a60c2aa</validCheckSum> <!-- new checksum after changing retire type to boolean -->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_identifier_source"/></not>
 		</preConditions>
@@ -138,8 +138,8 @@
 	</changeSet>
 
 	<changeSet id="82b51fe1-e6ad-423c-80a0-d2a48a3efe6c" author="Partners In Health">
-		<validCheckSum>8:60a9e331320a501dcf5aa1517d207b80</validCheckSum> <!-- old checksum before changing tinyint(1) to boolean -->
-	    <validCheckSum>8:8180e375c265c002562bd651f27fde0e</validCheckSum> <!-- new checksum after changing tinyint(1) to boolean -->
+		<validCheckSum>3:e0952f1a50f9be63a3cfd396d111d9cb</validCheckSum> <!-- old checksum before changing tinyint(1) to boolean -->
+	    <validCheckSum>3:a3643c5b833ace706ff415e5b18bb6fb</validCheckSum> <!-- new checksum after changing tinyint(1) to boolean -->
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="idgen_auto_generation_option" /></not>
 		</preConditions>
@@ -261,8 +261,8 @@
 	</changeSet>
 
 	<changeSet id="a5b34ba3-2cb0-46b5-bb47-4e07da4a7acd" author="Jeremy Keiper">
-		<validCheckSum>8:87d442ef15920fbbb282a63243b4d241</validCheckSum> <!-- old checksum without removing ` from sql-->
-		<validCheckSum>8:bf30ad2e0f1f88d6f04731aa96ae0367</validCheckSum> <!-- current checksum after removing ` from sql -->
+		<validCheckSum>3:3f350713e51462182783a5edffe44609</validCheckSum> <!-- old checksum without removing ` from sql-->
+		<validCheckSum>3:f1fa3d1f87e4ccbae90130249ccc4706</validCheckSum> <!-- current checksum after removing ` from sql -->
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="idgen_seq_id_gen" columnName="max_length"/>
 			<columnExists tableName="idgen_seq_id_gen" columnName="min_length"/>
@@ -330,8 +330,6 @@
  	</changeSet>
  	
  	<changeSet id="c7084acb-9cc5-4643-ad6d-6302acc76d69" author="Samuel Male">
-	    <validCheckSum>8:c36d1a93a37c8073f872d783eb3f7897</validCheckSum> <!-- old checksum before changing uuid to char(38) -->
-	    <validCheckSum>8:35b24b07f328933802389d347109f2ea</validCheckSum> <!-- new checksum after changing uuid to char(38) -->
  		<preConditions onFail="MARK_RAN">
  			<not><columnExists tableName="idgen_auto_generation_option" columnName="uuid"/></not>
  		</preConditions>
