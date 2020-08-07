@@ -21,6 +21,7 @@ import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -300,7 +301,9 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     public Long getSequenceValue(SequentialIdentifierGenerator generator) {
         Number val = (Number) sessionFactory.getCurrentSession()
                 .createSQLQuery("select next_sequence_value from idgen_seq_id_gen where id = :id")
-                .setParameter("id", generator.getId())
+		        // Added IntegerType.INSTANCE because hibernate in case of PostgreSQL converts null ids to 
+		        // bytea type and causes error. So had to add explicit type.
+		        .setParameter("id", generator.getId(), IntegerType.INSTANCE)
                 .uniqueResult();
         return val == null ? null : val.longValue();
 	}
