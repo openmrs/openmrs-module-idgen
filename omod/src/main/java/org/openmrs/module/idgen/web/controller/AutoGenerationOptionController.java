@@ -1,6 +1,7 @@
 package org.openmrs.module.idgen.web.controller;
 
 import org.apache.commons.logging.Log;
+
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.LocationService;
@@ -10,11 +11,14 @@ import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.propertyeditor.AutoGenerationOptionEditor;
 import org.openmrs.module.idgen.propertyeditor.IdentifierSourceEditor;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.idgen.validator.AutoGenerationOptionValidator;
 import org.openmrs.propertyeditor.PatientIdentifierTypeEditor;
 import org.openmrs.util.OpenmrsClassLoader;
+import org.openmrs.validator.ValidateUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -107,12 +111,11 @@ public class AutoGenerationOptionController {
     @RequestMapping("/module/idgen/saveAutoGenerationOption")
     public ModelAndView saveAutoGenerationOption(@ModelAttribute("option") AutoGenerationOption option, BindingResult result, SessionStatus status) {
 		
-    	// TODO: Implement validation here
+    	ValidateUtil.validate(option, result);
 		
 		if (result.hasErrors()) {
 			return new ModelAndView("/module/idgen/editAutoGenerationOption");
 		}
-		
 		// add/update the option
 		Context.getService(IdentifierSourceService.class).saveAutoGenerationOption(option);
 		
