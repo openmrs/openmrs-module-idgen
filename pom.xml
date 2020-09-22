@@ -13,7 +13,7 @@
 		<connection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</connection>
 		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-idgen.git</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-idgen/</url>
-		<tag>2.8</tag>
+		<tag>HEAD</tag>
 	
 	</scm>
 	
