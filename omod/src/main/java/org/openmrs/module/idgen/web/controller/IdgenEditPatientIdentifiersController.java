@@ -79,7 +79,7 @@ public class IdgenEditPatientIdentifiersController {
  		// Default Patient Identifiers To Display
     	List<Map<String, Object>> defaultIdentifiers = new ArrayList<Map<String, Object>>();
     	if (patientId != null) {
-    		Patient patient = Context.getPatientService().getPatient(patientId);
+    		Patient patient = Context.getPatientService().getPatientOrPromotePerson(patientId);
     		for (PatientIdentifier pi : patient.getActiveIdentifiers()) {
         		Map<String, Object> rowData = new HashMap<String, Object>();
         		rowData.putAll(allIdentifiers.get(pi.getIdentifierType().getPatientIdentifierTypeId().toString()));
