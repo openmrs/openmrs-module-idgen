@@ -48,7 +48,7 @@
 					</select>
 				</td>
 				<th><spring:message code="idgen.identifierContains"/>:</th>
-				<td width="100%"><input type="text" name="identifier" value="${identifier}"/></td>
+				<td width="100%"><input type="text" id="identifier" name="identifier" value="${ui.encodeHtmlContent(identifier)}"/></td>
 			</tr>
 			<tr>
 				<th><spring:message code="idgen.generatedBetween"/>:</th>
@@ -58,7 +58,7 @@
 					<openmrs:fieldGen type="java.util.Date" formFieldName="toDate" val="${toDate}" />
 				</td>
 				<th><spring:message code="idgen.commentContains"/>:</th>
-				<td width="100%"><input type="text" name="comment" value="${comment}"/></td>
+				<td width="100%"><input type="text" id="comment" name="comment" value="${ui.encodeHtmlContent(comment)}"/></td>
 			</tr>
 			<tr>
 				<th><spring:message code="idgen.generatedBy"/>:</th>
