@@ -59,7 +59,7 @@ nb-configuration.xml
 .*
 !.gitignore
 !.gitattributes
-!.travis.yml
+!.github
 *~
 
 ### OS generated files ###
