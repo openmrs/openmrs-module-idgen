@@ -25,7 +25,7 @@ public class AutoGenerationOptionValidator implements Validator {
 			return;
 		}
 		AutoGenerationOption autoGenerationOption = (AutoGenerationOption) object;
-		if(!(autoGenerationOption.isManualEntryEnabled() && autoGenerationOption.isAutomaticGenerationEnabled())){
+		if(!(autoGenerationOption.isManualEntryEnabled() || autoGenerationOption.isAutomaticGenerationEnabled())){
 			errors.reject("Either automatic or manual generation must be enabled");
 		}
 
