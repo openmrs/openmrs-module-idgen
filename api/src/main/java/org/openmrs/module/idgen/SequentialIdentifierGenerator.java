@@ -218,26 +218,46 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	 * @return the {@link PrefixProvider}
 	 */
 	public PrefixProvider getPrefixProvider(String prefix) throws APIException {
-		
+
 		if (StringUtils.isBlank(prefix)) {
 			return new ConstantPrefixProvider("");
 		}
-		
+
 		if (prefix.startsWith(CONFIGURATION_PREFIX)) {
-			
-			String beanName = StringUtils.substringAfter(prefix, ":");
-			
+			PrefixProvider provider = null;
+			String providerDetails = StringUtils.substringAfter(prefix, ":");
+			String[] providerAndConfiguration = providerDetails.split(":", 2);
+			String providerName = providerAndConfiguration[0];
+			String configuration = (providerAndConfiguration.length == 2 ? providerAndConfiguration[1] : null);
+
+			// First, try to load the prefix provider from the context, looking it up by bean name
 			try {
-				return Context.getRegisteredComponent(beanName, PrefixProvider.class);
+				provider = Context.getRegisteredComponent(providerName, PrefixProvider.class);
 			}
 			catch (Exception e) {
-				throw new APIException(
-				    "Invalid prefix configuration. The " + PrefixProvider.class.getSimpleName() + " bean name ('" + beanName + "') could not be resolved.",
-				    e);
 			}
-			
+
+			// If not found, try instantiating from a classname
+			if (provider == null) {
+				try {
+					Class<? extends PrefixProvider> prefixProviderClass =
+							(Class<? extends PrefixProvider>) Context.loadClass(providerName);
+					if (configuration != null) {
+						provider = prefixProviderClass.getConstructor(String.class).newInstance(configuration);
+					} else {
+						provider = prefixProviderClass.newInstance();
+					}
+				}
+				catch (Exception e) {
+					String msg = "Invalid prefix configuration. The prefix provider '" + providerName + "'";
+					msg += (configuration == null ? "" : " with configuration '" + configuration + "'");
+					msg += "could not be retrieved as a bean or instantiated as a class.";
+					throw new APIException(msg, e);
+				}
+			}
+			return provider;
 		}
-		
+
 		return new ConstantPrefixProvider(prefix);
 	}
 

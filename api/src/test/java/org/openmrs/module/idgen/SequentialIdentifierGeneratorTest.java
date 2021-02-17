@@ -2,20 +2,27 @@ package org.openmrs.module.idgen;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
+import org.openmrs.module.idgen.prefixprovider.DateBasedPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -29,8 +36,18 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class SequentialIdentifierGeneratorTest {
 		
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
 		mockStatic(Context.class);
+		when(Context.loadClass(anyString())).thenAnswer(new Answer<Object>() {
+			public Object answer(InvocationOnMock invocationOnMock) {
+				try {
+					return Class.forName(invocationOnMock.getArgumentAt(0, String.class));
+				}
+				catch (Exception e) {
+					return null;
+				}
+			}
+		});
 	}
 
 	/**
@@ -153,5 +170,20 @@ public class SequentialIdentifierGeneratorTest {
 		Assert.assertEquals("", gen.getPrefixProvider(null).getValue());
 		Assert.assertEquals("", gen.getPrefixProvider("").getValue());
 		Assert.assertEquals("", gen.getPrefixProvider(" ").getValue());
+	}
+
+	@Test
+	public void getIdentifierForSeed_shouldGenerateDatePrefixedIdFromDateBasedPrefixProvider() {
+		Date now = new Date();
+		String expectedPrefix = new SimpleDateFormat("yyyyMM").format(now);
+		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
+		generator.setBaseCharacterSet("0123456789");
+		generator.setFirstIdentifierBase("000");
+		generator.setName("Date Prefixed Sequential Identifier Source");
+		StringBuilder prefix = new StringBuilder();
+		prefix.append(SequentialIdentifierGenerator.CONFIGURATION_PREFIX);
+		prefix.append(DateBasedPrefixProvider.class.getName()).append(":yyyyMM");
+		generator.setPrefix(prefix.toString());
+		assertThat(generator.getIdentifierForSeed(1L), is(expectedPrefix + "001"));
 	}
 }
