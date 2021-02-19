@@ -34,7 +34,7 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
                 newPostRequest(getURI() + "/" + "0d47284f-9e9b-4a81-a88b-8bb42bc0a907" + "/identifier",
                         "{\"comment\":\"foo\"}")));
 
-        assertEquals("MRS000011", result.get(IdentifierResource.IDENTIFIER_KEY));
+        assertEquals("MRS200011", result.get(IdentifierResource.IDENTIFIER_KEY));
     }
 
     @Test

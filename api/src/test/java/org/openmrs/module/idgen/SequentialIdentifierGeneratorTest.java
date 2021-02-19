@@ -2,10 +2,14 @@ package org.openmrs.module.idgen;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import java.util.Date;
+
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +22,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
+import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
+import org.openmrs.module.idgen.service.BaseIdentifierSourceService;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -25,12 +31,14 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * test class for {@link SequentialIdentifierGenerator}
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
+@PrepareForTest({Context.class, DateUtil.class})
 public class SequentialIdentifierGeneratorTest {
 		
 	@Before
 	public void setup() {
 		mockStatic(Context.class);
+		mockStatic(DateUtil.class);
+		when(DateUtil.getDate(anyString())).thenCallRealMethod();
 	}
 
 	/**
@@ -153,5 +161,69 @@ public class SequentialIdentifierGeneratorTest {
 		Assert.assertEquals("", gen.getPrefixProvider(null).getValue());
 		Assert.assertEquals("", gen.getPrefixProvider("").getValue());
 		Assert.assertEquals("", gen.getPrefixProvider(" ").getValue());
+	}
+
+	@Test
+	public void getMinimumSequenceValue_shouldSupportDynamicDateEvaluation() {
+
+		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
+		generator.setName("KGH ID Identifier Generator");
+		generator.setPrefix("KGH");
+		generator.setBaseCharacterSet("1234567890");
+		generator.setFirstIdentifierBase("0001");
+
+		Date endOfJan = DateUtil.getDate("2020-01-31");
+		when(DateUtil.getCurrentDate()).thenReturn(endOfJan);
+
+		generator.setFirstIdentifierBase("${currentDate:yyyyMMdd}1");
+		String firstIdentifierBase = generator.evaluateFirstIdentifierBase();
+		Assert.assertThat(firstIdentifierBase, Matchers.is("202001311"));
+
+		generator.setFirstIdentifierBase("888${currentDate:yyyyMM}55");
+		firstIdentifierBase = generator.evaluateFirstIdentifierBase();
+		Assert.assertThat(firstIdentifierBase, Matchers.is("88820200155"));
+
+		generator.setFirstIdentifierBase("${currentDate:yyyy}111${currentDate:MM}");
+		firstIdentifierBase = generator.evaluateFirstIdentifierBase();
+		Assert.assertThat(firstIdentifierBase, Matchers.is("202011101"));
+	}
+
+	@Test
+	public void shouldSwitchToNewPrefixAndResetSequenceOnNewDate() {
+
+		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
+		generator.setName("KGH ID Identifier Generator");
+		generator.setPrefix("KGH");
+		generator.setBaseCharacterSet("1234567890");
+		generator.setFirstIdentifierBase("0001");
+
+		SequentialIdentifierGeneratorProcessor processor = new SequentialIdentifierGeneratorProcessor();
+		processor.setIdentifierSourceService(new BaseIdentifierSourceService() {
+			long nextSequenceNum = 1L;
+			public void saveSequenceValue(SequentialIdentifierGenerator sequentialIdentifierGenerator, long l) {
+				nextSequenceNum = l;
+			}
+			public Long getSequenceValue(SequentialIdentifierGenerator sequentialIdentifierGenerator) {
+				return nextSequenceNum;
+			}
+		});
+
+		generator.setFirstIdentifierBase("${currentDate:yyMM}0001");
+
+		Date endOfJan = DateUtil.getDate("2020-01-31");
+		when(DateUtil.getCurrentDate()).thenReturn(endOfJan);
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20010001"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20010002"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20010003"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20010004"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20010005"));
+
+		Date startOfFeb = DateUtil.getDate("2020-02-01");
+		when(DateUtil.getCurrentDate()).thenReturn(startOfFeb);
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20020001"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20020002"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20020003"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20020004"));
+		Assert.assertThat(processor.getIdentifiers(generator, 1).get(0), Matchers.is("KGH20020005"));
 	}
 }

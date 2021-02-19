@@ -13,13 +13,15 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Evaluates a SequentialIdentifierSource
@@ -41,15 +43,21 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
 		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
+
+		// Get the next sequence value.
         Long sequenceValue = identifierSourceService.getSequenceValue(seq);
-    	if (sequenceValue == null || sequenceValue < 0) {
-    		if (seq.getFirstIdentifierBase() != null) {
-    			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
-    		}
-    		else {
-    			sequenceValue = 1L;
-    		}
-    	}
+
+        // Get the first sequence value allowed based on the identifier base
+		Long baseSequenceValue = 1L;
+		String identifierBase = seq.evaluateFirstIdentifierBase();
+		if (StringUtils.isNotBlank(identifierBase)) {
+			baseSequenceValue = IdgenUtil.convertFromBase(identifierBase, seq.getBaseCharacterSet().toCharArray());
+		}
+
+		// If the base sequence value is greater than the next sequence value, reset the next sequence value to the base
+		if (sequenceValue == null || sequenceValue < baseSequenceValue) {
+			sequenceValue = baseSequenceValue;
+		}
 
     	Set<String> reservedIdentifiers = source.getReservedIdentifiers();
     	

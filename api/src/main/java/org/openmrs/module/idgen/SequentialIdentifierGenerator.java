@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.idgen;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -70,7 +72,8 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
      */
     public String getIdentifierForSeed(long seed) {
     	// Convert the next sequence integer into a String with the appropriate Base characters
-		int seqLength = firstIdentifierBase == null ? 1 : firstIdentifierBase.length();
+	    String evaluatedIdentifierBase = evaluateFirstIdentifierBase();
+		int seqLength = evaluatedIdentifierBase == null ? 1 : evaluatedIdentifierBase.length();
 
 		String identifier = IdgenUtil.convertToBase(seed, baseCharacterSet.toCharArray(), seqLength);
 		
@@ -107,6 +110,34 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 
     	return identifier;
     }
+
+	/**
+	 * @return the minimum sequence value that should be used for the next identifier generated
+	 */
+	public String evaluateFirstIdentifierBase() {
+		String ret = firstIdentifierBase;
+		if (StringUtils.isNotBlank(ret)) {
+			// If the first identifier base contains dates to evaluate, do so
+			boolean continueIterating = ret.contains("${");
+			while (continueIterating) {
+				continueIterating = false;
+				int startIndex = ret.indexOf("${");
+				int endIndex = ret.indexOf("}", startIndex);
+				if (startIndex >= 0 && endIndex > startIndex) {
+					String dataToEvaluate = ret.substring(startIndex + 2, endIndex);
+					String[] keyAndConfig = dataToEvaluate.split(":");
+					if (keyAndConfig[0].equalsIgnoreCase("currentDate")) {
+						String d = new SimpleDateFormat(keyAndConfig[1]).format(DateUtil.getCurrentDate());
+						ret = ret.replace("${" + dataToEvaluate + "}", d);
+						continueIterating = true;
+					}
+				}
+			}
+		}
+		return ret;
+	}
+
+
 
 	//***** PROPERTY ACCESS *****
 
