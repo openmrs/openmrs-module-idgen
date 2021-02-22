@@ -13,13 +13,14 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Evaluates a SequentialIdentifierSource
@@ -43,12 +44,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
         Long sequenceValue = identifierSourceService.getSequenceValue(seq);
     	if (sequenceValue == null || sequenceValue < 0) {
-    		if (seq.getFirstIdentifierBase() != null) {
-    			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
-    		}
-    		else {
-    			sequenceValue = 1L;
-    		}
+    		sequenceValue = resetToFirstSequenceValue(seq);
     	}
 
     	Set<String> reservedIdentifiers = source.getReservedIdentifiers();
@@ -56,7 +52,7 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
     	List<String> identifiers = new ArrayList<String>();
     	
     	for (int i=0; i<batchSize;) {
-    		String val = seq.getIdentifierForSeed(sequenceValue);
+    		String val = generateIdentifier(seq, sequenceValue);
     		if (!reservedIdentifiers.contains(val)) {
     			identifiers.add(val);
     			i++;
@@ -67,5 +63,26 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
         identifierSourceService.saveSequenceValue(seq, sequenceValue);
 
     	return identifiers;
+	}
+
+	/**
+	 * This sets the next sequence value to 1 or whatever number represents the first identifier base configured
+	 * and saves this to the database
+	 * @return the next sequence value, after it is reset
+	 */
+	protected Long resetToFirstSequenceValue(SequentialIdentifierGenerator seq) {
+		Long sequenceValue = 1L;
+		if (seq.getFirstIdentifierBase() != null) {
+			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
+		}
+		identifierSourceService.saveSequenceValue(seq, sequenceValue);
+		return sequenceValue;
+	}
+
+	/**
+	 * @return an identifier for the given sequence number seed
+	 */
+	protected String generateIdentifier(SequentialIdentifierGenerator seq, Long sequenceValue) {
+		return seq.getIdentifierForSeed(sequenceValue);
 	}
 }

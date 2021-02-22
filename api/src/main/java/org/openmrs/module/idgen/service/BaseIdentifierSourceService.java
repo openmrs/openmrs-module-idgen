@@ -13,6 +13,15 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
@@ -28,21 +37,10 @@ import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
-import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
-import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.module.idgen.service.db.IdentifierSourceDAO;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *  Base Implementation of the IdentifierSourceService API
@@ -396,6 +394,13 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws APIException {
 		return dao.getLogEntries(source, fromDate, toDate, identifier, generatedBy, comment);
+	}
+
+	/**
+	 * @see IdentifierSourceService#getMostRecentLogEntry(IdentifierSource)
+	 */
+	public LogEntry getMostRecentLogEntry(IdentifierSource source) throws APIException {
+		return dao.getMostRecentLogEntry(source);
 	}
 
     /**

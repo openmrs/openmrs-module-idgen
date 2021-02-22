@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,7 @@ import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
+import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -303,5 +306,65 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void getAutoGenerationOptionById_shouldFetchAutoGenerationOptionByPrimaryKey() {
         AutoGenerationOption option = identifierSourceService.getAutoGenerationOption(2);
         Assert.assertEquals(2, option.getId().intValue());
+    }
+
+	@Test
+	public void shouldReturnNullIfNoLogEntriesFound() {
+		// Source 4 has no log entries in the test data
+		IdentifierSource is = identifierSourceService.getIdentifierSource(4);
+		LogEntry entry = identifierSourceService.getMostRecentLogEntry(is);
+		Assert.assertNull(entry);
+	}
+
+	@Test
+	public void shouldReturnMostRecentLogEntryOrderedByDateGeneratedAndId() {
+		// Source 1 has 3 entries.  Order should be 3, 1, 2
+		IdentifierSource is = identifierSourceService.getIdentifierSource(1);
+		LogEntry entry = identifierSourceService.getMostRecentLogEntry(is);
+		Assert.assertEquals(2, entry.getId().intValue());
+		Assert.assertEquals("New Visit", entry.getComment());
+		Assert.assertEquals(is, entry.getSource());
+		Assert.assertEquals(1, entry.getGeneratedBy().getId().intValue());
+		Assert.assertEquals("100HH9", entry.getIdentifier());
+	}
+
+    @Test
+	public void shouldReturnMostRecentLogEntryForSourceWhenGeneratedInBatch() {
+	    SequentialIdentifierGenerator is = (SequentialIdentifierGenerator)identifierSourceService.getIdentifierSource(1);
+	    List<String>  sig = identifierSourceService.generateIdentifiers(is, 1000, "hello");
+	    LogEntry entry = identifierSourceService.getMostRecentLogEntry(is);
+	    Assert.assertNotNull(entry);
+	    Assert.assertEquals("hello", entry.getComment());
+	    Assert.assertEquals(is, entry.getSource());
+	    Assert.assertEquals(Context.getAuthenticatedUser(), entry.getGeneratedBy());
+	    assertDatesEqual(new Date(), entry.getDateGenerated(), "yyyy-MM-dd");
+
+	    // This source has a nextSequenceValue = 6, so last id in a batch of 1000 should be 1005
+	    String expected = is.getIdentifierForSeed(1005L);
+	    Assert.assertEquals(expected, entry.getIdentifier());
+    }
+
+	@Test
+	public void shouldReturnMostRecentLogEntryForSourceWhenGeneratedInSequence() {
+		SequentialIdentifierGenerator is = (SequentialIdentifierGenerator)identifierSourceService.getIdentifierSource(1);
+		for (int i=0; i<1000; i++) {
+			List<String>  sig = identifierSourceService.generateIdentifiers(is, 1, "Sequence-" + i);
+			LogEntry entry = identifierSourceService.getMostRecentLogEntry(is);
+			Assert.assertNotNull(entry);
+			Assert.assertEquals("Sequence-" + i, entry.getComment());
+			Assert.assertEquals(is, entry.getSource());
+			Assert.assertEquals(Context.getAuthenticatedUser(), entry.getGeneratedBy());
+			assertDatesEqual(new Date(), entry.getDateGenerated(), "yyyy-MM-dd");
+
+			// This source has a nextSequenceValue = 6, so last id in a batch should be 6+i
+			long expectedSeed = 6 + i;
+			String expected = is.getIdentifierForSeed(expectedSeed);
+			Assert.assertEquals(expected, entry.getIdentifier());
+		}
+	}
+
+    protected void assertDatesEqual(Date expected, Date actual, String dateFormat) {
+	    SimpleDateFormat df = new SimpleDateFormat(dateFormat);
+	    Assert.assertEquals(df.format(expected), df.format(actual));
     }
 }

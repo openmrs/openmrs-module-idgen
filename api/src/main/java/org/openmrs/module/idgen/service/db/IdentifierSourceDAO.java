@@ -143,6 +143,15 @@ public interface IdentifierSourceDAO {
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws DAOException;
 
+	/**
+	 * Retrieves the most recent Log Entry for the given source, based on generation date and auto incremented id
+	 * @param source - the identifier source for which to return the log entry
+	 * @return LogEntry - the most recent LogEntry that matches the given source
+	 * @throws DAOException
+	 */
+	@Transactional(readOnly = true)
+	LogEntry getMostRecentLogEntry(IdentifierSource source) throws DAOException;
+
     /**
      * @param uuid
      * @return the IdentifierSource with the given uuid

@@ -13,6 +13,10 @@
  */
 package org.openmrs.module.idgen.service.db;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -38,10 +42,6 @@ import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 /**
  *  Hibernate Implementation of the IdentifierSourceDAO Interface
@@ -248,6 +248,22 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 		}	
 		criteria.addOrder(Order.desc("dateGenerated"));
 		return (List<LogEntry>) criteria.list();
+	}
+
+	/**
+	 * @see IdentifierSourceDAO#getLogEntries(IdentifierSource, Date, Date, String, User, String)
+	 */
+	@SuppressWarnings("unchecked")
+	public LogEntry getMostRecentLogEntry(IdentifierSource source) throws DAOException {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(LogEntry.class);
+		if (source == null) {
+			throw new DAOException("You must specify the Identifier Source that you wish to query");
+		}
+		criteria.add(Restrictions.eq("source", source));
+		criteria.addOrder(Order.desc("dateGenerated"));
+		criteria.addOrder(Order.desc("id"));
+		criteria.setMaxResults(1);
+		return (LogEntry) criteria.uniqueResult();
 	}
 
     /**
