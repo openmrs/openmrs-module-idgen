@@ -40,29 +40,12 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
 	 */
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
-		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
         Long sequenceValue = identifierSourceService.getSequenceValue(seq);
     	if (sequenceValue == null || sequenceValue < 0) {
     		sequenceValue = resetToFirstSequenceValue(seq);
     	}
-
-    	Set<String> reservedIdentifiers = source.getReservedIdentifiers();
-    	
-    	List<String> identifiers = new ArrayList<String>();
-    	
-    	for (int i=0; i<batchSize;) {
-    		String val = generateIdentifier(seq, sequenceValue);
-    		if (!reservedIdentifiers.contains(val)) {
-    			identifiers.add(val);
-    			i++;
-    		}
-	    	sequenceValue++;
-    	}
-
-        identifierSourceService.saveSequenceValue(seq, sequenceValue);
-
-    	return identifiers;
+    	return generateBatch(seq, sequenceValue, batchSize);
 	}
 
 	/**
@@ -80,9 +63,20 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	}
 
 	/**
-	 * @return an identifier for the given sequence number seed
+	 * @return a batch of identifiers of the given batchSize, starting with the given sequenceValue
 	 */
-	protected String generateIdentifier(SequentialIdentifierGenerator seq, Long sequenceValue) {
-		return seq.getIdentifierForSeed(sequenceValue);
+	protected List<String> generateBatch(SequentialIdentifierGenerator seq, Long sequenceValue, int batchSize) {
+		List<String> identifiers = new ArrayList<String>();
+		Set<String> reservedIdentifiers = seq.getReservedIdentifiers();
+		for (int i=0; i<batchSize;) {
+			String val = seq.getIdentifierForSeed(sequenceValue);
+			if (!reservedIdentifiers.contains(val)) {
+				identifiers.add(val);
+				i++;
+			}
+			sequenceValue++;
+		}
+		identifierSourceService.saveSequenceValue(seq, sequenceValue);
+		return identifiers;
 	}
 }
