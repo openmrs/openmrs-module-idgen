@@ -13,13 +13,14 @@
  */
 package org.openmrs.module.idgen.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Evaluates a SequentialIdentifierSource
@@ -39,33 +40,43 @@ public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceP
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
 	 */
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
-		
 		SequentialIdentifierGenerator seq = (SequentialIdentifierGenerator) source;
         Long sequenceValue = identifierSourceService.getSequenceValue(seq);
     	if (sequenceValue == null || sequenceValue < 0) {
-    		if (seq.getFirstIdentifierBase() != null) {
-    			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
-    		}
-    		else {
-    			sequenceValue = 1L;
-    		}
+    		sequenceValue = resetToFirstSequenceValue(seq);
     	}
+    	return generateBatch(seq, sequenceValue, batchSize);
+	}
 
-    	Set<String> reservedIdentifiers = source.getReservedIdentifiers();
-    	
-    	List<String> identifiers = new ArrayList<String>();
-    	
-    	for (int i=0; i<batchSize;) {
-    		String val = seq.getIdentifierForSeed(sequenceValue);
-    		if (!reservedIdentifiers.contains(val)) {
-    			identifiers.add(val);
-    			i++;
-    		}
-	    	sequenceValue++;
-    	}
+	/**
+	 * This sets the next sequence value to 1 or whatever number represents the first identifier base configured
+	 * and saves this to the database
+	 * @return the next sequence value, after it is reset
+	 */
+	protected Long resetToFirstSequenceValue(SequentialIdentifierGenerator seq) {
+		Long sequenceValue = 1L;
+		if (seq.getFirstIdentifierBase() != null) {
+			sequenceValue = IdgenUtil.convertFromBase(seq.getFirstIdentifierBase(), seq.getBaseCharacterSet().toCharArray());
+		}
+		identifierSourceService.saveSequenceValue(seq, sequenceValue);
+		return sequenceValue;
+	}
 
-        identifierSourceService.saveSequenceValue(seq, sequenceValue);
-
-    	return identifiers;
+	/**
+	 * @return a batch of identifiers of the given batchSize, starting with the given sequenceValue
+	 */
+	protected List<String> generateBatch(SequentialIdentifierGenerator seq, Long sequenceValue, int batchSize) {
+		List<String> identifiers = new ArrayList<String>();
+		Set<String> reservedIdentifiers = seq.getReservedIdentifiers();
+		for (int i=0; i<batchSize;) {
+			String val = seq.getIdentifierForSeed(sequenceValue);
+			if (!reservedIdentifiers.contains(val)) {
+				identifiers.add(val);
+				i++;
+			}
+			sequenceValue++;
+		}
+		identifierSourceService.saveSequenceValue(seq, sequenceValue);
+		return identifiers;
 	}
 }
