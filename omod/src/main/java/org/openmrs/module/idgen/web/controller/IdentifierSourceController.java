@@ -1,7 +1,9 @@
 package org.openmrs.module.idgen.web.controller;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,11 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -147,17 +145,20 @@ public class IdentifierSourceController {
      * Saves an IdentifierSource
      */
     @RequestMapping("/module/idgen/saveIdentifierSource")
-    public ModelAndView saveIdentifierSource(@ModelAttribute("source") IdentifierSource source, BindingResult result, SessionStatus status) {
+    public ModelAndView saveIdentifierSource(@ModelAttribute("source") IdentifierSource source,
+		    BindingResult result, SessionStatus status,
+		    @RequestParam(value="skipValidation", required = false) Boolean skipValidation) {
 		
     	// Validate input
-    	Validator v = new IdentifierSourceValidator();
-    	if (source instanceof SequentialIdentifierGenerator) {
-    		v = new SequentialIdentifierGeneratorValidator();
-    	}
-    	else if (source instanceof RemoteIdentifierSource) {
-    		v = new RemoteIdentifierSourceValidator();
-    	}
-    	v.validate(source, result);
+	    if (BooleanUtils.isNotTrue(skipValidation)) {
+		    Validator v = new IdentifierSourceValidator();
+		    if (source instanceof SequentialIdentifierGenerator) {
+			    v = new SequentialIdentifierGeneratorValidator();
+		    } else if (source instanceof RemoteIdentifierSource) {
+			    v = new RemoteIdentifierSourceValidator();
+		    }
+		    v.validate(source, result);
+	    }
     	
 		if (result.hasErrors()) {
 			return new ModelAndView("/module/idgen/editIdentifierSource");
