@@ -19,7 +19,7 @@
 			<spring:message code="general.edit" />: ${source.name}
 		</c:otherwise>
 	</c:choose>
-	<spring:message code="idgen.general.for"/> ${source.identifierType.name}
+	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>
 </h3>
 
 <frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form">
