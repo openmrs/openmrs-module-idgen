@@ -13,6 +13,10 @@
  */
 package org.openmrs.module.idgen.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -26,14 +30,9 @@ import org.openmrs.module.idgen.IdgenConstants;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
-import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Interface for IdentifierSource Service Methods
@@ -254,6 +253,15 @@ public interface IdentifierSourceService extends OpenmrsService {
 	@Transactional(readOnly=true)
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws APIException;
+
+	/**
+	 * Retrieves the most recent Log Entry for the given source, based on generation date and auto incremented id
+	 * @param source - the identifier source for which to return the log entry
+	 * @return LogEntry - the most recent LogEntry that matches the given source
+	 * @throws APIException
+	 */
+	@Transactional(readOnly=true)
+	LogEntry getMostRecentLogEntry(IdentifierSource source) throws APIException;
 
 	/**
 	 * Convenience method that checks a pool's level and incrementally adds identifiers in batches of 100

@@ -167,6 +167,9 @@
 		</c:if>
 	</table>
 	<br/>
+	<input type="checkbox" name="skipValidation" value="true"/> <spring:message code="idgen.skipValidation" />
+	<br/>
+	<br/>
 	<input type="submit" value="<spring:message code="general.save" />"/>
 	<input type="button" value="<spring:message code="general.cancel" />" onclick="document.location.href='manageIdentifierSources.form';"/>
 </frm:form>
