@@ -7,7 +7,7 @@
     "url": "https://github.com/openmrs/openmrs-module-idgen"
   },
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.21.1",
     "bootstrap": "^4.0.0-alpha.6",
     "jquery": "^3.2.1",
     "moment": "^2.18.1",
