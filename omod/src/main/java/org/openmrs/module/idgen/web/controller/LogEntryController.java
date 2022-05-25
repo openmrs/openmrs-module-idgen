@@ -45,7 +45,7 @@ public class LogEntryController {
     /**
      * View / Search Log Entries
      */
-    @RequestMapping("/module/idgen/viewLogEntries")
+    @RequestMapping("/module/idgen/viewLogEntries.form")
     public void viewLogEntries(ModelMap model, HttpServletRequest request,
     							     @RequestParam(required=false, value="source") IdentifierSource source,
     							     @RequestParam(required=false, value="fromDate") Date fromDate,

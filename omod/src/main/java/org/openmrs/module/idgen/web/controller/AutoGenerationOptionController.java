@@ -51,7 +51,7 @@ public class AutoGenerationOptionController {
     /**
      * Edit a new or existing AutoGeneration Option
      */
-    @RequestMapping("/module/idgen/editAutoGenerationOption")
+    @RequestMapping("/module/idgen/editAutoGenerationOption.form")
     public void editAutoGenerationOption(ModelMap model, HttpServletRequest request,
     							     @RequestParam(required=false, value="autoGenerationOption") AutoGenerationOption option,   // expects to get either an option or an identifier type
                                      @RequestParam(required=false, value="identifierType") PatientIdentifierType type) {
@@ -75,7 +75,7 @@ public class AutoGenerationOptionController {
     /**
      * Retrieves all AutoGenerationOptions
      */
-    @RequestMapping("/module/idgen/manageAutoGenerationOptions")
+    @RequestMapping("/module/idgen/manageAutoGenerationOptions.form")
     public void manageAutoGenerationOptions(ModelMap model) {
 		if (Context.isAuthenticated()) {
 
@@ -104,7 +104,7 @@ public class AutoGenerationOptionController {
     /**
      * Saves an AutoGenerationOption
      */
-    @RequestMapping("/module/idgen/saveAutoGenerationOption")
+    @RequestMapping("/module/idgen/saveAutoGenerationOption.form")
     public ModelAndView saveAutoGenerationOption(@ModelAttribute("option") AutoGenerationOption option, BindingResult result, SessionStatus status) {
 		
     	// TODO: Implement validation here
@@ -126,7 +126,7 @@ public class AutoGenerationOptionController {
     /**
      * Delete an existing AutoGeneration Option
      */
-    @RequestMapping("/module/idgen/deleteAutoGenerationOption")
+    @RequestMapping("/module/idgen/deleteAutoGenerationOption.form")
     public ModelAndView deleteAutoGenerationOption(ModelMap model, HttpServletRequest request,
                                          @RequestParam("autoGenerationOption") AutoGenerationOption option) {
         if (Context.isAuthenticated()) {

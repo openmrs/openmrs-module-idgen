@@ -74,7 +74,7 @@ public class IdentifierSourceController {
     /**
      * Edit a new or existing IdentifierSource
      */
-    @RequestMapping("/module/idgen/editIdentifierSource")
+    @RequestMapping("/module/idgen/editIdentifierSource.form")
     public void editIdentifierSource(ModelMap model, HttpServletRequest request,
     							     @RequestParam(required=false, value="source") IdentifierSource source,
     							     @RequestParam(required=false, value="identifierType") PatientIdentifierType identifierType,
@@ -109,7 +109,7 @@ public class IdentifierSourceController {
     /**
      * Retrieves all IdentifierSources
      */
-    @RequestMapping("/module/idgen/manageIdentifierSources")
+    @RequestMapping("/module/idgen/manageIdentifierSources.form")
     public void manageIdentifierSources(ModelMap model, 
     									@RequestParam(required=false, value="includeRetired") Boolean includeRetired) {
 		if (Context.isAuthenticated()) {
@@ -135,7 +135,7 @@ public class IdentifierSourceController {
     /**
      * Deletes an IdentifierSource
      */
-    @RequestMapping("/module/idgen/deleteIdentifierSource")
+    @RequestMapping("/module/idgen/deleteIdentifierSource.form")
     public String deletePatientSearch(ModelMap model, @RequestParam(required=true, value="source") IdentifierSource source) {
     	Context.getService(IdentifierSourceService.class).purgeIdentifierSource(source);
     	return "redirect:/module/idgen/manageIdentifierSources.list";
@@ -144,7 +144,7 @@ public class IdentifierSourceController {
     /**
      * Saves an IdentifierSource
      */
-    @RequestMapping("/module/idgen/saveIdentifierSource")
+    @RequestMapping("/module/idgen/saveIdentifierSource.form")
     public ModelAndView saveIdentifierSource(@ModelAttribute("source") IdentifierSource source,
 		    BindingResult result, SessionStatus status,
 		    @RequestParam(value="skipValidation", required = false) Boolean skipValidation) {
@@ -172,7 +172,7 @@ public class IdentifierSourceController {
     /**
      * Generate Identifiers Page
      */
-    @RequestMapping("/module/idgen/viewIdentifierSource")
+    @RequestMapping("/module/idgen/viewIdentifierSource.form")
     public void viewIdentifierSource(ModelMap model, @RequestParam(required=true, value="source") IdentifierSource source) {
     	model.addAttribute("source", source);
     }
@@ -180,7 +180,7 @@ public class IdentifierSourceController {
     /**
      * Generate and Output a Single new Identifier
      */
-    @RequestMapping("/module/idgen/generateIdentifier")
+    @RequestMapping("/module/idgen/generateIdentifier.form")
     public void generateIdentifier(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
     							   @RequestParam(required=false, value="comment") String comment,
@@ -192,7 +192,7 @@ public class IdentifierSourceController {
     /**
      * Export Identifiers To File
      */
-    @RequestMapping("/module/idgen/exportIdentifiers")
+    @RequestMapping("/module/idgen/exportIdentifiers.form")
     public void exportIdentifiers(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
     							   @RequestParam(required=true, value="numberToGenerate") Integer numberToGenerate,
@@ -221,7 +221,7 @@ public class IdentifierSourceController {
     /**
      * Upload Identifiers From File
      */
-    @RequestMapping("/module/idgen/addIdentifiersFromFile")
+    @RequestMapping("/module/idgen/addIdentifiersFromFile.form")
     public String addIdentifiersFromFile(ModelMap model, HttpServletRequest request, HttpServletResponse response,
                                          @RequestParam(required=true, value="source") IdentifierSource source,
                                          @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
@@ -261,7 +261,7 @@ public class IdentifierSourceController {
     /**
      * Upload Identifiers to Pool From Source
      */
-    @RequestMapping("/module/idgen/addIdentifiersFromSource")
+    @RequestMapping("/module/idgen/addIdentifiersFromSource.form")
     public String addIdentifiersFromSource(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
     							   @RequestParam(required=true, value="batchSize") Integer batchSize) throws Exception {
@@ -275,7 +275,7 @@ public class IdentifierSourceController {
     /**
      * Reserve Identifiers From File
      */
-    @RequestMapping("/module/idgen/reserveIdentifiersFromFile")
+    @RequestMapping("/module/idgen/reserveIdentifiersFromFile.form")
     public String reserveIdentifiersFromFile(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source,
     							   @RequestParam(required=true, value="inputFile") MultipartFile inputFile) throws Exception {
@@ -302,7 +302,7 @@ public class IdentifierSourceController {
     /**
      * Export Identifiers To File
      */
-    @RequestMapping("/module/idgen/exportReservedIdentifiers")
+    @RequestMapping("/module/idgen/exportReservedIdentifiers.form")
     public void exportReservedIdentifiers(ModelMap model, HttpServletRequest request, HttpServletResponse response,
     							   @RequestParam(required=true, value="source") IdentifierSource source) throws Exception {
 
