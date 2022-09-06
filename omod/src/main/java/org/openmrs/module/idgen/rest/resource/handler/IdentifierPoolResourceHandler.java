@@ -42,7 +42,7 @@ import io.swagger.models.properties.IntegerProperty;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
 
-@SubClassHandler(supportedClass = IdentifierPool.class, supportedOpenmrsVersions = {"1.8.*", "1.9.*","1.10.*", "1.11.*","2.0.*","2.1.*","2.2.*", "2.3.*", "2.4.*", "2.5.*", "2.6.*"})
+@SubClassHandler(supportedClass = IdentifierPool.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
 public class IdentifierPoolResourceHandler extends BaseDelegatingSubclassHandler<IdentifierSource, IdentifierPool>
 implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
 
