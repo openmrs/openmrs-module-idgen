@@ -47,8 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE
-        + "/autogenerationoption", supportedClass = AutoGenerationOption.class, supportedOpenmrsVersions = { "1.9.*",
-                "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*", "2.5.*", "2.6.*" })
+        + "/autogenerationoption", supportedClass = AutoGenerationOption.class, supportedOpenmrsVersions = {"1.9.* - 9.9.*"})
 public class AutoGenerationOptionResource extends MetadataDelegatingCrudResource<AutoGenerationOption> {
 	
 	@Override

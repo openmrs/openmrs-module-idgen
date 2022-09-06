@@ -28,7 +28,7 @@ import io.swagger.models.properties.IntegerProperty;
 import io.swagger.models.properties.LongProperty;
 import io.swagger.models.properties.StringProperty;
 
-@SubClassHandler(supportedClass = SequentialIdentifierGenerator.class, supportedOpenmrsVersions = {"1.8.*", "1.9.*","1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*","2.2.*", "2.3.*", "2.4.*", "2.5.*", "2.6.*"})
+@SubClassHandler(supportedClass = SequentialIdentifierGenerator.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
 public class SequentialIdentifierGeneratorResourceHandler extends BaseDelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGenerator>
 implements DelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGenerator> {
 
