@@ -138,7 +138,7 @@ public class IdentifierSourceController {
     @RequestMapping("/module/idgen/deleteIdentifierSource.form")
     public String deletePatientSearch(ModelMap model, @RequestParam(required=true, value="source") IdentifierSource source) {
     	Context.getService(IdentifierSourceService.class).purgeIdentifierSource(source);
-    	return "redirect:/module/idgen/manageIdentifierSources.list";
+    	return "redirect:/module/idgen/manageIdentifierSources.form";
     }
     
     /**
