@@ -285,7 +285,7 @@
 	<changeSet id="02fb6cc1-d45c-4985-8117-0d313975fd81" author="Partners In Health">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="idgen_auto_generation_option" />
-			<not><foreignKeyConstraintExists foreignKeyName="location_for_auto_generation_option" /></not>
+			<not><foreignKeyConstraintExists foreignKeyName="location_for_auto_generation_option" foreignKeyTableName="idgen_auto_generation_option"/></not>
 		</preConditions>
 		<addForeignKeyConstraint
 				baseTableName="idgen_auto_generation_option"
@@ -298,7 +298,7 @@
 
 	<changeSet id="4dce863f-bb66-4aa3-9663-22a23be24689" author="Partners In Health">
 		<preConditions onFail="MARK_RAN">
-			<foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" />
+			<foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" foreignKeyTableName="idgen_auto_generation_option"/>
 		</preConditions>
 		<dropForeignKeyConstraint baseTableName="idgen_auto_generation_option" constraintName="identifier_type for idgen_auto_generation_option"/>
  	</changeSet>
@@ -312,7 +312,7 @@
 
 	<changeSet id="0f79a646-4f62-4fef-b035-421ad8f73ba2" author="Partners In Health">
 		<preConditions onFail="MARK_RAN">
-			<not><foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" /></not>
+			<not><foreignKeyConstraintExists foreignKeyName="identifier_type for idgen_auto_generation_option" foreignKeyTableName="idgen_auto_generation_option"/></not>
 		</preConditions>
 		<addForeignKeyConstraint
 				constraintName="identifier_type for idgen_auto_generation_option"
