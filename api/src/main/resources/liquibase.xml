@@ -371,6 +371,21 @@
 			<replace replace="name-of-uuid-function" with="UUID()"/>
 		</modifySql>
  	</changeSet>
+
+	<changeSet id="9b5c919c-2223-41d2-824a-b65869666028" author="Ian Bacher">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="mariadb" />
+		</preConditions>
+		<comment>
+			Generating UUIDs for all rows in the idgen_auto_generation_option table for MariaDB to not distub daa579e7-b8de-4858-bfe5-c9ef2606db5e
+		</comment>
+		<update tableName="idgen_auto_generation_option" >
+			<column name="uuid" valueNumeric="name-of-uuid-function" />
+		</update>
+		<modifySql dbms="mariadb">
+			<replace replace="name-of-uuid-function" with="UUID()"/>
+		</modifySql>
+	</changeSet>
  	
  	<changeSet id="6b164990-ccd3-4508-9c08-11d27786da17" author="Samuel Male">
  		<comment>
