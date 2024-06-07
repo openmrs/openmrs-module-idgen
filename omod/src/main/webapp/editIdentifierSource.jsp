@@ -16,7 +16,7 @@
 			<spring:message code="general.new" />: <spring:message code="idgen.${source['class'].name}" />
 		</c:when>
 		<c:otherwise>
-			<spring:message code="general.edit" />: ${source.name}
+			<spring:message code="general.edit" />: <c:out value='${source.name}'/>
 		</c:otherwise>
 	</c:choose>
 	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>

@@ -10,20 +10,20 @@
 	.underlineRow td {border-bottom: 1px solid black;}
 </style>
 
-<h3>${source.identifierType.name}: ${source.name}</h3>
+<h3>${source.identifierType.name}: <c:out value='${source.name}'/></h3>
 
 <table id="sourceTable">
 	<tr>
 		<th><spring:message code="idgen.sourceName" /></th>
 		<td>
-			${source.name}
+			<c:out value='${source.name}'/>
 			&nbsp;&nbsp;
 			(<a href="editIdentifierSource.form?source=${source.id}"><spring:message code="general.edit" />)
 		</td>
 	</tr>
 	<tr>
 		<th><spring:message code="general.description" />:</th>
-		<td>${source.description}</td>
+		<td><c:out value='${source.description}'/></td>
 	</tr>
 	<tr>
 		<th><spring:message code="PatientIdentifier.identifierType" /></th>
@@ -115,8 +115,8 @@
 	<c:if test="${!empty source.source}">
 		<br/>
 		<form action="addIdentifiersFromSource.form" method="post" enctype="multipart/form-data">
-			The pool can also be filled by directly connecting to Identifier Source ${source.source.name}.<br/>
-			Quantity to upload from ${source.source.name}:
+			The pool can also be filled by directly connecting to Identifier Source <c:out value='${source.source.name}'/>.<br/>
+			Quantity to upload from <c:out value='${source.source.name}'/>:
 			<input type="hidden" name="source" value="${source.id}"/>
 			<input type="input" name="batchSize"/>
 			<input type="submit" value="Upload"/>
