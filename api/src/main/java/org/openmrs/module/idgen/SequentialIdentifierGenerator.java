@@ -20,6 +20,8 @@ import org.openmrs.module.idgen.prefixprovider.ConstantPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.patient.IdentifierValidator;
+import org.openmrs.module.idgen.suffixprovider.ConstantSuffixProvider;
+import org.openmrs.module.idgen.suffixprovider.SuffixProvider;
 
 /**
  * Auto-generating Identifier Source, which returns Identifiers in sequence
@@ -38,7 +40,15 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 	 * </pre></blockquote>
 	 */
 	private String prefix;
-    private String suffix; // Optional suffix
+	/**
+	 * A suffix can either be configurable or static. Configurable suffixes provide the
+	 * {@link SuffixProvider} bean name which will be used as a suffix source; Example:
+	 * <blockquote><pre>
+	 * "provider:LocationBasedSuffixProvider" // Configurable suffix
+	 * "LOC-" // Static suffix
+	 * </pre></blockquote>
+	 */
+    private String suffix;
     private String firstIdentifierBase; // First identifier to start at
 	private Integer minLength; // If > 0, will always return identifiers with a minimum of this length
 	private Integer maxLength; // If > 0, will always return identifiers no longer than this length
@@ -79,8 +89,14 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 			prefixProvider = new ConstantPrefixProvider(prefix);
 		}
 		identifier = prefixProvider.getValue() + identifier;
-    	identifier = (suffix == null ? identifier : identifier + suffix);
-    	
+
+
+		SuffixProvider sufixProvider = getSuffixProvider(suffix);
+		if (sufixProvider == null) {
+			sufixProvider = new ConstantSuffixProvider(suffix);
+		}
+		identifier = identifier + sufixProvider.getValue();
+
     	// Add check-digit, if required
     	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
     		try {
@@ -239,6 +255,39 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 		}
 		
 		return new ConstantPrefixProvider(prefix);
+	}
+
+	/**
+	 * Gets the {@link SuffixProvider} from a configured {@code suffix}
+	 *
+	 * @should return {@link ConstantSuffixProvider} based on {@code suffix} if a static suffix is provided.
+	 * @should return {@link ConstantSuffixProvider} based on a blank suffix if an null or blank suffix is provided
+	 * @should return {@link ConstantSuffixProvider} if the configured suffix provider cannot be Spring wired.
+	 * @param suffix A string representing a suffix configuration or a static suffix value.
+	 * @return the {@link SuffixProvider}
+	 */
+	public SuffixProvider getSuffixProvider(String suffix) throws APIException {
+
+		if (StringUtils.isBlank(suffix)) {
+			return new ConstantSuffixProvider("");
+		}
+
+		if (suffix.startsWith(CONFIGURATION_PREFIX)) {
+
+			String beanName = StringUtils.substringAfter(suffix, ":");
+
+			try {
+				return Context.getRegisteredComponent(beanName, SuffixProvider.class);
+			}
+			catch (Exception e) {
+				throw new APIException(
+				    "Invalid suffix configuration. The " + SuffixProvider.class.getSimpleName() + " bean name ('" + beanName + "') could not be resolved.",
+				    e);
+			}
+
+		}
+
+		return new ConstantSuffixProvider(suffix);
 	}
 
 }
