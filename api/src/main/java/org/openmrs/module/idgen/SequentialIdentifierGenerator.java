@@ -91,11 +91,11 @@ public class SequentialIdentifierGenerator extends BaseIdentifierSource {
 		identifier = prefixProvider.getValue() + identifier;
 
 
-		SuffixProvider sufixProvider = getSuffixProvider(suffix);
-		if (sufixProvider == null) {
-			sufixProvider = new ConstantSuffixProvider(suffix);
+		SuffixProvider suffixProvider = getSuffixProvider(suffix);
+		if (suffixProvider == null) {
+			suffixProvider = new ConstantSuffixProvider(suffix);
 		}
-		identifier = identifier + sufixProvider.getValue();
+		identifier = identifier + suffixProvider.getValue();
 
     	// Add check-digit, if required
     	if (getIdentifierType() != null && StringUtils.isNotEmpty(getIdentifierType().getValidator())) {
