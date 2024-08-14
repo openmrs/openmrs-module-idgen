@@ -46,6 +46,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should return all supported IdentifierSource types
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public List<Class<? extends IdentifierSource>> getIdentifierSourceTypes();
 
 	/**
@@ -56,6 +57,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should return a saved identifier pool
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException;
 	
 	/**
@@ -64,6 +66,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should return all identifier sources
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws APIException;
 	
 	/**
@@ -74,6 +77,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should return all identifier sources by type
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public Map<PatientIdentifierType, List<IdentifierSource>> getIdentifierSourcesByType(boolean includeRetired) throws APIException;
 	
 	/**
@@ -146,6 +150,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @return
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public IdentifierSourceProcessor getProcessor(IdentifierSource source);
 	
 	/**
@@ -155,18 +160,21 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException;
 
 	/**
 	 * Returns available identifiers from a pool
 	 */
 	@Transactional(readOnly=true)
+	@Authorized
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException;
 	
 	/**
 	 * Returns Pooled Identifiers for the given source, with the given status options
 	 */
 	@Transactional(readOnly=true)
+	@Authorized
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException;
 	
 	/**
@@ -191,6 +199,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 
      */
     @Transactional(readOnly = true)
+	@Authorized
     public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException;
 
     /**
@@ -201,6 +210,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @since 4.6.0
      */
     @Transactional(readOnly = true)
+	@Authorized
     public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
     
     /**
@@ -210,6 +220,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @should return options that don't have a configured location
 	 */
 	@Transactional(readOnly = true)
+	@Authorized
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;
 
     /**
@@ -218,6 +229,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @throws APIException
      */
     @Transactional(readOnly = true)
+	@Authorized
     public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException;
 
     /**
@@ -226,6 +238,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @throws non-unique exception if more than one auto-generation option for this type
      */
     @Transactional(readOnly = true)
+	@Authorized
     public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
 
 	/**
@@ -251,6 +264,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * The identifier and comment parameters do a "like" match, the date parameters ignore time
 	 */
 	@Transactional(readOnly=true)
+	@Authorized
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws APIException;
 
@@ -261,6 +275,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional(readOnly=true)
+	@Authorized
 	LogEntry getMostRecentLogEntry(IdentifierSource source) throws APIException;
 
 	/**
@@ -269,12 +284,14 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @param pool
 	 */
 	@Transactional
+	@Authorized
 	public void checkAndRefillIdentifierPool(IdentifierPool pool);
 	
 	/**
 	 * Convenience method that returns the set of Patient Identifier Types that match certain AutoGeneration parameters
 	 */
 	@Transactional(readOnly=true)
+	@Authorized
 	public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled);
 
     /**
@@ -282,6 +299,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @return the identifier source with the given uuid
      */
     @Transactional(readOnly=true)
+	@Authorized
     IdentifierSource getIdentifierSourceByUuid(String uuid);
     
     /**
@@ -290,6 +308,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @return the identifier source(s) with the given identifier type.
      */
     @Transactional(readOnly=true)
+	@Authorized
     List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType);
 
     /**
@@ -297,6 +316,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @param seq
      * @param sequenceValue
      */
+	@Authorized
     void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue);
 
     /**
@@ -304,6 +324,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @param seq
      * @return the sequence value from seq
      */
+	@Authorized
     Long getSequenceValue(SequentialIdentifierGenerator seq);
 
     /**
@@ -311,6 +332,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * hack, but because evidently the @Transactional annotation will only be picked up by service methods and we need this
      * method to be transactional
      */
+	@Authorized
     List<String> generateIdentifiersInternal(Integer sourceId, Integer batchSize, String comment);
 
 }
