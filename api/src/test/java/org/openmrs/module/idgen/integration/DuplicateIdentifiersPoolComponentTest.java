@@ -48,6 +48,7 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
                 @Override
                 public void run() {
                     Context.openSession();
+                    Context.authenticate("admin", "test");
                     IdentifierSource source = getService().getIdentifierSource(4);
                     try {
                         authenticate();
