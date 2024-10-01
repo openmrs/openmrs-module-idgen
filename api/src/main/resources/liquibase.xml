@@ -397,4 +397,11 @@
 			<column name="uuid" />
 		</createIndex>
  	</changeSet>
+
+	<changeSet id="9f33b50e-77e9-46df-b3ea-070c5360a5a3" author="loliveira">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="idgen_seq_id_gen" columnName="suffix"/>
+		</preConditions>
+		<modifyDataType tableName="idgen_seq_id_gen" columnName="suffix" newDataType="varchar(100)"/>
+	</changeSet>
 </databaseChangeLog>
