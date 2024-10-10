@@ -7,7 +7,7 @@
 <%@ include file="localHeader.jsp"%>
 
 <script type="text/javascript">
-function sanitizeAndSubmit() {
+function beforeSubmit() {
 	const baseCharacterSet = document.getElementById('baseCharacterSet');
 	const prefix = document.getElementById('prefix');
 	const suffix = document.getElementById('suffix');
@@ -56,7 +56,7 @@ function sanitizeAndSubmit() {
 			<td>
 				<c:choose>
 					<c:when test="${!empty source.identifierType.validator}">
-						<c:out value='${source.identifierType.validator}'/>
+						${source.identifierType.validator}
 					</c:when>
 					<c:otherwise>
 						<spring:message code="general.none" />
