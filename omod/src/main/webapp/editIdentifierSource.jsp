@@ -7,16 +7,16 @@
 <%@ include file="localHeader.jsp"%>
 
 <script type="text/javascript">
-
-var $j = jQuery;
-function beforeSubmit() {
+function sanitizeAndSubmit() {
 	const baseCharacterSet = document.getElementById('baseCharacterSet');
 	const prefix = document.getElementById('prefix');
 	const suffix = document.getElementById('suffix');
+	const firstIdentifierBase = document.getElementById('firstIdentifierBase');
 
 	baseCharacterSet.value=html_sanitize(baseCharacterSet.value);
 	prefix.value=html_sanitize(prefix.value);
 	suffix.value=html_sanitize(suffix.value);
+	firstIdentifierBase.value=html_sanitize(firstIdentifierBase.value);
 	return true;
 }
 </script>
@@ -37,7 +37,7 @@ function beforeSubmit() {
 	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>
 </h3>
 
-<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onSubmit="return beforeSubmit()">
+<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onsubmit="return sanitizeAndSubmit()">
 	<frm:errors path="*" cssClass="error"/><br/>
 	<table>
 		<tr>
@@ -56,7 +56,7 @@ function beforeSubmit() {
 			<td>
 				<c:choose>
 					<c:when test="${!empty source.identifierType.validator}">
-						${source.identifierType.validator}
+						<c:out value='${source.identifierType.validator}'/>
 					</c:when>
 					<c:otherwise>
 						<spring:message code="general.none" />
@@ -89,7 +89,7 @@ function beforeSubmit() {
 			<tr>
 				<th align="right" valign="top">
 					<span class="requiredField">*</span>
-					<spring:message code="idgen.firstIdentifierBase" />:
+					<spring:message id="baseCharacterSet" code="idgen.firstIdentifierBase" />:
 				</th>
 				<td>
 					<c:choose>
@@ -99,7 +99,7 @@ function beforeSubmit() {
 							<spring:message code="idgen.inUseUnableToModify" />
 						</c:when>
 						<c:otherwise>
-							<frm:input path="firstIdentifierBase" size="20" /><frm:errors path="firstIdentifierBase" cssClass="error" />
+							<frm:input id="firstIdentifierBase" path="firstIdentifierBase" size="20" /><frm:errors path="firstIdentifierBase" cssClass="error" />
 						</c:otherwise>
 					</c:choose>
 				</td>
