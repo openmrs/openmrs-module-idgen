@@ -6,6 +6,21 @@
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="localHeader.jsp"%>
 
+<script type="text/javascript">
+
+var $j = jQuery;
+function beforeSubmit() {
+	const baseCharacterSet = document.getElementById('baseCharacterSet');
+	const prefix = document.getElementById('prefix');
+	const suffix = document.getElementById('suffix');
+
+	baseCharacterSet.value=html_sanitize(baseCharacterSet.value);
+	prefix.value=html_sanitize(prefix.value);
+	suffix.value=html_sanitize(suffix.value);
+	return true;
+}
+</script>
+
 <style>
 	.requiredField {font-weight:bold; color:red;}
 </style>
@@ -22,7 +37,7 @@
 	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>
 </h3>
 
-<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form">
+<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onSubmit="return beforeSubmit()">
 	<frm:errors path="*" cssClass="error"/><br/>
 	<table>
 		<tr>
@@ -69,7 +84,7 @@
 					<span class="requiredField">*</span>
 					<spring:message code="idgen.baseCharacterSet" />:
 				</th>
-				<td><frm:input path="baseCharacterSet" size="80" /><frm:errors path="baseCharacterSet" cssClass="error" /></td>
+				<td><frm:input id="baseCharacterSet" path="baseCharacterSet" size="80" /><frm:errors path="baseCharacterSet" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<th align="right" valign="top">
@@ -91,11 +106,11 @@
 			</tr>
 			<tr>
 				<th align="right"><spring:message code="idgen.prefix" />:</th>
-				<td><frm:input path="prefix" size="10" /><frm:errors path="prefix" cssClass="error" /></td>
+				<td><frm:input id="prefix" path="prefix" size="10" /><frm:errors path="prefix" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<th align="right"><spring:message code="idgen.suffix" />:</th>
-				<td><frm:input path="suffix" size="10" /><frm:errors path="suffix" cssClass="error" /></td>
+				<td><frm:input id="suffix" path="suffix" size="10" /><frm:errors path="suffix" cssClass="error" /></td>
 			</tr>
 			<tr>
 				<th align="right"><spring:message code="idgen.minLength" />:</th>
