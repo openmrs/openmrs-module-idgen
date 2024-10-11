@@ -7,7 +7,7 @@
 <%@ include file="localHeader.jsp"%>
 
 <script type="text/javascript">
-function beforeSubmit() {
+function sanitizeAndSubmit() {
 	const baseCharacterSet = document.getElementById('baseCharacterSet');
 	const prefix = document.getElementById('prefix');
 	const suffix = document.getElementById('suffix');
@@ -37,7 +37,7 @@ function beforeSubmit() {
 	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>
 </h3>
 
-<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onsubmit="return beforeSubmit()">
+<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onsubmit="return sanitizeAndSubmit()">
 	<frm:errors path="*" cssClass="error"/><br/>
 	<table>
 		<tr>
