@@ -37,7 +37,7 @@ function beforeSubmit() {
 	<spring:message code="idgen.general.for"/> <c:out value='${source.identifierType.name}'/>
 </h3>
 
-<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onsubmit="return sanitizeAndSubmit()">
+<frm:form modelAttribute="source" method="post" action="saveIdentifierSource.form" onsubmit="return beforeSubmit()">
 	<frm:errors path="*" cssClass="error"/><br/>
 	<table>
 		<tr>
