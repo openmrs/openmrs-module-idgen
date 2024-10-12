@@ -52,19 +52,19 @@
 	<table id="sourceTable">
 		<tr>
 			<th><spring:message code="idgen.baseCharacterSet"/>:</th>
-			<td>${source.baseCharacterSet}</td>
+			<td><c:out value='${source.baseCharacterSet}'/></td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.firstIdentifierBase"/>:</th>
-			<td>${source.firstIdentifierBase}</td>
+			<td><c:out value='${source.firstIdentifierBase}'/></td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.prefix"/>:</th>
-			<td>${source.prefix}</td>
+			<td><c:out value='${source.prefix}'/></td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.suffix"/>:</th>
-			<td>${source.suffix}</td>
+			<td>$<c:out value='{source.suffix}'/></td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.minLength"/>:</th>
