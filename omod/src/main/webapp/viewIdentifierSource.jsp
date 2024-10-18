@@ -64,7 +64,7 @@
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.suffix"/>:</th>
-			<td>$<c:out value='{source.suffix}'/></td>
+			<td><c:out value='${source.suffix}'/></td>
 		</tr>
 		<tr>
 			<th><spring:message code="idgen.minLength"/>:</th>
