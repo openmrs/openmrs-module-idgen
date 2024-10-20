@@ -283,6 +283,12 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+				<!-- Fix for "Failed to execute goal org.apache.maven.plugins:maven-resources-plugin:3.2.0:resources (default-resources) on project application-etude: Input length = 1" -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 

@@ -15,6 +15,14 @@ package  org.openmrs.module.idgen.rest.resource.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -34,13 +42,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingSubclassH
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.BooleanProperty;
-import io.swagger.models.properties.IntegerProperty;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.models.properties.StringProperty;
 
 @SubClassHandler(supportedClass = IdentifierPool.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
 public class IdentifierPoolResourceHandler extends BaseDelegatingSubclassHandler<IdentifierSource, IdentifierPool>
@@ -152,44 +153,41 @@ implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
 	}
 
 	@Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = new ModelImpl();
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<?> model = new ObjectSchema();
 		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
-			model
-				.property("uuid", new StringProperty())
-				.property("name", new RefProperty("#/definitions/IdentifierPoolResourceGet"))
-				.property("display", new StringProperty());	 
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("name", new Schema<Object>().$ref("#/components/schemas/IdentifierPoolResourceGet"))
+					.addProperty("display", new StringSchema());
 		}
 		if (rep instanceof FullRepresentation) {
-			model
-				.property("password", new StringProperty())
-				.property("url", new StringProperty())
-				.property("user", new RefProperty("#/definitions/UserGet"));
+			model.addProperty("password", new StringSchema())
+					.addProperty("url", new StringSchema())
+					.addProperty("user", new Schema<User>().$ref("#/components/schemas/UserGet"));
 		}
 		if (rep instanceof RefRepresentation) {
-			model
-				.property("uuid", new StringProperty())
-				.property("name", new RefProperty("#/definitions/IdentifierPoolResourceGetRef"))
-				.property("display", new StringProperty());
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("name", new Schema<Object>().$ref("#/components/schemas/IdentifierPoolResourceGetRef"))
+					.addProperty("display", new StringSchema());
 		}
 		return model;
 	}
 
 	@Override
-	public Model getCREATEModel(Representation rep) {
-		return new ModelImpl()
-					.property("name", new RefProperty("#/definitions/IdentifierPoolResourceCreate"))
-					.property("identifierType", new RefProperty("#/definitions/IdentifierTypeGet"))
-					.property("sequential", new BooleanProperty())
-					.property("refillWithScheduledTask", new BooleanProperty())
-					.property("source", new RefProperty("#/definitions/IdentifierSourceGet"))
-					.property("batchSize", new IntegerProperty())
-					.property("minPoolSize", new IntegerProperty());
+	public Schema<?> getCREATESchema(Representation rep) {
+		return new ObjectSchema()
+				.addProperty("name", new Schema<Object>().$ref("#/components/schemas/IdentifierPoolResourceCreate"))
+				.addProperty("identifierType", new Schema<PatientIdentifierType>().$ref("#/components/schemas/IdentifierTypeGet"))
+				.addProperty("sequential", new BooleanSchema())
+				.addProperty("refillWithScheduledTask", new BooleanSchema())
+				.addProperty("source", new Schema<IdentifierSource>().$ref("#/components/schemas/IdentifierSourceGet"))
+				.addProperty("batchSize", new IntegerSchema())
+				.addProperty("minPoolSize", new IntegerSchema());
 	}
 	
 	@Override
-	public Model getUPDATEModel(Representation rep) {
-		return getCREATEModel(rep); //FIXME add Impl
+	public Schema<?> getUPDATESchema(Representation rep) {
+		return getCREATESchema(rep); //FIXME add Impl
 	}
 	
 }
