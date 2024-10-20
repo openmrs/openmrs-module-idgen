@@ -3,6 +3,10 @@ package org.openmrs.module.idgen.rest.resource.handler;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -21,12 +25,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingSubclassHandler;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.IntegerProperty;
-import io.swagger.models.properties.LongProperty;
-import io.swagger.models.properties.StringProperty;
 
 @SubClassHandler(supportedClass = SequentialIdentifierGenerator.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
 public class SequentialIdentifierGeneratorResourceHandler extends BaseDelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGenerator>
@@ -140,38 +138,35 @@ implements DelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGener
 	}
 
 	@Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = new ModelImpl();
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<Object> model = new ObjectSchema();
 		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
-			model
-				.property("baseCharacterSet", new StringProperty())
-				.property("prefix", new StringProperty())
-				.property("suffix", new StringProperty())
-				.property("firstIdentifierBase", new StringProperty())
-				.property("minLength", new IntegerProperty())
-				.property("maxLength", new IntegerProperty());
+			model.addProperty("baseCharacterSet", new StringSchema())
+					.addProperty("prefix", new StringSchema())
+					.addProperty("suffix", new StringSchema())
+					.addProperty("firstIdentifierBase", new StringSchema())
+					.addProperty("minLength", new IntegerSchema())
+					.addProperty("maxLength", new IntegerSchema());
 		}
 		if (rep instanceof FullRepresentation) {
-			model
-				.property("nextSequenceValue", new LongProperty());
+			model.addProperty("nextSequenceValue", new Schema<Long>().type("integer").format("int64"));
 		}
 		if (rep instanceof RefRepresentation) {
-			model
-				.property("baseCharacterSet", new StringProperty());
+			model.addProperty("baseCharacterSet", new StringSchema());
 		}
 		return model;
 	}
 
 	@Override
-	public Model getCREATEModel(Representation rep) {
-		return new ModelImpl()
-				.property("baseCharacterSet", new StringProperty())
-				.property("prefix", new StringProperty())
-				.property("suffix", new StringProperty())
-				.property("firstIdentifierBase", new StringProperty())
-				.property("minLength", new IntegerProperty())
-				.property("nextSequenceValue", new LongProperty())
-				.property("maxLength", new IntegerProperty());
+	public Schema<?> getCREATESchema(Representation rep) {
+		return new ObjectSchema()
+				.addProperty("baseCharacterSet", new StringSchema())
+				.addProperty("prefix", new StringSchema())
+				.addProperty("suffix", new StringSchema())
+				.addProperty("firstIdentifierBase", new StringSchema())
+				.addProperty("minLength", new IntegerSchema())
+				.addProperty("nextSequenceValue", new Schema<Long>().type("integer").format("int64"))
+				.addProperty("maxLength", new IntegerSchema());
 	}
 	
 	@PropertyGetter("display")
@@ -181,5 +176,4 @@ implements DelegatingSubclassHandler<IdentifierSource, SequentialIdentifierGener
                 + identifierSource.getClass().getName();
     }
 
-	
 }

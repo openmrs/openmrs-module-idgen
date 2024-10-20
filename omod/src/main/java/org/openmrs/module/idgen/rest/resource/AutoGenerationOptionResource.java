@@ -9,6 +9,10 @@
  */
 package org.openmrs.module.idgen.rest.resource;
 
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.api.context.Context;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Location;
@@ -33,12 +37,6 @@ import org.openmrs.module.webservices.rest.web.response.ObjectNotFoundException;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import org.openmrs.module.webservices.validation.ValidationException;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.BooleanProperty;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.models.properties.StringProperty;
 
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
@@ -239,48 +237,45 @@ public class AutoGenerationOptionResource extends MetadataDelegatingCrudResource
 		}
 		return null;
 	}
-	
+
 	@Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = ((ModelImpl) super.getGETModel(rep));
-		
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<?> model = super.getGETSchema(rep);
+
 		if (rep instanceof RefRepresentation) {
-			model   
-					.property("uuid", new StringProperty())
-					.property("display", new StringProperty());
-		}	
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("display", new StringSchema());
+		}
 		if (!(rep instanceof RefRepresentation)) {
-			model
-					.property("uuid", new StringProperty())
-			        .property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"))
-			        .property("location", new RefProperty("#/definitions/LocationGet"))
-			        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
-			        .property("manualEntryEnabled", new BooleanProperty())
-			        .property("automaticGenerationEnabled", new BooleanProperty());
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("identifierType", new Schema<PatientIdentifierType>().$ref("#/components/schemas/PatientidentifiertypeGet"))
+					.addProperty("location", new Schema<Location>().$ref("#/components/schemas/LocationGet"))
+					.addProperty("source", new Schema<IdentifierSource>().$ref("#/components/schemas/IdgenIdentifiersourceGet"))
+					.addProperty("manualEntryEnabled", new BooleanSchema())
+					.addProperty("automaticGenerationEnabled", new BooleanSchema());
 		}
 		if (rep instanceof DefaultRepresentation) {
-			model   
-					.property("full", new StringProperty());
+			model.addProperty("full", new StringSchema());
 		}
 		return model;
 	}
-	
+
 	@Override
-	public Model getCREATEModel(Representation rep) {
-		return new ModelImpl()
-				.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"))
-				.property("location", new RefProperty("#/definitions/LocationGet"))
-		        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
-		        .property("manualEntryEnabled", new BooleanProperty())
-		        .property("automaticGenerationEnabled", new BooleanProperty());
+	public Schema<?> getCREATESchema(Representation rep) {
+		return new ObjectSchema()
+				.addProperty("identifierType", new Schema<PatientIdentifierType>().$ref("#/components/schemas/PatientidentifiertypeGet"))
+				.addProperty("location", new Schema<Location>().$ref("#/components/schemas/LocationGet"))
+				.addProperty("source", new Schema<IdentifierSource>().$ref("#/components/schemas/IdgenIdentifiersourceGet"))
+				.addProperty("manualEntryEnabled", new BooleanSchema())
+				.addProperty("automaticGenerationEnabled", new BooleanSchema());
 	}
-	
+
 	@Override
-	public Model getUPDATEModel(Representation rep) {
-		return new ModelImpl()
-				.property("location", new RefProperty("#/definitions/LocationGet"))
-		        .property("source", new RefProperty("#/definitions/IdgenIdentifiersourceGet"))
-		        .property("manualEntryEnabled", new BooleanProperty())
-		        .property("automaticGenerationEnabled", new BooleanProperty());
+	public Schema<?> getUPDATESchema(Representation rep) {
+		return new ObjectSchema()
+				.addProperty("location", new Schema<Location>().$ref("#/components/schemas/LocationGet"))
+				.addProperty("source", new Schema<IdentifierSource>().$ref("#/components/schemas/IdgenIdentifiersourceGet"))
+				.addProperty("manualEntryEnabled", new BooleanSchema())
+				.addProperty("automaticGenerationEnabled", new BooleanSchema());
 	}
 }

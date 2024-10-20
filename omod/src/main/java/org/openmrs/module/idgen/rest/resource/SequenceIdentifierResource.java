@@ -2,6 +2,8 @@ package org.openmrs.module.idgen.rest.resource;
 
 import java.util.Arrays;
 
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.Identifier;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -70,5 +72,16 @@ public class SequenceIdentifierResource extends DelegatingCrudResource<Identifie
 			description.addProperty("identifierValue");
 		}
 		return description;
+	}
+
+	@Override
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<?> schema = super.getGETSchema(rep);
+		if (rep instanceof RefRepresentation) {
+			schema.addProperty("identifierValue", new StringSchema());
+		} else if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
+			schema.addProperty("identifierValue", new StringSchema());
+		}
+		return schema;
 	}
 }

@@ -9,6 +9,9 @@
  */
 package org.openmrs.module.idgen.rest.resource;
 
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.Identifier;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -21,10 +24,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingSubResource;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.StringProperty;
 
 @org.openmrs.module.webservices.rest.web.annotation.SubResource(parent = IdentifierSourceResource.class, path =
         "identifier", supportedClass = Identifier.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
@@ -51,18 +50,18 @@ public class IdentifierResource extends DelegatingSubResource<Identifier, Identi
     }
 
     @Override
-    public Model getGETModel(Representation rep) {
+    public Schema<?> getGETSchema(Representation rep) {
     	return null;
     }
     
     @Override
-    public Model getCREATEModel(Representation rep) {
-    	return new ModelImpl()
-				.property("comment", new StringProperty());
+    public Schema<?> getCREATESchema(Representation rep) {
+    	return new ObjectSchema()
+				.addProperty("comment", new StringSchema());
     }
     
     @Override
-    public Model getUPDATEModel(Representation rep) {
+    public Schema<?> getUPDATESchema(Representation rep) {
     	return null;
     }
     

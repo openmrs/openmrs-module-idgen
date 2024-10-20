@@ -11,6 +11,9 @@ package org.openmrs.module.idgen.rest.resource;
 import java.util.Date;
 import java.util.List;
 
+import io.swagger.v3.oas.models.media.DateSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.User;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
@@ -35,12 +38,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingC
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.DateProperty;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.models.properties.StringProperty;
 
 @Resource(name = RestConstants.VERSION_1 + IdgenRestController.IDGEN_NAMESPACE
 		+ "/logentry", supportedClass = LogEntry.class, supportedOpenmrsVersions = {"1.9.* - 9.9.*"})
@@ -133,30 +130,27 @@ public class LogEntryResource extends MetadataDelegatingCrudResource<LogEntry> {
 	public void purge(LogEntry delegate, RequestContext context) throws ResourceDoesNotSupportOperationException {
 		throw new ResourceDoesNotSupportOperationException();
 	}
-	
+
 	@Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = ((ModelImpl) super.getGETModel(rep));
-		
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<?> model = super.getGETSchema(rep);
+
 		if (rep instanceof RefRepresentation) {
-			model   
-					.property("uuid", new StringProperty())
-					.property("identifier", new StringProperty())
-					.property("display", new StringProperty());
-		}	
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("identifier", new StringSchema())
+					.addProperty("display", new StringSchema());
+		}
 		if (!(rep instanceof FullRepresentation)) {
-			model
-					.property("uuid", new StringProperty())
-			        .property("name", new StringProperty())
-			        .property("identifier", new StringProperty())
-			        .property("comment", new StringProperty())
-			        .property("generatedBy", new RefProperty("#/definitions/UserGet"))
-			        .property("dateGenerated", new DateProperty())
-			        .property("description", new StringProperty());
+			model.addProperty("uuid", new StringSchema())
+					.addProperty("name", new StringSchema())
+					.addProperty("identifier", new StringSchema())
+					.addProperty("comment", new StringSchema())
+					.addProperty("generatedBy", new Schema<User>().$ref("#/components/schemas/UserGet"))
+					.addProperty("dateGenerated", new DateSchema())
+					.addProperty("description", new StringSchema());
 		}
 		if (rep instanceof DefaultRepresentation) {
-			model   
-					.property("full", new StringProperty());
+			model.addProperty("full", new StringSchema());
 		}
 		return model;
 	}
@@ -167,12 +161,12 @@ public class LogEntryResource extends MetadataDelegatingCrudResource<LogEntry> {
 	}
 	
 	@Override
-	public Model getCREATEModel(Representation rep) {
+	public Schema<?> getCREATESchema(Representation rep) {
 		return null;
 	}
 	
 	@Override
-	public Model getUPDATEModel(Representation rep) {
+	public Schema<?> getUPDATESchema(Representation rep) {
 		return null;
 	}
 
