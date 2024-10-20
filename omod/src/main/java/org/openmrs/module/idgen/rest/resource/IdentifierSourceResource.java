@@ -8,6 +8,9 @@
  */
 package org.openmrs.module.idgen.rest.resource;
 
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
@@ -25,11 +28,6 @@ import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.webservices.validation.ValidationException;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.models.properties.StringProperty;
 
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -506,33 +504,35 @@ public class IdentifierSourceResource extends MetadataDelegatingCrudResource<Ide
     public boolean hasTypesDefined() {
         return true;
     }
-    
+
     @Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = new ModelImpl();
-		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
-        	model.property("uuid", new StringProperty());
-        	model.property("name", new StringProperty());
-        	model.property("description", new StringProperty());
-			model.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"));
-		} else {
-			model.property("uuid", new StringProperty());
-			model.property("display", new StringProperty());
-		}
-		return model;
-	}
+    public Schema<?> getGETSchema(Representation rep) {
+        Schema<?> model = super.getGETSchema(rep);
+        if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
+            model.addProperty("uuid", new StringSchema())
+                    .addProperty("name", new StringSchema())
+                    .addProperty("description", new StringSchema())
+                    .addProperty("identifierType", new Schema<PatientIdentifierType>().$ref("#/components/schemas/PatientidentifiertypeGet"));
+        } else {
+            model.addProperty("uuid", new StringSchema())
+                    .addProperty("display", new StringSchema());
+        }
+        return model;
+    }
+
+    @Override
+    public Schema<?> getCREATESchema(Representation rep) {
+        return new ObjectSchema()
+                .addProperty("name", new StringSchema())
+                .addProperty("description", new StringSchema())
+                .addProperty("identifierType", new Schema<PatientIdentifierType>().$ref("#/components/schemas/PatientidentifiertypeGet"));
+    }
 	
 	@Override
-	public Model getCREATEModel(Representation rep) {
-		return new ModelImpl()
-				.property("name", new StringProperty())
-				.property("description", new StringProperty())
-				.property("identifierType", new RefProperty("#/definitions/PatientidentifiertypeGet"));
-	}
-	
-	@Override
-	public Model getUPDATEModel(Representation rep) {
-		return getCREATEModel(rep); //FIXME add impl
+	public Schema<?> getUPDATESchema(Representation rep) {
+		return getCREATESchema(rep)
+                .addProperty("name", new StringSchema())
+                .addProperty("description", new StringSchema());
 	}
 
     private Boolean parseBoolean(Object value) {
