@@ -22,6 +22,11 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests setting up a local pool, that pulls from a remote pool, and generates for an identifier type
@@ -29,11 +34,13 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 public class RemoteWithLocalPoolIntegrationTest extends IdgenBaseTest {
 
 	@Before
+	@Transactional
 	public void setUp() throws Exception {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
 
 	@Test
+	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public void testConfigurePoolFilledFromRemoteSource() throws Exception {
 
 		IdentifierSourceService service = Context.getService(IdentifierSourceService.class);

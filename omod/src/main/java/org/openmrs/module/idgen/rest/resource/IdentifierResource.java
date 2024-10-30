@@ -42,8 +42,18 @@ public class IdentifierResource extends DelegatingSubResource<Identifier, Identi
     		return null;
     	}
         IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
-        String identifier = service.generateIdentifier(service.getIdentifierSourceByUuid(parentUniqueId),
-                post.containsKey("comment") ? String.valueOf(post.get("comment")) : "");
+
+        String comment = "";
+        if (post.containsKey("comment")) {
+            Object commentObj = post.get("comment");
+            if (commentObj instanceof char[]) {
+                comment = new String((char[]) commentObj);
+            } else {
+                comment = String.valueOf(commentObj);
+            }
+        }
+
+        String identifier = service.generateIdentifier(service.getIdentifierSourceByUuid(parentUniqueId), comment);
         SimpleObject response = new SimpleObject();
         response.add(IDENTIFIER_KEY, identifier);
         return response;

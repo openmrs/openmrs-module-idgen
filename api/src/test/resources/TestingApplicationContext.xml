@@ -8,10 +8,10 @@
 		http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/util
 		http://www.springframework.org/schema/util/spring-util-3.0.xsd">
-	
-	<!-- 
+
+	<!--
 	From applicationContext-service.xml in openmrs-api
-	Needed to override and add hibernate mappings to the classpath since omod is not packaged yet 
+	Needed to override and add hibernate mappings to the classpath since omod is not packaged yet
 	-->
 	<bean id="sessionFactory" class="org.openmrs.api.db.hibernate.HibernateSessionFactoryBean">
 		<property name="configLocations">
@@ -21,7 +21,12 @@
 			</list>
 		</property>
 		<property name="mappingJarLocations">
-			<ref bean="mappingJarResources" />
+			<ref bean="mappingJarResources"/>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>org.openmrs</value>
+			</list>
 		</property>
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>

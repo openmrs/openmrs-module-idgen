@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -31,8 +33,6 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.api.db.hibernate.DbSession;
-import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -41,6 +41,7 @@ import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,8 +53,8 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	protected Log log = LogFactory.getLog(getClass());
 	
 	//***** PROPERTIES *****
-	
-	private DbSessionFactory sessionFactory;
+
+	private SessionFactory sessionFactory;
 	
 	//***** INSTANCE METHODS *****
 
@@ -84,7 +85,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	@Transactional
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
-		DbSession currentSession = sessionFactory.getCurrentSession();
+		Session currentSession = sessionFactory.getCurrentSession();
 		currentSession.saveOrUpdate(identifierSource);
 		currentSession.flush();
 		refreshIdentifierSource(identifierSource);
@@ -335,14 +336,14 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/**
 	 * @return the sessionFactory
 	 */
-	public DbSessionFactory getSessionFactory() {
+	public SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
 	/**
 	 * @param sessionFactory the sessionFactory to set
 	 */
-	public void setSessionFactory(DbSessionFactory sessionFactory) {
+	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 }
