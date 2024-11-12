@@ -16,7 +16,7 @@
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
-        <WEBSERVICES_VERSION>2.23.0</WEBSERVICES_VERSION>
+        <WEBSERVICES_VERSION>2.46.0-SNAPSHOT</WEBSERVICES_VERSION>
     </properties>
 
 	<dependencies>
@@ -32,15 +32,35 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod</artifactId>
+			<artifactId>legacyui-omod</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-1.8</artifactId>
 			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod</artifactId>
+			<artifactId>webservices.rest-omod-2.0</artifactId>
+			<version>${WEBSERVICES_VERSION}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-2.0</artifactId>
+			<version>${WEBSERVICES_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>webservices.rest-omod-1.8</artifactId>
 			<version>${WEBSERVICES_VERSION}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
@@ -58,13 +78,13 @@
 			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
 		</dependency>
-                <dependency>
-                        <groupId>org.openmrs.module</groupId>
-                        <artifactId>idgen-api</artifactId>
-                        <version>${project.parent.version}</version>
-                        <scope>test</scope>
-                        <type>test-jar</type>
-                </dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>idgen-api</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>
 	</dependencies>
 
 	<build>

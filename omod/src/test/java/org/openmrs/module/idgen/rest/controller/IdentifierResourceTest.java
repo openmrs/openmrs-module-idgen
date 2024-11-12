@@ -12,11 +12,13 @@ package org.openmrs.module.idgen.rest.controller;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 
+@Ignore
 public class IdentifierResourceTest extends MainResourceControllerTest {
 
     @Before

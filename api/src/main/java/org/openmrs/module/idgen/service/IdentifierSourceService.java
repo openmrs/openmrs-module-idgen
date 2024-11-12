@@ -32,6 +32,7 @@ import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -41,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface IdentifierSourceService extends OpenmrsService {
 	
 	/**
-	 * @param id the id to retrieve for the given type
 	 * @return all IdentifierSource types that are supported
 	 * @should return all supported IdentifierSource types
 	 */
@@ -117,7 +117,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * Returns null if this PatientIdentifierType is not set to be auto-generated
 	 */
 	@Transactional
-	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
 	public String generateIdentifier(PatientIdentifierType type, String comment);
 
     /**
@@ -125,7 +125,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * Returns null if this PatientIdentifierType is not set to be auto-generated
      */
     @Transactional
-    @Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
     public String generateIdentifier(PatientIdentifierType type, Location location, String comment);
 	
 	/**
@@ -133,7 +133,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
-	@Authorized( OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS )
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
 	public String generateIdentifier(IdentifierSource source, String comment) throws APIException;
 	
 	/**
@@ -194,7 +194,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
 
     /**
-     * @param id of auto generation option
+     * @param autoGenerationOptionId id of auto generation option
      * @return the AutoGenerationOption
 
      */
@@ -214,7 +214,7 @@ public interface IdentifierSourceService extends OpenmrsService {
     public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
     
     /**
-	 * @param patient identifier type
+	 * @param type patient identifier type
      * @param location location
 	 * @return the AutoGenerationOption that matches the given PatientIdentifierType and Location
      * @should return options that don't have a configured location
@@ -224,7 +224,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;
 
     /**
-     * @param patient identifier type
+     * @param type patient identifier type
      * @return all AutoGenerationOptions that match the given patient identifier type
      * @throws APIException
      */
@@ -233,9 +233,9 @@ public interface IdentifierSourceService extends OpenmrsService {
     public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException;
 
     /**
-     * @param patient identifier type
+     * @param type patient identifier type
      * @return the AutoGenerationOption that matches the given PatientIdentifierType
-     * @throws non-unique exception if more than one auto-generation option for this type
+     * @throws APIException Non unique exception if more than one auto-generation option for this type
      */
     @Transactional(readOnly = true)
 	@Authorized
@@ -243,7 +243,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 
 	/**
 	 * Persists a AutoGenerationOption, either as a save or update.
-	 * @param option
+	 * @param option the auto generation option
 	 * @return the AutoGenerationOption that was passed in
 	 */
 	@Transactional

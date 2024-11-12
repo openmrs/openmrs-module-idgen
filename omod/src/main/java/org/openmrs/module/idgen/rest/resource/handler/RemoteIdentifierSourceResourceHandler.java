@@ -4,6 +4,10 @@ package org.openmrs.module.idgen.rest.resource.handler;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
@@ -23,11 +27,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingSubclassH
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import io.swagger.models.Model;
-import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.models.properties.StringProperty;
 
 @SubClassHandler(supportedClass = RemoteIdentifierSource.class, supportedOpenmrsVersions = {"1.8.* - 9.9.*"})
 public class RemoteIdentifierSourceResourceHandler extends BaseDelegatingSubclassHandler<IdentifierSource, RemoteIdentifierSource>
@@ -125,29 +124,28 @@ implements DelegatingSubclassHandler<IdentifierSource, RemoteIdentifierSource> {
 	}
 
 	@Override
-	public Model getGETModel(Representation rep) {
-		ModelImpl model = new ModelImpl()
-						.property("uuid", new StringProperty())
-						.property("name", new StringProperty())
-						.property("display", new StringProperty());	 
-		
+	public Schema<?> getGETSchema(Representation rep) {
+		Schema<?> model = new ObjectSchema()
+				.addProperty("uuid", new StringSchema())
+				.addProperty("name", new StringSchema())
+				.addProperty("display", new StringSchema());
+
 		if (rep instanceof FullRepresentation) {
-			model
-				.property("password", new StringProperty())
-				.property("url", new StringProperty())
-				.property("user", new RefProperty("#/definitions/UserGet"));
+			model.addProperty("password", new StringSchema())
+					.addProperty("url", new StringSchema())
+					.addProperty("user", new Schema<User>().$ref("#/components/schemas/UserGet"));
 		}
-		
+
 		return model;
 	}
 
 	@Override
-	public Model getCREATEModel(Representation rep) {
-		return new ModelImpl()
-					.property("uuid", new StringProperty())
-					.property("name", new StringProperty())
-					.property("url", new StringProperty())
-					.property("password", new StringProperty());	 
+	public Schema<?> getCREATESchema(Representation rep) {
+		return new ObjectSchema()
+				.addProperty("uuid", new StringSchema())
+				.addProperty("name", new StringSchema())
+				.addProperty("url", new StringSchema())
+				.addProperty("password", new StringSchema());
 	}
 	
 	@PropertyGetter("display")
