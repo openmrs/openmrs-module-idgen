@@ -89,7 +89,7 @@ function sanitizeAndSubmit() {
 			<tr>
 				<th align="right" valign="top">
 					<span class="requiredField">*</span>
-					<spring:message id="baseCharacterSet" code="idgen.firstIdentifierBase" />:
+					<spring:message code="idgen.firstIdentifierBase" />:
 				</th>
 				<td>
 					<c:choose>
