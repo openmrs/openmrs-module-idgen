@@ -1,30 +1,21 @@
 package org.openmrs.module.idgen.prefixprovider;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
-import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
-public class LocationBasedPrefixProviderTest {
+public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveTest {
 
 	LocationBasedPrefixProvider locationPrefixProvider;
 	UserContext userContext;
@@ -40,27 +31,17 @@ public class LocationBasedPrefixProviderTest {
 	@Before
 	public void setup() {
 		locationPrefixProvider = new LocationBasedPrefixProvider();
-
-		mockStatic(Context.class);
-		userContext = mock(UserContext.class);
-		when(Context.getUserContext()).thenReturn(userContext);
-
-		LocationService ls = mock(LocationService.class);
-		AdministrationService as = mock(AdministrationService.class);
-		when(Context.getLocationService()).thenReturn(ls);
-		when(Context.getAdministrationService()).thenReturn(as);
-		when(ls.getAllLocationAttributeTypes()).thenReturn(Collections.<LocationAttributeType>emptyList());
-		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
-		        .thenReturn("Location Code");
+		Context.getAdministrationService().saveGlobalProperty(
+				new GlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP, "LocationCode"));
 		setupLocationTree();
 	}
 
 	@Test
 	public void getValue_shouldReturnPrefixDependingOnLocationInUserContext() {
-		when(userContext.getLocation()).thenReturn(locationB3);
+		Context.getUserContext().setLocation(location5);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
 		// Change to location A3
-		when(userContext.getLocation()).thenReturn(locationA3);
+		when(Context.getUserContext().getLocation()).thenReturn(locationA3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
 
 	}
