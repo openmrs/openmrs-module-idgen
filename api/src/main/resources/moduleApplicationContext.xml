@@ -96,6 +96,9 @@
         </property>
     </bean>
 
+	<bean  class="org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider" />
+	<bean  class="org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider" />
+
 	<!-- Add global property listeners -->
 	<bean id="idgen.globalPropertyListeners" parent="openmrsEventListeners">
 	    <property name="globalPropertyListeners">
