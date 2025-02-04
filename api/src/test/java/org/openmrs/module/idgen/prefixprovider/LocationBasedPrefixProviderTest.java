@@ -1,21 +1,27 @@
 package org.openmrs.module.idgen.prefixprovider;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.GlobalProperty;
+import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveTest {
+public class LocationBasedPrefixProviderTest {
 
 	LocationBasedPrefixProvider locationPrefixProvider;
 	UserContext userContext;
@@ -28,22 +34,37 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 	Location location5;
 	Location locationA2;
 
+	MockedStatic<Context> mockedContext;
+
 	@Before
 	public void setup() {
+		mockedContext = mockStatic(Context.class);
 		locationPrefixProvider = new LocationBasedPrefixProvider();
-		Context.getAdministrationService().saveGlobalProperty(
-				new GlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP, "LocationCode"));
+		userContext = mock(UserContext.class);
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
+
+		LocationService ls = mock(LocationService.class);
+		AdministrationService as = mock(AdministrationService.class);
+		mockedContext.when(Context::getLocationService).thenReturn(ls);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		when(ls.getAllLocationAttributeTypes()).thenReturn(Collections.<LocationAttributeType>emptyList());
+		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
+				.thenReturn("Location Code");
 		setupLocationTree();
+	}
+
+	@After
+	public void tearDown() {
+		mockedContext.close();
 	}
 
 	@Test
 	public void getValue_shouldReturnPrefixDependingOnLocationInUserContext() {
-		Context.getUserContext().setLocation(locationB3);
+		when(userContext.getLocation()).thenReturn(locationB3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
 		// Change to location A3
-		Context.getUserContext().setLocation(locationA3);
+		when(userContext.getLocation()).thenReturn(locationA3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
-
 	}
 
 	@Test
@@ -111,8 +132,6 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 
 		locationA3 = new Location();
 		locationA3.setParentLocation(locationA2);
-		locationA3.setName("LOC-A3");
-		Context.getLocationService().saveLocation(locationA3);
 
 		// Second Branch
 		Location locationB1 = new Location();
@@ -123,9 +142,6 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 
 		locationB3 = new Location();
 		locationB3.setParentLocation(locationB2);
-		locationB3.setName("LOC-B3");
-		Context.getLocationService().saveLocation(locationB3);
-
 	}
 
 	private LocationAttributeType createPrefixAttributeType() {

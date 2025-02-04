@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,11 @@ public class SequentialIdentifierGeneratorTest {
 	@Before
 	public void setup() {
 		mockedContext = mockStatic(Context.class);
+	}
+
+	@After
+	public void teardown() {
+		mockedContext.close();
 	}
 
 	/**
