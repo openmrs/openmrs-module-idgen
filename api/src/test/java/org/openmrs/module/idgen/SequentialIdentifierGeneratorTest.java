@@ -2,27 +2,36 @@ package org.openmrs.module.idgen;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.GlobalProperty;
+import org.mockito.MockedStatic;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.UserContext;
 import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-
-import javax.persistence.Transient;
+import org.openmrs.module.idgen.suffixprovider.SuffixProvider;
 
 /**
  * test class for {@link SequentialIdentifierGenerator}
  */
-public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiveTest {
+public class SequentialIdentifierGeneratorTest {
 
+	private MockedStatic<Context> mockedContext;
+
+	@Before
+	public void setup() {
+		mockedContext = mockStatic(Context.class);
+	}
 
 	/**
 	 * @verifies generate an identifier within minLength and maxLength bounds
@@ -97,12 +106,14 @@ public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiv
 		generator.setPrefix(
 		    SequentialIdentifierGenerator.CONFIGURATION_PREFIX + LocationBasedPrefixProvider.class.getSimpleName());
 
-		Context.getAdministrationService()
-				.saveGlobalProperty(new GlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP, "Location Code"));
-		Location locationTree = createLocationTree(true);
-		locationTree.setName("LOC-Tree");
-		Context.getLocationService().saveLocation(locationTree);
-		Context.getUserContext().setLocation(locationTree);
+		UserContext userContext = mock(UserContext.class);
+		AdministrationService as = mock(AdministrationService.class);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
+		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
+		        .thenReturn("Location Code");
+		when(userContext.getLocation()).thenReturn(createLocationTree(true));
+		mockedContext.when(() -> Context.getRegisteredComponent("LocationBasedPrefixProvider", PrefixProvider.class)).thenReturn(new LocationBasedPrefixProvider());
 
 		assertThat(generator.getIdentifierForSeed(1L), is("LOC_2-001"));
 	}
@@ -116,12 +127,15 @@ public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiv
 		generator.setSuffix(
 		    SequentialIdentifierGenerator.CONFIGURATION_PREFIX + LocationBasedSuffixProvider.class.getSimpleName());
 
-		Context.getAdministrationService().
-				saveGlobalProperty(new GlobalProperty(LocationBasedSuffixProvider.SUFFIX_LOCATION_ATTRIBUTE_TYPE_GP, "LocationCode"));
-		Location locationTree = createLocationTree(false);
-		locationTree.setName("LOC-Tree");
-		Context.getLocationService().saveLocation(locationTree);
-		Context.getUserContext().setLocation(locationTree);
+		UserContext userContext = mock(UserContext.class);
+		AdministrationService as = mock(AdministrationService.class);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
+		when(as.getGlobalProperty(LocationBasedSuffixProvider.SUFFIX_LOCATION_ATTRIBUTE_TYPE_GP))
+		        .thenReturn("Location Code");
+		when(userContext.getLocation()).thenReturn(createLocationTree(false));
+		mockedContext.when(() -> Context.getRegisteredComponent("LocationBasedSuffixProvider", SuffixProvider.class)).thenReturn(new LocationBasedSuffixProvider());
+
 		assertThat(generator.getIdentifierForSeed(1L), is("001-LOC_2"));
 	}
 
