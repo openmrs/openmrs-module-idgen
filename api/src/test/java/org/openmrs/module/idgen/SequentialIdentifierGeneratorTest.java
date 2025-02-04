@@ -16,6 +16,8 @@ import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
+import javax.persistence.Transient;
+
 /**
  * test class for {@link SequentialIdentifierGenerator}
  */
@@ -97,7 +99,10 @@ public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiv
 
 		Context.getAdministrationService()
 				.saveGlobalProperty(new GlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP, "Location Code"));
-		Context.getUserContext().setLocation(createLocationTree(true));
+		Location locationTree = createLocationTree(true);
+		locationTree.setName("LOC-Tree");
+		Context.getLocationService().saveLocation(locationTree);
+		Context.getUserContext().setLocation(locationTree);
 
 		assertThat(generator.getIdentifierForSeed(1L), is("LOC_2-001"));
 	}
@@ -113,7 +118,10 @@ public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiv
 
 		Context.getAdministrationService().
 				saveGlobalProperty(new GlobalProperty(LocationBasedSuffixProvider.SUFFIX_LOCATION_ATTRIBUTE_TYPE_GP, "LocationCode"));
-		Context.getUserContext().setLocation(createLocationTree(false));
+		Location locationTree = createLocationTree(false);
+		locationTree.setName("LOC-Tree");
+		Context.getLocationService().saveLocation(locationTree);
+		Context.getUserContext().setLocation(locationTree);
 		assertThat(generator.getIdentifierForSeed(1L), is("001-LOC_2"));
 	}
 

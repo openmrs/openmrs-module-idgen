@@ -41,7 +41,7 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 		Context.getUserContext().setLocation(locationB3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
 		// Change to location A3
-		when(Context.getUserContext().getLocation()).thenReturn(locationA3);
+		Context.getUserContext().setLocation(locationA3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
 
 	}
@@ -111,6 +111,8 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 
 		locationA3 = new Location();
 		locationA3.setParentLocation(locationA2);
+		locationA3.setName("LOC-A3");
+		Context.getLocationService().saveLocation(locationA3);
 
 		// Second Branch
 		Location locationB1 = new Location();
@@ -121,6 +123,9 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 
 		locationB3 = new Location();
 		locationB3.setParentLocation(locationB2);
+		locationB3.setName("LOC-B3");
+		Context.getLocationService().saveLocation(locationB3);
+
 	}
 
 	private LocationAttributeType createPrefixAttributeType() {
