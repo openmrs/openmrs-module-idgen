@@ -38,7 +38,7 @@ public class LocationBasedPrefixProviderTest extends BaseModuleContextSensitiveT
 
 	@Test
 	public void getValue_shouldReturnPrefixDependingOnLocationInUserContext() {
-		Context.getUserContext().setLocation(location5);
+		Context.getUserContext().setLocation(locationB3);
 		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
 		// Change to location A3
 		when(Context.getUserContext().getLocation()).thenReturn(locationA3);

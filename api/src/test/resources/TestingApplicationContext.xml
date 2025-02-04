@@ -40,8 +40,8 @@
         </property>
     </bean>
 
-	<bean  class="org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider" />
-	<bean  class="org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider" />
+	<bean id="LocationBasedSuffixProvider"  class="org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider" />
+	<bean id="LocationBasedPrefixProvider" class="org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider" />
 
 
 </beans>

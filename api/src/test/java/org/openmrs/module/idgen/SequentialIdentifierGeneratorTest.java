@@ -95,8 +95,6 @@ public class SequentialIdentifierGeneratorTest extends BaseModuleContextSensitiv
 		generator.setPrefix(
 		    SequentialIdentifierGenerator.CONFIGURATION_PREFIX + LocationBasedPrefixProvider.class.getSimpleName());
 
-		when(Context.getRegisteredComponent("LocationBasedPrefixProvider", PrefixProvider.class)).thenReturn(new LocationBasedPrefixProvider());
-
 		Context.getAdministrationService()
 				.saveGlobalProperty(new GlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP, "Location Code"));
 		Context.getUserContext().setLocation(createLocationTree(true));
