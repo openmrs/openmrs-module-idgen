@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-   <patient_identifier_type patient_identifier_type_id="50" name="Location Prefixed Identification Number" description="Identifier generated from a location prefix" format="[A-Z]{3,5}\-[0]{3}\-[0-9]{3}" creator="1" date_created="2019-04-1 15:59:20.0" required="false" format_description="" validator="" CHECK_DIGIT="5" retired="false" uuid="b0d10dc0-d8ce-11e3-9c1a-0jhg89c9a66"/>
+   <patient_identifier_type patient_identifier_type_id="50" name="Location Prefixed Identification Number" description="Identifier generated from a location prefix" format="[A-Z]{3,5}\-[0]{3}\-[0-9]{3}" creator="1" date_created="2019-04-1 15:59:20.0" required="false" format_description="" validator="" retired="false" uuid="b0d10dc0-d8ce-11e3-9c1a-0jhg89c9a66"/>
    <global_property PROPERTY="idgen.prefixLocationAttributeType" PROPERTY_VALUE="Location Code" DESCRIPTION="" UUID="932ce5e6-5hj-443f-a6e3-6768421c17e9"/>
    
    <location location_id="10" name="Location 1" parent_location="[NULL]" description="test description" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f0f8ba64b-ea57-4a41-b33c-9dfc59b0c60a"/>
@@ -46,7 +46,7 @@
    
    <IDGEN_LOG_ENTRY ID="1" SOURCE="1" GENERATED_BY="1" IDENTIFIER="100892" COMMENT="New patient " DATE_GENERATED="2016-10-03 12:00:00.489" />
    <IDGEN_LOG_ENTRY ID="2" SOURCE="1" GENERATED_BY="1" IDENTIFIER="100HH9" COMMENT="New Visit" DATE_GENERATED="2017-10-03 12:00:00.489" />
-   <IDGEN_LOG_ENTRY ID="3" SOURCE="1" GENERATED_BY="2" IDENTIFIER="100H9T" DATE_GENERATED="2017-10-01 12:00:00.489" />
-   <IDGEN_LOG_ENTRY ID="4" SOURCE="2" GENERATED_BY="3" IDENTIFIER="100H28" COMMENT="Demo Data" DATE_GENERATED="2017-10-02 12:00:00.489" />
-   <IDGEN_LOG_ENTRY ID="5" SOURCE="3" GENERATED_BY="4" IDENTIFIER="100GYF" DATE_GENERATED="2017-09-20 12:00:00.489" />  
+   <IDGEN_LOG_ENTRY ID="3" SOURCE="1" GENERATED_BY="1" IDENTIFIER="100H9T" DATE_GENERATED="2017-10-01 12:00:00.489" />
+   <IDGEN_LOG_ENTRY ID="4" SOURCE="2" GENERATED_BY="1" IDENTIFIER="100H28" COMMENT="Demo Data" DATE_GENERATED="2017-10-02 12:00:00.489" />
+   <IDGEN_LOG_ENTRY ID="5" SOURCE="3" GENERATED_BY="1" IDENTIFIER="100GYF" DATE_GENERATED="2017-09-20 12:00:00.489" />
 </dataset>
