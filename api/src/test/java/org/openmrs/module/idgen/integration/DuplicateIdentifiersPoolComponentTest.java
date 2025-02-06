@@ -7,7 +7,8 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.springframework.test.annotation.NotTransactional;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
     }
 
     @Test
-    @NotTransactional
+    @Transactional(propagation = Propagation.NEVER)
     public void testUnderLoad() throws Exception {
 
         final List<String> generated = new ArrayList<String>();
