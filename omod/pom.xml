@@ -1,15 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.openmrs.module</groupId>
-		<artifactId>idgen</artifactId>
-		<version>4.15.0-SNAPSHOT</version>
-	</parent>
-	<groupId>org.openmrs.module</groupId>
-	<artifactId>idgen-omod</artifactId>
-	<packaging>jar</packaging>
-	<name>ID Generation OMOD</name>
-	<description>OpenMRS module project for ID Generation</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.openmrs.module</groupId>
+        <artifactId>idgen</artifactId>
+        <version>4.15.0-SNAPSHOT</version>
+    </parent>
+    <groupId>org.openmrs.module</groupId>
+    <artifactId>idgen-omod</artifactId>
+    <packaging>jar</packaging>
+    <name>ID Generation OMOD</name>
+    <description>OpenMRS module project for ID Generation</description>
 
     <properties>
         <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
@@ -19,12 +20,12 @@
         <WEBSERVICES_VERSION>2.23.0</WEBSERVICES_VERSION>
     </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>idgen-api</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>idgen-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
@@ -32,100 +33,100 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod</artifactId>
-			<version>${WEBSERVICES_VERSION}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod</artifactId>
-			<version>${WEBSERVICES_VERSION}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-common</artifactId>
-			<version>${WEBSERVICES_VERSION}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-common</artifactId>
-			<version>${WEBSERVICES_VERSION}</version>
-			<scope>provided</scope>
-		</dependency>
-                <dependency>
-                        <groupId>org.openmrs.module</groupId>
-                        <artifactId>idgen-api</artifactId>
-                        <version>${project.parent.version}</version>
-                        <scope>test</scope>
-                        <type>test-jar</type>
-                </dependency>
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>legacyui-omod</artifactId>
-			<version>1.22.0</version>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod</artifactId>
+            <version>${WEBSERVICES_VERSION}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod</artifactId>
+            <version>${WEBSERVICES_VERSION}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod-common</artifactId>
+            <version>${WEBSERVICES_VERSION}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod-common</artifactId>
+            <version>${WEBSERVICES_VERSION}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>idgen-api</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>legacyui-omod</artifactId>
+            <version>1.22.0</version>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<finalName>${project.parent.artifactId}-${project.parent.version}</finalName>
+    <build>
+        <finalName>${project.parent.artifactId}-${project.parent.version}</finalName>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/*.xml</exclude>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/webapp</directory>
-				<filtering>false</filtering>
-				<targetPath>web/module</targetPath>
-			</resource>
-		</resources>
-	
-		<plugins>
-			<plugin>
-				<groupId>org.openmrs.maven.plugins</groupId>
-				<artifactId>maven-openmrs-plugin</artifactId>
-			</plugin>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <filtering>false</filtering>
+                <targetPath>web/module</targetPath>
+            </resource>
+        </resources>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>Expand resources</id>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<includeGroupIds>${project.parent.groupId}</includeGroupIds>
-							<includeArtifactIds>${project.parent.artifactId}-api</includeArtifactIds>
-							<includeScope>compile</includeScope>
-							<includes>**\/*.xml,**\/*.properties</includes>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+        <plugins>
+            <plugin>
+                <groupId>org.openmrs.maven.plugins</groupId>
+                <artifactId>maven-openmrs-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>Expand resources</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <includeGroupIds>${project.parent.groupId}</includeGroupIds>
+                            <includeArtifactIds>${project.parent.artifactId}-api</includeArtifactIds>
+                            <includeScope>compile</includeScope>
+                            <includes>**\/*.xml,**\/*.properties</includes>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
