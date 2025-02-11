@@ -174,7 +174,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
             // starts a new transaction (which Hibernate handles by opening a new session)
             // we refresh the source afterwards to pick up any changes made during the inner transaction
             // *note that because of this refresh any changes made to the identifier source up to this point will be lost*
-            List<String> identifiers = Context.getService(IdentifierSourceService.class).generateIdentifiersInternal(source.getId(), batchSize, comment);
+            List<String> identifiers = generateIdentifiersInternal(source.getId(), batchSize, comment);
             dao.refreshIdentifierSource(source);
             return identifiers;
         }
