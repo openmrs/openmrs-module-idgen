@@ -56,10 +56,10 @@ public class IdentifierSourceControllerTest {
 	
 	@Test
 	public void exportIdentifiers_shouldReturnJson() throws Exception {
-		Mockito.stub(iss.generateIdentifiers(
+		Mockito.when(iss.generateIdentifiers(
 				Mockito.any(IdentifierSource.class), 
 				Mockito.any(Integer.class), 
-				Mockito.any(String.class))).toReturn(Arrays.asList("1", "2", "3"));
+				Mockito.any(String.class))).thenReturn(Arrays.asList("1", "2", "3"));
 		
 		
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
