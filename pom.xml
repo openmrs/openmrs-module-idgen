@@ -138,7 +138,7 @@
 	</dependencies>
 
 	<properties>
-		<openMRSVersion>2.4.1</openMRSVersion>
+		<openMRSVersion>2.7.0</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
@@ -186,8 +186,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<target>1.8</target>
-						<source>1.8</source>
+						<target>17</target>
+						<source>17</source>
 						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>
