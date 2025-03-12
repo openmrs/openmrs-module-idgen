@@ -18,9 +18,9 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.openmrs.module.idgen.web.controller.BaseWebControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
-import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests CRUD operations for {@link AutoGenerationOption}s via web service calls
  */
-public class AutoGenerationOptionControllerTest extends MainResourceControllerTest {
+public class AutoGenerationOptionControllerTest extends BaseWebControllerTest {
 	
 	@Autowired
 	private IdentifierSourceService identifierSourceService;
@@ -56,17 +56,14 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
 	
-	@Override
 	public String getURI() {
 		return "idgen/autogenerationoption";
 	}
 	
-	@Override
 	public String getUuid() {
 		return AUTO_GENERATION_OPTION_UUID;
 	}
 	
-	@Override
 	public long getAllCount() {
 		Integer allAutoGenerationOptions = 0;
 		for (PatientIdentifierType patientIdentifierType : Context.getPatientService().getAllPatientIdentifierTypes()) {
@@ -87,7 +84,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		String json = new ObjectMapper().writeValueAsString(autoGenerationOption);
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI());
 		req.setContent(json.getBytes());
-		SimpleObject response = deserialize(handle(req));
+		SimpleObject response = deserialize(handle(req), SimpleObject.class);
 		assertEquals(originalCount + 1, getAllCount());
 		Object autogenerationOptionUuid = PropertyUtils.getProperty(response, "uuid");
 		AutoGenerationOption newAutoGenerationOption = identifierSourceService
@@ -110,7 +107,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		String json = new ObjectMapper().writeValueAsString(autoGenerationOption);
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI());
 		req.setContent(json.getBytes());
-		SimpleObject response = deserialize(handle(req));
+		SimpleObject response = deserialize(handle(req), SimpleObject.class);
 		assertEquals(originalCount + 1, getAllCount());
 		Object autogenerationOptionUuid = PropertyUtils.getProperty(response, "uuid");
 		AutoGenerationOption newAutoGenerationOption = identifierSourceService

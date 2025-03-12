@@ -17,7 +17,7 @@
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
-        <WEBSERVICES_VERSION>2.23.0</WEBSERVICES_VERSION>
+        <WEBSERVICES_VERSION>2.48.0</WEBSERVICES_VERSION>
     </properties>
 
     <dependencies>

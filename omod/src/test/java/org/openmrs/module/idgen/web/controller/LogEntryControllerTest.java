@@ -15,11 +15,13 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.test.Util;
-import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public class LogEntryControllerTest extends MainResourceControllerTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class LogEntryControllerTest extends BaseWebControllerTest {
 	public static String USER_UUID = "1010d442-e134-11de-babe-001e378eb67e";
 	public static String LOG_ENTRY_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a901";
 
@@ -28,25 +30,25 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
 
-	@Override
 	public long getAllCount() {
 		return Context.getService(IdentifierSourceService.class).getLogEntries(null, null, null, null, null, null)
 				.size();
 	}
 
-	@Override
 	public String getURI() {
 		return "idgen/logentry";
 	}
 
-	@Override
 	public String getUuid() {
 		return "100892";
 	}
 
-	@Override
+
 	public void shouldGetAll() throws Exception {
-		super.shouldGetAll();
+		SimpleObject result = deserialize(handle(request(RequestMethod.GET, getURI())));
+
+		assertNotNull(result);
+		assertEquals(getAllCount(), Util.getResultsSize(result));
 	}
 
 	@Test

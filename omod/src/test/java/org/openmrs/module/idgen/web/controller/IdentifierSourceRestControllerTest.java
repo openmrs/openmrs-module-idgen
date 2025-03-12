@@ -21,7 +21,6 @@ import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.webservices.rest.SimpleObject;
-import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 import org.openmrs.module.webservices.rest.test.Util;
 
-public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
+public class IdentifierSourceRestControllerTest extends BaseWebControllerTest {
 	
     public static final String SEQUENTIAL_IDENTIFIER_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a901";
     public static final String REMOTE_IDENTIFIER_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a902";
@@ -58,24 +57,20 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         this.service = Context.getService(IdentifierSourceService.class);
     }
 
-    @Override
     public String getURI() {
         return "idgen/identifiersource";
     }
 
-    @Override
     public String getUuid() {
         return SEQUENTIAL_IDENTIFIER_SOURCE_UUID;
     }
 
-    @Override
     public long getAllCount()  {
         return service.getAllIdentifierSources(false).size();
     }
 
-    @Override
     public void shouldGetAll() throws Exception {
-        SimpleObject result = deserialize(handle(newGetRequest(getURI())));
+        SimpleObject result = deserialize(handle(newGetRequest(getURI())), SimpleObject.class);
         assertNotNull(result);
         assertEquals(getAllCount(), Util.getResultsSize(result));
     }
@@ -87,11 +82,11 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         
         MockHttpServletRequest getRequest = newGetRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID);
         getRequest.addParameter("v", "custom:(reservedIdentifiers)");
-        SimpleObject initialIdentifiers = deserialize(handle(getRequest));
+        SimpleObject initialIdentifiers = deserialize(handle(getRequest), SimpleObject.class);
         assertEquals("[]", initialIdentifiers.get("reservedIdentifiers").toString());
         
         MockHttpServletRequest postRequest = newPostRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID, reservedIdentifiers);
-        SimpleObject uploadResult = deserialize(handle(postRequest));
+        SimpleObject uploadResult = deserialize(handle(postRequest), SimpleObject.class);
         assertThat(
                 uploadResult.toString(), 
                 containsString(SEQUENTIAL_IDENTIFIER_SOURCE_UUID)
@@ -99,7 +94,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         
         MockHttpServletRequest getRequestAfterUpload = newGetRequest(getURI() + "/" + SEQUENTIAL_IDENTIFIER_SOURCE_UUID);
         getRequestAfterUpload.addParameter("v", "custom:(reservedIdentifiers)");
-        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload), SimpleObject.class);
         assertThat(identifiersAfterUpload.get("reservedIdentifiers").toString(), allOf(
                 containsString("1"),
                 containsString("2"),
@@ -118,7 +113,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
                 "}";
         
         MockHttpServletRequest getRequest = newPostRequest(getURI(), generateIdentifiers);
-        SimpleObject getResult = deserialize(handle(getRequest));
+        SimpleObject getResult = deserialize(handle(getRequest), SimpleObject.class);
         assertEquals("[G-0, H-8, I-5, J-3, K-1]", getResult.get("identifiers").toString());
     }
     
@@ -129,7 +124,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
                 "\"operation\": \"uploadFromSource\"}";
         
         MockHttpServletRequest postRequest = newPostRequest(getURI() + "/" + POOL_SOURCE_UUID, uploadIdentifiers);
-        SimpleObject uploadResult = deserialize(handle(postRequest));
+        SimpleObject uploadResult = deserialize(handle(postRequest), SimpleObject.class);
         assertThat(
                 uploadResult.toString(), 
                 containsString(POOL_SOURCE_UUID)
@@ -137,7 +132,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         
         MockHttpServletRequest getRequestAfterUpload = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
         getRequestAfterUpload.addParameter("v", "custom:(identifiers)");
-        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload), SimpleObject.class);
         assertThat(
                 identifiersAfterUpload.get("identifiers").toString(), allOf(
                 containsString("G-0"),
@@ -152,7 +147,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
                 "\"operation\": \"uploadFromFile\"}";
         
         MockHttpServletRequest postRequest = newPostRequest(getURI() + "/" + POOL_SOURCE_UUID, uploadIdentifiers);
-        SimpleObject uploadResult = deserialize(handle(postRequest));
+        SimpleObject uploadResult = deserialize(handle(postRequest), SimpleObject.class);
         assertThat(
                 uploadResult.toString(), 
                 containsString(POOL_SOURCE_UUID)
@@ -160,7 +155,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         
         MockHttpServletRequest getRequestAfterUpload = newGetRequest(getURI() + "/" + POOL_SOURCE_UUID);
         getRequestAfterUpload.addParameter("v", "custom:(identifiers)");
-        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload));
+        SimpleObject identifiersAfterUpload = deserialize(handle(getRequestAfterUpload), SimpleObject.class);
         assertThat(
                 identifiersAfterUpload.get("identifiers").toString(), allOf(
                 containsString("1"),
@@ -175,14 +170,14 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     public void shouldSearchByPatientIdentifierType() throws Exception {
         MockHttpServletRequest request = newGetRequest(getURI());
         request.addParameter("identifierType", PATIENT_IDENTIFIER_TYPE_UUID);
-        List<Object> result = deserialize(handle(request)).get("results");
+        List<Object> result = deserialize(handle(request), SimpleObject.class).get("results");
         assertNotNull(result);
         assertEquals(REMOTE_IDENTIFIER_SOURCE_UUID, PropertyUtils.getProperty(result.get(0), "uuid"));
     }
 
     @Test
     public void shouldGetAnIdentifierSourceByUuid() throws Exception {
-        SimpleObject result = deserialize(handle(newGetRequest(getURI() + "/" + getUuid())));
+        SimpleObject result = deserialize(handle(newGetRequest(getURI() + "/" + getUuid())), SimpleObject.class);
         assertNotNull(result);
         assertEquals(getUuid(), PropertyUtils.getProperty(result, "uuid"));
     }
@@ -230,7 +225,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         String jsonIdentifierSource = new ObjectMapper().writeValueAsString(identifierSource);
         MockHttpServletRequest req = newPostRequest(getURI(), jsonIdentifierSource);
 
-        SimpleObject newIdentifierSource = deserialize(handle(req));
+        SimpleObject newIdentifierSource = deserialize(handle(req), SimpleObject.class);
         String newIdentifierSourceUuid = PropertyUtils.getProperty(newIdentifierSource, "uuid").toString();
         SequentialIdentifierGenerator generatedIdentifierSource = (SequentialIdentifierGenerator) service.getIdentifierSourceByUuid(newIdentifierSourceUuid);
 
@@ -263,7 +258,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         String jsonIdentifierSource = new ObjectMapper().writeValueAsString(identifierSource);
         MockHttpServletRequest req = newPostRequest(getURI(), jsonIdentifierSource);
 
-        SimpleObject newIdentifierSource = deserialize(handle(req));
+        SimpleObject newIdentifierSource = deserialize(handle(req), SimpleObject.class);
         String newIdentifierSourceUuid = PropertyUtils.getProperty(newIdentifierSource, "uuid").toString();
         RemoteIdentifierSource generatedIdentifierSource = (RemoteIdentifierSource) service.getIdentifierSourceByUuid(newIdentifierSourceUuid);
 
@@ -295,7 +290,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         String jsonIdentifierSource = new ObjectMapper().writeValueAsString(identifierSource);
         MockHttpServletRequest req = newPostRequest(getURI(), jsonIdentifierSource);
 
-        SimpleObject newIdentifierSource = deserialize(handle(req));
+        SimpleObject newIdentifierSource = deserialize(handle(req), SimpleObject.class);
         String newIdentifierSourceUuid = PropertyUtils.getProperty(newIdentifierSource, "uuid").toString();
         IdentifierPool generatedIdentifierSource = (IdentifierPool) service.getIdentifierSourceByUuid(newIdentifierSourceUuid);
 
