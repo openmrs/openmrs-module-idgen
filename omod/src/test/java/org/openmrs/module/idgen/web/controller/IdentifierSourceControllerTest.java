@@ -21,13 +21,11 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -56,10 +54,10 @@ public class IdentifierSourceControllerTest {
 	
 	@Test
 	public void exportIdentifiers_shouldReturnJson() throws Exception {
-		Mockito.stub(iss.generateIdentifiers(
+		Mockito.when(iss.generateIdentifiers(
 				Mockito.any(IdentifierSource.class), 
 				Mockito.any(Integer.class), 
-				Mockito.any(String.class))).toReturn(Arrays.asList("1", "2", "3"));
+				Mockito.any(String.class))).thenReturn(Arrays.asList("1", "2", "3"));
 		
 		
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();

@@ -32,6 +32,7 @@ import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -117,7 +118,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * Returns null if this PatientIdentifierType is not set to be auto-generated
 	 */
 	@Transactional
-	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
 	public String generateIdentifier(PatientIdentifierType type, String comment);
 
     /**
@@ -125,7 +126,7 @@ public interface IdentifierSourceService extends OpenmrsService {
      * Returns null if this PatientIdentifierType is not set to be auto-generated
      */
     @Transactional
-    @Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+    @Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
     public String generateIdentifier(PatientIdentifierType type, Location location, String comment);
 	
 	/**
@@ -133,7 +134,7 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 */
 	@Transactional
-	@Authorized( OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS )
+	@Authorized( PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS )
 	public String generateIdentifier(IdentifierSource source, String comment) throws APIException;
 	
 	/**

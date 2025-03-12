@@ -14,10 +14,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
+import org.openmrs.module.idgen.web.controller.BaseWebControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
-import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 
-public class IdentifierResourceTest extends MainResourceControllerTest {
+public class IdentifierResourceTest extends BaseWebControllerTest {
 
     @Before
     public void init() throws Exception {
@@ -32,26 +33,25 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
     public void shouldGetNewIdentifier_SequenceIdentifierGenerator() throws Exception {
         SimpleObject result = deserialize(handle(
                 newPostRequest(getURI() + "/" + "0d47284f-9e9b-4a81-a88b-8bb42bc0a907" + "/identifier",
-                        "{\"comment\":\"foo\"}")));
+                        "{\"comment\":\"foo\"}")), SimpleObject.class);
 
         assertEquals("MRS000011", result.get(IdentifierResource.IDENTIFIER_KEY));
     }
 
     @Test
     public void shouldGetNewIdentifier_PooledIdentifier() throws Exception {
-        SimpleObject result = deserialize(handle(
-                newPostRequest(getURI() + "/" + "0d47284f-9e9b-4a81-a88b-8bb42bc0a903" + "/identifier",
-                        "{\"comment\":\"foo\"}")));
+        MockHttpServletRequest request = newPostRequest(getURI() + "/" + "0d47284f-9e9b-4a81-a88b-8bb42bc0a903" + "/identifier",
+                "{\"comment\":\"foo\"}");
+
+        SimpleObject result = deserialize(handle(request), SimpleObject.class);
 
         assertEquals("0-0", result.get(IdentifierResource.IDENTIFIER_KEY));
     }
     
-	@Override
 	public long getAllCount() {
 		return 8;
 	}
 
-	@Override
 	public String getUuid() {
 		return "0d47284f-9e9b-4a81-a88b-8bb42bc0a907";
 	}
