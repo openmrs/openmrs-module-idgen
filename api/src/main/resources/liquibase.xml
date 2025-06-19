@@ -368,7 +368,7 @@
 			<replace replace="name-of-uuid-function" with="NEWSEQUENTIALID()"/>
 		</modifySql>
 		<modifySql dbms="postgresql">
-			<replace replace="name-of-uuid-function" with="UUID()"/>
+			<replace replace="name-of-uuid-function" with="gen_random_uuid()"/>
 		</modifySql>
  	</changeSet>
 
