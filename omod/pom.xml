@@ -5,7 +5,6 @@
 		<artifactId>idgen</artifactId>
 		<version>4.15.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen-omod</artifactId>
 	<packaging>jar</packaging>
 	<name>ID Generation OMOD</name>
@@ -16,7 +15,9 @@
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
-        <WEBSERVICES_VERSION>2.23.0</WEBSERVICES_VERSION>
+        <WEBSERVICES_VERSION>3.0.0-SNAPSHOT</WEBSERVICES_VERSION>
+		<LEGACY_UI_VERSION>2.0.0-SNAPSHOT</LEGACY_UI_VERSION>
+		<JAVAX_VERSION>4.0.1</JAVAX_VERSION>
     </properties>
 
 	<dependencies>
@@ -25,13 +26,6 @@
 			<artifactId>idgen-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.5.0</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>webservices.rest-omod</artifactId>
@@ -58,13 +52,25 @@
 			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
 		</dependency>
-                <dependency>
-                        <groupId>org.openmrs.module</groupId>
-                        <artifactId>idgen-api</artifactId>
-                        <version>${project.parent.version}</version>
-                        <scope>test</scope>
-                        <type>test-jar</type>
-                </dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>idgen-api</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>legacyui-omod</artifactId>
+			<version>${LEGACY_UI_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${JAVAX_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

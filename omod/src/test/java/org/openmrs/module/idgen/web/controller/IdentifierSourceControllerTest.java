@@ -21,13 +21,11 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -37,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Tests methods in IdentifierSourceController
@@ -56,10 +56,10 @@ public class IdentifierSourceControllerTest {
 	
 	@Test
 	public void exportIdentifiers_shouldReturnJson() throws Exception {
-		Mockito.stub(iss.generateIdentifiers(
+		when(iss.generateIdentifiers(
 				Mockito.any(IdentifierSource.class), 
 				Mockito.any(Integer.class), 
-				Mockito.any(String.class))).toReturn(Arrays.asList("1", "2", "3"));
+				Mockito.any(String.class))).thenReturn(Arrays.asList("1", "2", "3"));
 		
 		
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
@@ -74,7 +74,7 @@ public class IdentifierSourceControllerTest {
 
     @Test
     public void importIdentifiers_shouldAcceptJson() throws Exception {
-        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), (List<String>) Mockito.anyCollectionOf(String.class));
+        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), (List<String>) Mockito.any());
 
         IdentifierPool identifierPool = new IdentifierPool();
         String identifiers = "{\"identifiers\":[\"1\",\"2\",\"3\"]}";

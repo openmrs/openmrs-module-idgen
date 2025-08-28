@@ -5,19 +5,21 @@
 		<artifactId>idgen</artifactId>
 		<version>4.15.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen-api</artifactId>
 	<packaging>jar</packaging>
 	<name>ID Generation API</name>
 	<description>API project for ID Generation</description>
 
+	<properties>
+		<MOCKITO_INLINE_VERSION>3.12.4</MOCKITO_INLINE_VERSION>
+	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.5.0</version>
-			<type>jar</type>
-			<scope>provided</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-inline</artifactId>
+			<version>${MOCKITO_INLINE_VERSION}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	

@@ -24,6 +24,11 @@
 			<ref bean="mappingJarResources" />
 		</property>
 		<!--  default properties must be set in the hibernate.default.properties -->
+		<property name="packagesToScan">
+			<list>
+				<value>org.openmrs</value>
+			</list>
+		</property>
 	</bean>
 
     <bean id="idgenTestTimerFactory" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
@@ -39,5 +44,9 @@
             </list>
         </property>
     </bean>
+
+
+	<bean id="LocationBasedSuffixProvider"  class="org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider" />
+	<bean id="LocationBasedPrefixProvider" class="org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider" />
 	
 </beans>

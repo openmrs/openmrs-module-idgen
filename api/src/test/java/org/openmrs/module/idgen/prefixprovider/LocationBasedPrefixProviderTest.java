@@ -2,15 +2,16 @@ package org.openmrs.module.idgen.prefixprovider;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.Collections;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
@@ -18,12 +19,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
-import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class LocationBasedPrefixProviderTest {
 	
 	LocationBasedPrefixProvider locationPrefixProvider;
@@ -36,23 +32,31 @@ public class LocationBasedPrefixProviderTest {
 	Location location3;
 	Location location5;
 	Location locationA2;
+
+	private MockedStatic<Context> mockedContext;
 	
 	@Before
 	public void setup() {
+		mockedContext = mockStatic(Context.class);
 		locationPrefixProvider = new LocationBasedPrefixProvider();
 		
-		mockStatic(Context.class);
 		userContext = mock(UserContext.class);
-		when(Context.getUserContext()).thenReturn(userContext);
-		
+
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
+
 		LocationService ls = mock(LocationService.class);
 		AdministrationService as = mock(AdministrationService.class);
-		when(Context.getLocationService()).thenReturn(ls);
-		when(Context.getAdministrationService()).thenReturn(as);
-		when(ls.getAllLocationAttributeTypes()).thenReturn(Collections.<LocationAttributeType>emptyList());
+		mockedContext.when(Context::getLocationService).thenReturn(ls);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		mockedContext.when(ls::getAllLocationAttributeTypes).thenReturn(Collections.<LocationAttributeType>emptyList());
 		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
 		        .thenReturn("Location Code");
 		setupLocationTree();
+	}
+
+	@After
+	public void teardown() {
+		mockedContext.close();
 	}
 	
 	@Test
