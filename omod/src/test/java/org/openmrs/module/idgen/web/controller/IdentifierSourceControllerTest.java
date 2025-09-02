@@ -36,6 +36,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,7 +76,7 @@ public class IdentifierSourceControllerTest {
 
     @Test
     public void importIdentifiers_shouldAcceptJson() throws Exception {
-        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), (List<String>) Mockito.any());
+        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), anyList());
 
         IdentifierPool identifierPool = new IdentifierPool();
         String identifiers = "{\"identifiers\":[\"1\",\"2\",\"3\"]}";
