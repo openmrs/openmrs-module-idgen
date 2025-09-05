@@ -89,6 +89,14 @@
 					<artifactId>javassist</artifactId>
 					<groupId>javassist</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.powermock</groupId>
+					<artifactId>powermock-module-junit4</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.powermock</groupId>
+					<artifactId>powermock-api-mockito2</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -105,34 +113,23 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.10.19</version>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>${byteBuddyVersion}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>mockito-all</artifactId>
-					<groupId>org.mockito</groupId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.30.2-GA</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
 	<properties>
-		<openMRSVersion>1.10.2</openMRSVersion>
+		<openMRSVersion>2.7.5</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<byteBuddyVersion>1.17.6</byteBuddyVersion>
 	</properties>
 	
 	<build>
@@ -179,8 +176,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<configuration>
-						<target>1.6</target>
-						<source>1.6</source>
+						<target>1.8</target>
+						<source>1.8</source>
 						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>

@@ -7,7 +7,8 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.springframework.test.annotation.NotTransactional;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,31 +38,30 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
     }
 
     @Test
-    @NotTransactional
-    public void testUnderLoad() throws Exception {
+    @Transactional(propagation = Propagation.NEVER)
+    public void testUnderLoad() {
 
         final List<String> generated = new ArrayList<String>();
 
-        List<Thread> threads = new ArrayList<Thread>();
+        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < NUM_THREADS; ++i) {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Context.openSession();
-                    Context.authenticate("admin", "test");
-                    IdentifierSource source = getService().getIdentifierSource(4);
-                    try {
-                        authenticate();
-                        sleep(100);
+            Thread thread = new Thread(() -> {
+                Context.openSession();
+                Context.authenticate("admin", "test");
+                IdentifierSource source = getService().getIdentifierSource(4);
+                try {
+                    authenticate();
+                    sleep(100);
+                    synchronized (generated) {
                         generated.addAll(getService().generateIdentifiers(source, 1, "thread"));
-                        sleep(100);
                     }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    finally {
-                        Context.closeSession();
-                    }
+                    sleep(100);
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                finally {
+                    Context.closeSession();
                 }
             });
             thread.start();
@@ -77,7 +77,7 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
         }
 
         assertThat(generated.size(), is(NUM_THREADS));
-        assertThat(new HashSet<String>(generated).size(), is(NUM_THREADS));
+        assertThat(new HashSet<>(generated).size(), is(NUM_THREADS));
     }
 
     public void sleep(long time) {

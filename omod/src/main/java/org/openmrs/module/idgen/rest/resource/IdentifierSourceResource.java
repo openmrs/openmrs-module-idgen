@@ -344,7 +344,7 @@ public class IdentifierSourceResource extends MetadataDelegatingCrudResource<Ide
         if (operation != null&& operation.toString().equals("uploadFromFile")) {
             Object identifiers = updateBody.get("identifiers");
             if(identifierSourceToUpdate != null && identifiers != null){
-                List<String> ids = new ArrayList<String>(Arrays.asList(identifiers.toString().split(",")));
+                List<String> ids = new ArrayList<>(Arrays.asList(identifiers.toString().split(",")));
                 IdentifierPool pool = (IdentifierPool) identifierSourceToUpdate;
                 if(pool != null && ids != null){
                     Context.getService(IdentifierSourceService.class).addIdentifiersToPool(pool, ids);

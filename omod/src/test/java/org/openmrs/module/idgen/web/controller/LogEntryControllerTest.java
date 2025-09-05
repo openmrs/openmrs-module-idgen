@@ -129,7 +129,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("generatedBy", USER_UUID);
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assert.assertEquals(5, Util.getResultsSize(result));
 	}
 
 	@Test

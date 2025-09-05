@@ -15,7 +15,7 @@ public abstract class IdgenBaseTest extends BaseModuleContextSensitiveTest {
         Properties props = super.getRuntimeProperties();
         String url = props.getProperty(Environment.URL);
         if (url.contains("jdbc:h2:") && !url.toLowerCase().contains(";mvcc=true")) {
-            props.setProperty(Environment.URL, url + ";mvcc=true");
+            props.setProperty(Environment.URL, url);
         }
         return props;
     }
