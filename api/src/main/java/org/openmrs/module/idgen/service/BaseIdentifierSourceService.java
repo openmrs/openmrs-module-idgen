@@ -188,6 +188,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @param processor
      * @return
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<String> generateIdentifiersInternal(Integer sourceId, Integer batchSize, String comment) {
 
         IdentifierSource source = getIdentifierSource(sourceId);
