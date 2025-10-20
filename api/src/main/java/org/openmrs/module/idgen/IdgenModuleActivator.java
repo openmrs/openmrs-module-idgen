@@ -15,9 +15,14 @@ package org.openmrs.module.idgen;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.DaemonTokenAware;
+import org.openmrs.module.idgen.processor.IdentifierPoolProcessor;
+import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;
+import org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor;
+import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.idgen.task.IdgenTask;
 
 /**
@@ -30,6 +35,19 @@ public class IdgenModuleActivator extends BaseModuleActivator implements DaemonT
 
 	@Override
 	public void started() {
+		IdentifierSourceService service = Context.getService(IdentifierSourceService.class);
+		service.registerProcessor(
+				SequentialIdentifierGenerator.class,
+				Context.getRegisteredComponents(SequentialIdentifierGeneratorProcessor.class).get(0)
+		);
+		service.registerProcessor(
+				RemoteIdentifierSource.class,
+				Context.getRegisteredComponents(RemoteIdentifierSourceProcessor.class).get(0)
+		);
+		service.registerProcessor(
+				IdentifierPool.class,
+				Context.getRegisteredComponents(IdentifierPoolProcessor.class).get(0)
+		);
 		IdgenTask.setEnabled(true);
 		log.info("Idgen Module Started...");
 	}

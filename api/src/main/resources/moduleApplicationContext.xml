@@ -11,71 +11,42 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-    <bean id="IdentifierSourceDAO" class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
-        <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
+    <bean id="identifierSourceDAO" class="org.openmrs.module.idgen.service.db.HibernateIdentifierSourceDAO">
+        <property name="sessionFactory" ref="dbSessionFactory"/>
     </bean>
 
-	<bean id="baseIdentifierSourceService" class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
-		<property name="dao">
-			<ref bean="IdentifierSourceDAO" />
+	<bean id="identifierSourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+		<property name="target">
+			<bean class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
+				<property name="dao" ref="identifierSourceDAO"/>
+			</bean>
 		</property>
-		<property name="processors">
-			<map>
-				<entry>
-					<key><value>org.openmrs.module.idgen.SequentialIdentifierGenerator</value></key>
-					<bean class="org.openmrs.module.idgen.processor.SequentialIdentifierGeneratorProcessor">
-                        <property name="identifierSourceService">
-                            <ref bean="baseIdentifierSourceService" />
-                        </property>
-                    </bean>
-				</entry>
-				<entry>
-					<key><value>org.openmrs.module.idgen.RemoteIdentifierSource</value></key>
-					<bean class="org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor"/>
-				</entry>
-				<entry>
-					<key><value>org.openmrs.module.idgen.IdentifierPool</value></key>
-					<bean class="org.openmrs.module.idgen.processor.IdentifierPoolProcessor"/>
-				</entry>
-			</map>
-		</property>
+		<property name="preInterceptors" ref="serviceInterceptors"/>
+		<property name="transactionAttributeSource" ref="transactionAttributeSource"/>
 	</bean>
 		
 	<!--  Configure the Service -->
-   	<bean parent="serviceContext" id="identifierSourceService">
+	<!-- Services accessible via Context.getService() -->
+	<bean parent="serviceContext">
 		<property name="moduleService">
-			<list>
+			<list merge="true">
 				<value>org.openmrs.module.idgen.service.IdentifierSourceService</value>
-				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-					<property name="transactionManager"><ref bean="transactionManager"/></property>
-					<property name="target">
-						<ref bean="baseIdentifierSourceService"/>
-					</property>
-					<property name="preInterceptors">
-						<list>
-							<ref bean="authorizationInterceptor"/>
-						</list>
-					</property>
-					<property name="transactionAttributeSource">
-						<bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
-					</property>
-				</bean>
+				<ref bean="identifierSourceService"/>
 			</list>
 		</property>
 	</bean>
+
 	<bean parent="patientServiceTarget">
 		<property name="identifierValidators">
 			<map>
-				<entry>
-					<key><value>org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator</value></key>
+				<entry key="org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator">
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator"/>
 				</entry>
-				<entry>
-					<key><value>org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator</value></key>
+				<entry key="org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator">
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod25IdentifierValidator"/>
 				</entry>
-				<entry>
-					<key><value>org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator</value></key>
+				<entry key="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator">
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
 				</entry>
 			</map>

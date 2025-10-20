@@ -22,10 +22,12 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.stereotype.Component;
 
 /**
  * Evaluates a RemoteIdentifierSource
  */
+@Component
 public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
 
 	/** 

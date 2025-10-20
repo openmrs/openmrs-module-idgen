@@ -13,10 +13,6 @@
  */
 package org.openmrs.module.idgen.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -32,22 +28,22 @@ import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
 import org.openmrs.util.OpenmrsConstants;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for IdentifierSource Service Methods
  */
-@Transactional
 public interface IdentifierSourceService extends OpenmrsService {
 	
 	/**
-	 * @param id the id to retrieve for the given type
 	 * @return all IdentifierSource types that are supported
 	 * @should return all supported IdentifierSource types
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public List<Class<? extends IdentifierSource>> getIdentifierSourceTypes();
+	List<Class<? extends IdentifierSource>> getIdentifierSourceTypes();
 
 	/**
 	 * @param id the id to retrieve for the given type
@@ -56,18 +52,16 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should return a saved remote identifier source
 	 * @should return a saved identifier pool
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public IdentifierSource getIdentifierSource(Integer id) throws APIException;
+	IdentifierSource getIdentifierSource(Integer id) throws APIException;
 	
 	/**
 	 * @param includeRetired if true, also returns retired IdentifierSources
 	 * @return all IdentifierSources
 	 * @should return all identifier sources
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws APIException;
+	List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws APIException;
 	
 	/**
 	 * Returns all IdentifierSources by PatientIdentifierType
@@ -76,9 +70,8 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @throws APIException
 	 * @should return all identifier sources by type
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public Map<PatientIdentifierType, List<IdentifierSource>> getIdentifierSourcesByType(boolean includeRetired) throws APIException;
+	Map<PatientIdentifierType, List<IdentifierSource>> getIdentifierSourcesByType(boolean includeRetired) throws APIException;
 	
 	/**
 	 * Persists a IdentifierSource, either as a save or update.
@@ -88,9 +81,8 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should save a rest identifier generator for later retrieval
 	 * @should save an identifier pool for later retrieval
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
-	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException;
+	IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
 	 * Retires the IdentifierSource, leaving it in the database, but removing it from data entry screens
@@ -101,57 +93,51 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @should set the retired bit before saving
 	 */
 	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
-	public void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException;
+	void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException;
 	
 	/**
 	 * Deletes a IdentifierSource from the database.
 	 * @param identifierSource the IdentifierSource to purge
 	 * @should delete an IdentifierSource from the system
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_IDENTIFIER_SOURCES )
-	public void purgeIdentifierSource(IdentifierSource identifierSource) throws APIException;
+	void purgeIdentifierSource(IdentifierSource identifierSource) throws APIException;
 	
 	/**
 	 * Given a PatientIdentifierType, generates an identifier using the proper IdentifierSource for this server
 	 * Returns null if this PatientIdentifierType is not set to be auto-generated
 	 */
-	@Transactional
 	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
-	public String generateIdentifier(PatientIdentifierType type, String comment);
+	String generateIdentifier(PatientIdentifierType type, String comment);
 
     /**
      * Given a PatientIdentifierType and Location, generates an identifier using the proper IdentifierSource
      * Returns null if this PatientIdentifierType is not set to be auto-generated
      */
-    @Transactional
-    @Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
-    public String generateIdentifier(PatientIdentifierType type, Location location, String comment);
+	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+    String generateIdentifier(PatientIdentifierType type, Location location, String comment);
 	
 	/**
 	 * Generates a Single Identifiers from the given source
 	 * @throws APIException
 	 */
-	@Transactional
-	@Authorized( OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS )
-	public String generateIdentifier(IdentifierSource source, String comment) throws APIException;
+	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	String generateIdentifier(IdentifierSource source, String comment) throws APIException;
 	
 	/**
 	 * Generates a List of Identifiers from the given source in the given quantity
 	 * @throws APIException
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_GENERATE_BATCH_OF_IDENTIFIERS )
-	public List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException;
+	List<String> generateIdentifiers(IdentifierSource source, Integer batchSize, String comment) throws APIException;
 	
 	/**
 	 * Returns an appropriate IdentifierSourceProcessor for the given IdentifierSource
 	 * @param source
 	 * @return
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public IdentifierSourceProcessor getProcessor(IdentifierSource source);
+	IdentifierSourceProcessor getProcessor(IdentifierSource source);
 	
 	/**
 	 * Registers a new Processor to handle a particular IdentifierSource
@@ -159,48 +145,41 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @param processorToRegister
 	 * @throws APIException
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException;
+	void registerProcessor(Class<? extends IdentifierSource> type, IdentifierSourceProcessor processorToRegister) throws APIException;
 
 	/**
 	 * Returns available identifiers from a pool
 	 */
-	@Transactional(readOnly=true)
 	@Authorized
-	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException;
+	List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) throws APIException;
 	
 	/**
 	 * Returns Pooled Identifiers for the given source, with the given status options
 	 */
-	@Transactional(readOnly=true)
 	@Authorized
-	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException;
+	int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) throws APIException;
 	
 	/**
 	 * Adds a List of Identifiers to the given pool
 	 * @throws APIException
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
-	public void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException;
+	void addIdentifiersToPool(IdentifierPool pool, List<String> identifiers) throws APIException;
 	
 	/**
 	 * Adds a batch of Identifiers to the given pool, from the attached source
 	 * @throws APIException
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_UPLOAD_BATCH_OF_IDENTIFIERS )
-	public void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
+	void addIdentifiersToPool(IdentifierPool pool, Integer batchSize) throws APIException;
 
     /**
-     * @param id of auto generation option
+     * @param autoGenerationOptionId of auto generation option
      * @return the AutoGenerationOption
-
      */
-    @Transactional(readOnly = true)
 	@Authorized
-    public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException;
+    AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws APIException;
 
     /**
      * Gets an AutoGenerationOption by its UUID
@@ -209,64 +188,57 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @return the AutoGenerationOption
      * @since 4.6.0
      */
-    @Transactional(readOnly = true)
 	@Authorized
-    public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
+    AutoGenerationOption getAutoGenerationOptionByUuid(String uuid);
     
     /**
-	 * @param patient identifier type
+	 * @param type patient identifier type
      * @param location location
 	 * @return the AutoGenerationOption that matches the given PatientIdentifierType and Location
      * @should return options that don't have a configured location
 	 */
-	@Transactional(readOnly = true)
 	@Authorized
-	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;
+	AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException;
 
     /**
-     * @param patient identifier type
+     * @param type patient identifier type
      * @return all AutoGenerationOptions that match the given patient identifier type
      * @throws APIException
      */
-    @Transactional(readOnly = true)
 	@Authorized
-    public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException;
+    List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException;
 
     /**
-     * @param patient identifier type
+     * @param type patient identifier type
      * @return the AutoGenerationOption that matches the given PatientIdentifierType
-     * @throws non-unique exception if more than one auto-generation option for this type
+     * @throws APIException non-unique exception if more than one auto-generation option for this type
      */
-    @Transactional(readOnly = true)
 	@Authorized
-    public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
+    AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException;
 
 	/**
 	 * Persists a AutoGenerationOption, either as a save or update.
 	 * @param option
 	 * @return the AutoGenerationOption that was passed in
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_AUTOGENERATION_OPTIONS )
-	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException;
+	AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException;
 	
 	/**
 	 * Deletes a AutoGenerationOption from the database.
 	 * @param option the AutoGenerationOption to purge
 	 * @should delete an AutoGenerationOption from the system
 	 */
-	@Transactional
 	@Authorized( IdgenConstants.PRIV_MANAGE_AUTOGENERATION_OPTIONS )
-	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException;
+	void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException;
 	
 	/**
 	 * Retrieves the Log Entries that match the supplied parameters.  All parameters are optional.
 	 * The identifier and comment parameters do a "like" match, the date parameters ignore time
 	 */
-	@Transactional(readOnly=true)
 	@Authorized
-	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
-										String identifier, User generatedBy, String comment) throws APIException;
+	List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate,
+								 String identifier, User generatedBy, String comment) throws APIException;
 
 	/**
 	 * Retrieves the most recent Log Entry for the given source, based on generation date and auto incremented id
@@ -274,7 +246,6 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * @return LogEntry - the most recent LogEntry that matches the given source
 	 * @throws APIException
 	 */
-	@Transactional(readOnly=true)
 	@Authorized
 	LogEntry getMostRecentLogEntry(IdentifierSource source) throws APIException;
 
@@ -283,22 +254,19 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * until the min available size is reached.  Only does something if the pool's source is a remote or sequential generator.
 	 * @param pool
 	 */
-	@Transactional
 	@Authorized
-	public void checkAndRefillIdentifierPool(IdentifierPool pool);
+	void checkAndRefillIdentifierPool(IdentifierPool pool);
 	
 	/**
 	 * Convenience method that returns the set of Patient Identifier Types that match certain AutoGeneration parameters
 	 */
-	@Transactional(readOnly=true)
 	@Authorized
-	public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled);
+	List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled);
 
     /**
      * @param uuid
      * @return the identifier source with the given uuid
      */
-    @Transactional(readOnly=true)
 	@Authorized
     IdentifierSource getIdentifierSourceByUuid(String uuid);
     
@@ -307,7 +275,6 @@ public interface IdentifierSourceService extends OpenmrsService {
      * @param patientIdentifierType the Patient Identifier Type used to retrieve the Identifier Source(s).
      * @return the identifier source(s) with the given identifier type.
      */
-    @Transactional(readOnly=true)
 	@Authorized
     List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType);
 

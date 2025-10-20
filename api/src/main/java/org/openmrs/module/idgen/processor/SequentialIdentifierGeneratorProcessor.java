@@ -13,20 +13,24 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenUtil;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Evaluates a SequentialIdentifierSource
  */
+@Component
 public class SequentialIdentifierGeneratorProcessor implements IdentifierSourceProcessor {
 
+	@Autowired
     private IdentifierSourceService identifierSourceService;
 
     /**

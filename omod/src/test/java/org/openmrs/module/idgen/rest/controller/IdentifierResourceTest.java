@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.module.idgen.IdgenModuleActivator;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
@@ -22,6 +23,7 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
     @Before
     public void init() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+        new IdgenModuleActivator().started();
     }
 
     public String getURI() {

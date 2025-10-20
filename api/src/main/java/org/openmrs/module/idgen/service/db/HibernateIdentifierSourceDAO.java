@@ -13,10 +13,6 @@
  */
 package org.openmrs.module.idgen.service.db;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -41,12 +37,14 @@ import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  *  Hibernate Implementation of the IdentifierSourceDAO Interface
  */
-@Transactional
 public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	
 	protected Log log = LogFactory.getLog(getClass());
@@ -60,7 +58,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceService#getIdentifierSource(Integer)
 	 */
-	@Transactional(readOnly=true)
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException {
 		return (IdentifierSource) sessionFactory.getCurrentSession().get(IdentifierSource.class, id);
 	}
@@ -69,7 +66,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceDAO#getAllIdentifierSources(boolean)
 	 */
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
 		if (!includeRetired) {
@@ -82,7 +78,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/**
 	 * @see IdentifierSourceService#saveIdentifierSource(IdentifierSource)
 	 */
-	@Transactional
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
 		DbSession currentSession = sessionFactory.getCurrentSession();
 		currentSession.saveOrUpdate(identifierSource);
@@ -94,7 +89,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceService#purgeIdentifierSource(IdentifierSource)
 	 */
-	@Transactional
 	public void purgeIdentifierSource(IdentifierSource identifierSource) {
 		sessionFactory.getCurrentSession().delete(identifierSource);
 	}
@@ -103,7 +97,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * 
 	 * @see IdentifierSourceDAO#getAvailableIdentifiers(IdentifierPool, int)
 	 */
-	@Transactional(readOnly=true)
 	@SuppressWarnings("unchecked")
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PooledIdentifier.class);
@@ -126,7 +119,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/**
 	 * @see IdentifierSourceDAO#getQuantityInPool(IdentifierPool, boolean, boolean)
 	 */
-	@Transactional(readOnly=true)
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) {
 		String hql = "select count(*) from PooledIdentifier where pool_id = " + pool.getId();
 		if (availableOnly) {
@@ -142,7 +134,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     /**
      * @see IdentifierSourceDAO#getAutoGenerationOption(Integer)
      */
-    @Transactional(readOnly=true)
     @Override
     public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws DAOException {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
@@ -163,7 +154,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     /**
 	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType,Location)
 	 */
-	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
 		criteria.add(Expression.eq("identifierType", type));
@@ -174,7 +164,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     /**
      * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
      */
-    @Transactional(readOnly=true)
     public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
         criteria.add(Expression.eq("identifierType", type));
@@ -184,7 +173,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
     /**
      * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
      */
-    @Transactional(readOnly=true)
     public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
         criteria.add(Expression.eq("identifierType", type));
@@ -194,7 +182,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceDAO#saveAutoGenerationOption(AutoGenerationOption)
 	 */
-	@Transactional
 	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		sessionFactory.getCurrentSession().saveOrUpdate(option);
 		return option;
@@ -203,7 +190,6 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	/** 
 	 * @see IdentifierSourceDAO#purgeAutoGenerationOption(AutoGenerationOption)
 	 */
-	@Transactional
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
 		sessionFactory.getCurrentSession().delete(option);
 	}

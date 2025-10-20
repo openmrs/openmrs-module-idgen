@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
+import org.openmrs.module.idgen.IdgenModuleActivator;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
@@ -56,6 +57,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     public void setUp() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
         this.service = Context.getService(IdentifierSourceService.class);
+        new IdgenModuleActivator().started();
     }
 
     @Override
