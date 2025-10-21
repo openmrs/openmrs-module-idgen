@@ -32,12 +32,14 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifiersMessage;
+import org.springframework.stereotype.Component;
 
 /**
  * Evaluates a RemoteIdentifierSource
  * By default, this expects an HTTP request to return a comma-separated String of identifiers.
  * This can be overridden in subclasses as needed
  */
+@Component
 public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcessor {
 
     private static Log log = LogFactory.getLog(RemoteIdentifierSourceProcessor.class);

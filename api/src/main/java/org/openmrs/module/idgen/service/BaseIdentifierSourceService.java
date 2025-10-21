@@ -45,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  *  Base Implementation of the IdentifierSourceService API
  */
-@Transactional
 public class BaseIdentifierSourceService extends BaseOpenmrsService implements IdentifierSourceService {
 	
 	protected Log log = LogFactory.getLog(getClass());
@@ -69,7 +68,6 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/**
 	 * @see IdentifierSourceService#getIdentifierSourceTypes()
 	 */
-	@Transactional(readOnly = true)
 	public List<Class<? extends IdentifierSource>> getIdentifierSourceTypes() {
 		List<Class<? extends IdentifierSource>> sourceTypes = new ArrayList<Class<? extends IdentifierSource>>();
 		sourceTypes.add(SequentialIdentifierGenerator.class);
@@ -147,7 +145,6 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * 
 	 * @see IdentifierSourceService#getProcessor(IdentifierSource)
 	 */
-	@Transactional(readOnly=true)
 	public IdentifierSourceProcessor getProcessor(IdentifierSource source) {
 		return getProcessors().get(source.getClass());
 	}
@@ -182,10 +179,9 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 
     /**
      * This method exists because we want a transaction to be opened and closed inside the synchronized block in generateIdentifiers
-     * @param source
+     * @param sourceId
      * @param batchSize
      * @param comment
-     * @param processor
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -220,6 +216,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     /**
      * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, java.lang.String)
      */
+	@Transactional
     public String generateIdentifier(PatientIdentifierType type, String comment) {
         AutoGenerationOption option = getAutoGenerationOption(type);
 
@@ -234,6 +231,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     /**
 	 * @see org.openmrs.module.idgen.service.IdentifierSourceService#generateIdentifier(org.openmrs.PatientIdentifierType, org.openmrs.Location, java.lang.String)
 	 */
+	@Transactional
 	public String generateIdentifier(PatientIdentifierType type, Location location, String comment) {
 		AutoGenerationOption option = getAutoGenerationOption(type, location);
 	
@@ -248,6 +246,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#generateIdentifier(IdentifierSource, String)
 	 */
+	@Transactional
 	public String generateIdentifier(IdentifierSource source, String comment) throws APIException {
 		List<String> l = generateIdentifiers(source, 1, comment);
 		if (l == null || l.size() != 1) {
@@ -305,6 +304,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	 * @see IdentifierSourceService#getAutoGenerationOptionByUuid(String)
 	 */
 	@Override
+	@Transactional(readOnly=true)
 	public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid) {
 		return dao.getAutoGenerationOptionByUuid(uuid);
 	}
@@ -391,6 +391,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/** 
 	 * @see IdentifierSourceService#getLogEntries(IdentifierSource, Date, Date, String, User, String)
 	 */
+	@Transactional(readOnly=true)
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws APIException {
 		return dao.getLogEntries(source, fromDate, toDate, identifier, generatedBy, comment);
@@ -399,6 +400,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
 	/**
 	 * @see IdentifierSourceService#getMostRecentLogEntry(IdentifierSource)
 	 */
+	@Transactional(readOnly=true)
 	public LogEntry getMostRecentLogEntry(IdentifierSource source) throws APIException {
 		return dao.getMostRecentLogEntry(source);
 	}
@@ -420,6 +422,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
     /**
      * @see org.openmrs.module.idgen.service.IdentifierSourceService#getPatientIdentifierTypesByAutoGenerationOption(java.lang.Boolean, java.lang.Boolean)
      */
+	@Transactional(readOnly=true)
     public List<PatientIdentifierType> getPatientIdentifierTypesByAutoGenerationOption(Boolean manualEntryEnabled, Boolean autoGenerationEnabled) {
     	
     	List<PatientIdentifierType> identifierTypes = new ArrayList<PatientIdentifierType>();
@@ -437,6 +440,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @see IdentifierSourceService#getIdentifierSourceByUuid(String)
      */
     @Override
+	@Transactional(readOnly=true)
     public IdentifierSource getIdentifierSourceByUuid(String uuid) {
         return dao.getIdentifierSourceByUuid(uuid);
     }
@@ -445,6 +449,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @see IdentifierSourceService#getIdentifierSourcesByType(PatientIdentifierType)
      */
     @Override
+	@Transactional(readOnly=true)
     public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType){
         return dao.getIdentifierSourcesByType(patientIdentifierType);
     }
@@ -453,6 +458,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @see IdentifierSourceService#saveSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator, long)
      */
     @Override
+	@Transactional
     public void saveSequenceValue(SequentialIdentifierGenerator seq, long sequenceValue) {
         dao.saveSequenceValue(seq, sequenceValue);
     }
@@ -461,6 +467,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @see IdentifierSourceService#getSequenceValue(org.openmrs.module.idgen.SequentialIdentifierGenerator)
      */
     @Override
+	@Transactional(readOnly=true)
     public Long getSequenceValue(SequentialIdentifierGenerator seq) {
         return dao.getSequenceValue(seq);
     }
@@ -469,6 +476,7 @@ public class BaseIdentifierSourceService extends BaseOpenmrsService implements I
      * @see IdentifierSourceService#retireIdentifierSource(org.openmrs.module.idgen.IdentifierSource, String)
      */
 	@Override
+	@Transactional
 	public void retireIdentifierSource(IdentifierSource identifierSource, String reason) throws APIException {
 		identifierSource.setRetired(true);
 		identifierSource.setRetireReason(reason);

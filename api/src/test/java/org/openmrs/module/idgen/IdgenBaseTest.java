@@ -1,6 +1,7 @@
 package org.openmrs.module.idgen;
 
 import org.hibernate.cfg.Environment;
+import org.junit.Before;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.Properties;
@@ -9,6 +10,11 @@ import java.util.Properties;
  * Base class that can be used for an common functionality or modifications to the standard base module context sensitive test
  */
 public abstract class IdgenBaseTest extends BaseModuleContextSensitiveTest {
+
+    @Before
+    public void setupActivator() {
+        new IdgenModuleActivator().started();
+    }
 
     @Override
     public Properties getRuntimeProperties() {
