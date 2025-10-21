@@ -15,7 +15,7 @@
         <property name="sessionFactory" ref="dbSessionFactory"/>
     </bean>
 
-	<bean id="identifierSourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	<bean id="baseIdentifierSourceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager" ref="transactionManager"/>
 		<property name="target">
 			<bean class="org.openmrs.module.idgen.service.BaseIdentifierSourceService">
@@ -32,7 +32,7 @@
 		<property name="moduleService">
 			<list merge="true">
 				<value>org.openmrs.module.idgen.service.IdentifierSourceService</value>
-				<ref bean="identifierSourceService"/>
+				<ref bean="baseIdentifierSourceService"/>
 			</list>
 		</property>
 	</bean>
