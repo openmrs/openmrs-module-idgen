@@ -310,8 +310,8 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
 	@Test
 	public void shouldReturnNullIfNoLogEntriesFound() {
-		// Source 4 has no log entries in the test data
-		IdentifierSource is = identifierSourceService.getIdentifierSource(4);
+		// Source 7 has no log entries in the test data
+		IdentifierSource is = identifierSourceService.getIdentifierSource(7);
 		LogEntry entry = identifierSourceService.getMostRecentLogEntry(is);
 		Assert.assertNull(entry);
 	}

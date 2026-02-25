@@ -89,6 +89,18 @@
 					<artifactId>javassist</artifactId>
 					<groupId>javassist</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.powermock</groupId>
+					<artifactId>powermock-module-junit4</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.powermock</groupId>
+					<artifactId>powermock-api-mockito2</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mockito</groupId>
+					<artifactId>mockito-core</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -106,34 +118,38 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.10.19</version>
+			<artifactId>mockito-inline</artifactId>
+			<version>4.11.0</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>mockito-all</artifactId>
-					<groupId>org.mockito</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
 	<properties>
-		<openMRSVersion>1.10.2</openMRSVersion>
+		<openMRSVersion>2.7.5</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<surefire.argLine />
 	</properties>
+	
+	<profiles>
+		<profile>
+			<id>java9plus</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<properties>
+				<surefire.argLine>
+					-Dnet.bytebuddy.experimental=true
+					--add-opens java.base/java.lang=ALL-UNNAMED
+					--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+					--add-opens java.base/java.util=ALL-UNNAMED
+					--add-opens java.base/java.text=ALL-UNNAMED
+					--add-opens java.base/java.io=ALL-UNNAMED
+					--add-opens java.base/java.net=ALL-UNNAMED
+					--add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED
+				</surefire.argLine>
+			</properties>
+		</profile>
+	</profiles>
 	
 	<build>
 		<resources>
@@ -182,6 +198,13 @@
 						<target>8</target>
 						<source>8</source>
 						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<argLine>${surefire.argLine}</argLine>
 					</configuration>
 				</plugin>
 				<plugin>
