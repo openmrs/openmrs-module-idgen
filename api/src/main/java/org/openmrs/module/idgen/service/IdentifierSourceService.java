@@ -27,7 +27,7 @@ import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.processor.IdentifierSourceProcessor;
-import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.Date;
 import java.util.List;
@@ -107,21 +107,21 @@ public interface IdentifierSourceService extends OpenmrsService {
 	 * Given a PatientIdentifierType, generates an identifier using the proper IdentifierSource for this server
 	 * Returns null if this PatientIdentifierType is not set to be auto-generated
 	 */
-	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
 	String generateIdentifier(PatientIdentifierType type, String comment);
 
     /**
      * Given a PatientIdentifierType and Location, generates an identifier using the proper IdentifierSource
      * Returns null if this PatientIdentifierType is not set to be auto-generated
      */
-	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
     String generateIdentifier(PatientIdentifierType type, Location location, String comment);
 	
 	/**
 	 * Generates a Single Identifiers from the given source
 	 * @throws APIException
 	 */
-	@Authorized(OpenmrsConstants.PRIV_EDIT_PATIENT_IDENTIFIERS)
+	@Authorized(PrivilegeConstants.EDIT_PATIENT_IDENTIFIERS)
 	String generateIdentifier(IdentifierSource source, String comment) throws APIException;
 	
 	/**
