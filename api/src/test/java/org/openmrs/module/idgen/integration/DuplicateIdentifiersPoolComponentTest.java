@@ -34,6 +34,7 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
         getService().addIdentifiersToPool(identifierPool, identifiers);
         getService().saveIdentifierSource(identifierPool);
         Context.flushSession();
+        getConnection().commit();
     }
 
     @Test

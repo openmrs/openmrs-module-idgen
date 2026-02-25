@@ -29,6 +29,7 @@ public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
     @Before
     public void setUp() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+        getConnection().commit();
     }
 
     @Test(expected = EmptyIdentifierPoolException.class)

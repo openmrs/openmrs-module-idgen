@@ -61,6 +61,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
     public void beforeEachTest() throws Exception {
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+        getConnection().commit();
     }
     
 	/**
