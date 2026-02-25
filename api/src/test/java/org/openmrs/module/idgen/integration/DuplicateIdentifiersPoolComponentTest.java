@@ -10,6 +10,7 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import static org.junit.Assert.assertThat;
 public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
 
     public static final int NUM_THREADS = 25;
+
+    private static final Object AUTH_LOCK = new Object();
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +44,7 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
     @Rollback(false)
     public void testUnderLoad() throws Exception {
 
-        final List<String> generated = new ArrayList<String>();
+        final List<String> generated = Collections.synchronizedList(new ArrayList<String>());
 
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < NUM_THREADS; ++i) {
@@ -49,10 +52,11 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
                 @Override
                 public void run() {
                     Context.openSession();
-                    Context.authenticate("admin", "test");
-                    IdentifierSource source = getService().getIdentifierSource(4);
                     try {
-                        authenticate();
+                        synchronized (AUTH_LOCK) {
+                            Context.authenticate("admin", "test");
+                        }
+                        IdentifierSource source = getService().getIdentifierSource(4);
                         sleep(100);
                         generated.addAll(getService().generateIdentifiers(source, 1, "thread"));
                         sleep(100);

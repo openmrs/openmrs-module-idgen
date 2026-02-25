@@ -59,6 +59,9 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 
     @Before
     public void beforeEachTest() throws Exception {
+        // Clean up rows committed by REQUIRES_NEW inner transactions from prior tests
+        getConnection().prepareStatement("DELETE FROM IDGEN_LOG_ENTRY").executeUpdate();
+        getConnection().commit();
 
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
         getConnection().commit();
