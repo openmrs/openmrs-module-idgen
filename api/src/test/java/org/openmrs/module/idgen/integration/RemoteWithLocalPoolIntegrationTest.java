@@ -13,9 +13,8 @@
  */
 package org.openmrs.module.idgen.integration;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -23,13 +22,15 @@ import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Tests setting up a local pool, that pulls from a remote pool, and generates for an identifier type
  */
 public class RemoteWithLocalPoolIntegrationTest extends IdgenBaseTest {
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
 
@@ -47,24 +48,24 @@ public class RemoteWithLocalPoolIntegrationTest extends IdgenBaseTest {
 		PatientIdentifierType idType = Context.getPatientService().getPatientIdentifierType(4);
 
 		// the first time we request an identifier it should make 2 remote requests with batchSize=3, and then give us one of those
-		Assert.assertEquals("1", service.generateIdentifier(idType, "First"));
-		Assert.assertEquals("Pool should have 5 available", 5, service.getQuantityInPool(pool, true, false));
-		Assert.assertEquals("Pool should have 1 used", 1, service.getQuantityInPool(pool, false, true));
-		Assert.assertEquals(2, remoteProcessorStub.getTimesCalled());
+		assertEquals("1", service.generateIdentifier(idType, "First"));
+		assertEquals(5, service.getQuantityInPool(pool, true, false), "Pool should have 5 available");
+		assertEquals(1, service.getQuantityInPool(pool, false, true), "Pool should have 1 used");
+		assertEquals(2, remoteProcessorStub.getTimesCalled());
 
 		// the next two requests should not make remote requests
-		Assert.assertEquals("2", service.generateIdentifier(idType, "Second"));
-		Assert.assertEquals("Pool should have 4 available", 4, service.getQuantityInPool(pool, true, false));
-		Assert.assertEquals("Pool should have 2 used", 2, service.getQuantityInPool(pool, false, true));
-		Assert.assertEquals("3", service.generateIdentifier(idType, "Third"));
-		Assert.assertEquals("Pool should have 3 available", 3, service.getQuantityInPool(pool, true, false));
-		Assert.assertEquals("Pool should have 3 used", 3, service.getQuantityInPool(pool, false, true));
-		Assert.assertEquals(2, remoteProcessorStub.getTimesCalled());
+		assertEquals("2", service.generateIdentifier(idType, "Second"));
+		assertEquals(4, service.getQuantityInPool(pool, true, false), "Pool should have 4 available");
+		assertEquals(2, service.getQuantityInPool(pool, false, true), "Pool should have 2 used");
+		assertEquals("3", service.generateIdentifier(idType, "Third"));
+		assertEquals(3, service.getQuantityInPool(pool, true, false), "Pool should have 3 available");
+		assertEquals(3, service.getQuantityInPool(pool, false, true), "Pool should have 3 used");
+		assertEquals(2, remoteProcessorStub.getTimesCalled());
 
 		// since we're below our min pool size, the next request will make a remote request
-		Assert.assertEquals("4", service.generateIdentifier(idType, "Fourth"));
-		Assert.assertEquals("Pool should have 5 available", 5, service.getQuantityInPool(pool, true, false));
-		Assert.assertEquals("Pool should have 4 used", 4, service.getQuantityInPool(pool, false, true));
-		Assert.assertEquals(3, remoteProcessorStub.getTimesCalled());
+		assertEquals("4", service.generateIdentifier(idType, "Fourth"));
+		assertEquals(5, service.getQuantityInPool(pool, true, false), "Pool should have 5 available");
+		assertEquals(4, service.getQuantityInPool(pool, false, true), "Pool should have 4 used");
+		assertEquals(3, remoteProcessorStub.getTimesCalled());
 	}
 }

@@ -13,10 +13,10 @@
  */
 package org.openmrs.module.idgen.integration;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -24,17 +24,23 @@ import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
     }
 
-    @Test(expected = EmptyIdentifierPoolException.class)
-    public void shouldNotGetMoreIdentifiersOnDemandIfConfiguredToUseScheduledTask() throws Exception {
-        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
-        getService().generateIdentifier(pool, "this will fail");
+    @Test
+    public void shouldNotGetMoreIdentifiersOnDemandIfConfiguredToUseScheduledTask() {
+        assertThrows(EmptyIdentifierPoolException.class, () -> {
+            IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
+            getService().generateIdentifier(pool, "this will fail");
+        });
     }
 
     @Test
@@ -47,16 +53,16 @@ public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
 
         IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(5); // Configured to not refill from scheduler
         getService().generateIdentifier(pool, "this will work");
-        Assert.assertTrue(pool.getAvailableIdentifiers().size() > 0);
-        Assert.assertTrue(pool.getUsedIdentifiers().size() == 1);
+        assertFalse(pool.getAvailableIdentifiers().isEmpty());
+        assertEquals(1, pool.getUsedIdentifiers().size());
     }
 
     @Test
-    @Ignore("I don't know of a way to get the timer task to actually commit to the DB in this same transaction")
+    @Disabled("I don't know of a way to get the timer task to actually commit to the DB in this same transaction")
     public void shouldGetMoreIdentifiersOnScheduleWhenConfigured() throws Exception {
         IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
         Thread.sleep(12000);
-        Assert.assertTrue(pool.getAvailableIdentifiers().size() > 0);
+        assertFalse(pool.getAvailableIdentifiers().isEmpty());
     }
 
     public IdentifierSourceService getService() {

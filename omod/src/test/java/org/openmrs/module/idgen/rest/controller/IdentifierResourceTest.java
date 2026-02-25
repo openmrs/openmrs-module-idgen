@@ -17,12 +17,25 @@ import org.openmrs.module.idgen.IdgenModuleActivator;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class IdentifierResourceTest extends MainResourceControllerTest {
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     @Before
-    public void init() throws Exception {
-        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+    public void init() {
+        new TransactionTemplate(transactionManager).execute(status -> {
+            try {
+                executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
         new IdgenModuleActivator().started();
     }
 

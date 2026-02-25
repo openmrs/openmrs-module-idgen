@@ -13,9 +13,8 @@
  */
 package org.openmrs.module.idgen.task;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.Module;
 import org.openmrs.module.ModuleFactory;
@@ -24,9 +23,11 @@ import org.openmrs.module.idgen.IdgenModuleActivator;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class IdgenTaskIT extends IdgenBaseTest {
 
-    @Before
+    @BeforeEach
     public void mockStartingModule() throws Exception {
         Module idgenModule = new Module("idgen");
         idgenModule.setModuleId("idgen");
@@ -48,7 +49,7 @@ public class IdgenTaskIT extends IdgenBaseTest {
     public void timerShouldFireAndShouldAuthenticate() throws Exception {
         TestTask.reset();
         Thread.sleep(10000);
-        Assert.assertTrue(TestTask.hasRun());
-        Assert.assertTrue(TestTask.wasAuthenticated());
+        assertTrue(TestTask.hasRun());
+        assertTrue(TestTask.wasAuthenticated());
     }
 }

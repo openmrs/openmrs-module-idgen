@@ -11,14 +11,4 @@
 	<name>ID Generation API</name>
 	<description>API project for ID Generation</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.5.0</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-	
 </project>

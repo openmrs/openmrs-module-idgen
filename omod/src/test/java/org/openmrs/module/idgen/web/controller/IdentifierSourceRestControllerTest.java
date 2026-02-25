@@ -10,7 +10,7 @@ package org.openmrs.module.idgen.web.controller;
 
 import java.util.List;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +23,10 @@ import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import static org.hamcrest.CoreMatchers.allOf;
@@ -49,13 +52,23 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     public static final String IDENTIFIER_POOL_SOURCE_TYPE = "IdentifierPool";
 
     private IdentifierSourceService service;
-    
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
-        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+    public void setUp() {
+        new TransactionTemplate(transactionManager).execute(status -> {
+            try {
+                executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
         this.service = Context.getService(IdentifierSourceService.class);
         new IdgenModuleActivator().started();
     }

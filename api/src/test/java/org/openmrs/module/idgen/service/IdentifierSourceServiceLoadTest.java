@@ -14,9 +14,9 @@
 
 package org.openmrs.module.idgen.service;
 
-import junit.framework.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
@@ -25,10 +25,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Can't run this in the same test as the other IdentifierSourceService tests
  */
-@Ignore
+@Disabled
 public class IdentifierSourceServiceLoadTest extends IdgenBaseTest {
 
     public static final int NUM_THREADS = 500;
@@ -74,10 +76,10 @@ public class IdentifierSourceServiceLoadTest extends IdgenBaseTest {
         }
 
         // make sure we generated the right number of ids
-        Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, generated.size());
+        assertEquals(NUM_THREADS * NUM_PER_THREAD, generated.size());
 
         // make sure each id is distinct
-        Assert.assertEquals(NUM_THREADS * NUM_PER_THREAD, new HashSet<String>(generated).size());
+        assertEquals(NUM_THREADS * NUM_PER_THREAD, new HashSet<String>(generated).size());
     }
 
 }

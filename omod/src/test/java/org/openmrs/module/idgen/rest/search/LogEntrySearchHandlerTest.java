@@ -30,6 +30,8 @@ public class LogEntrySearchHandlerTest extends MainResourceControllerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		getConnection().createStatement().executeUpdate("DELETE FROM idgen_log_entry");
+		Context.clearSession();
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
 
