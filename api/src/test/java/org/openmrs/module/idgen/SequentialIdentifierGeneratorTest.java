@@ -4,12 +4,13 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
@@ -20,19 +21,22 @@ import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
 import org.openmrs.module.idgen.prefixprovider.PrefixProvider;
 import org.openmrs.module.idgen.suffixprovider.LocationBasedSuffixProvider;
 import org.openmrs.module.idgen.suffixprovider.SuffixProvider;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * test class for {@link SequentialIdentifierGenerator}
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class SequentialIdentifierGeneratorTest {
-		
+
+	private MockedStatic<Context> mockedContext;
+
 	@Before
 	public void setup() {
-		mockStatic(Context.class);
+		mockedContext = Mockito.mockStatic(Context.class);
+	}
+
+	@After
+	public void tearDown() {
+		mockedContext.close();
 	}
 
 	/**
@@ -110,12 +114,12 @@ public class SequentialIdentifierGeneratorTest {
 		
 		UserContext userContext = mock(UserContext.class);
 		AdministrationService as = mock(AdministrationService.class);
-		when(Context.getAdministrationService()).thenReturn(as);
-		when(Context.getUserContext()).thenReturn(userContext);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
 		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
 		        .thenReturn("Location Code");
 		when(userContext.getLocation()).thenReturn(createLocationTree(true));
-		when(Context.getRegisteredComponent("LocationBasedPrefixProvider", PrefixProvider.class)).thenReturn(new LocationBasedPrefixProvider());
+		mockedContext.when(() -> Context.getRegisteredComponent("LocationBasedPrefixProvider", PrefixProvider.class)).thenReturn(new LocationBasedPrefixProvider());
 		
 		assertThat(generator.getIdentifierForSeed(1L), is("LOC_2-001"));
 	}
@@ -131,12 +135,12 @@ public class SequentialIdentifierGeneratorTest {
 
 		UserContext userContext = mock(UserContext.class);
 		AdministrationService as = mock(AdministrationService.class);
-		when(Context.getAdministrationService()).thenReturn(as);
-		when(Context.getUserContext()).thenReturn(userContext);
+		mockedContext.when(Context::getAdministrationService).thenReturn(as);
+		mockedContext.when(Context::getUserContext).thenReturn(userContext);
 		when(as.getGlobalProperty(LocationBasedSuffixProvider.SUFFIX_LOCATION_ATTRIBUTE_TYPE_GP))
 		        .thenReturn("Location Code");
 		when(userContext.getLocation()).thenReturn(createLocationTree(false));
-		when(Context.getRegisteredComponent("LocationBasedSuffixProvider", SuffixProvider.class)).thenReturn(new LocationBasedSuffixProvider());
+		mockedContext.when(() -> Context.getRegisteredComponent("LocationBasedSuffixProvider", SuffixProvider.class)).thenReturn(new LocationBasedSuffixProvider());
 
 		assertThat(generator.getIdentifierForSeed(1L), is("001-LOC_2"));
 	}

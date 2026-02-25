@@ -11,7 +11,7 @@ package org.openmrs.module.idgen.rest.controller;
  */
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
