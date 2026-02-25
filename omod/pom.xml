@@ -34,6 +34,12 @@
         </dependency>
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
+			<artifactId>legacyui-omod</artifactId>
+			<version>1.23.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
 			<artifactId>webservices.rest-omod</artifactId>
 			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
