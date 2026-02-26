@@ -16,7 +16,8 @@
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
-        <WEBSERVICES_VERSION>2.23.0</WEBSERVICES_VERSION>
+        <WEBSERVICES_VERSION>3.0.0</WEBSERVICES_VERSION>
+        <LEGACYUI_VERSION>1.16.0</LEGACYUI_VERSION>
     </properties>
 
 	<dependencies>
@@ -57,6 +58,18 @@
 			<artifactId>webservices.rest-omod-common</artifactId>
 			<version>${WEBSERVICES_VERSION}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>legacyui-omod</artifactId>
+			<version>${LEGACYUI_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>test</scope>
 		</dependency>
                 <dependency>
                         <groupId>org.openmrs.module</groupId>

@@ -23,8 +23,16 @@
 		<property name="mappingJarLocations">
 			<ref bean="mappingJarResources" />
 		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>org.openmrs</value>
+			</list>
+		</property>
 		<!--  default properties must be set in the hibernate.default.properties -->
 	</bean>
+
+	<!-- Downgrade REQUIRES_NEW to REQUIRED for tests (H2 MVStore can't read uncommitted data from suspended transactions) -->
+	<bean id="transactionAttributeSource" class="org.openmrs.module.idgen.TestTransactionAttributeSource"/>
 
     <bean id="idgenTestTimerFactory" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
         <property name="scheduledExecutorTasks">

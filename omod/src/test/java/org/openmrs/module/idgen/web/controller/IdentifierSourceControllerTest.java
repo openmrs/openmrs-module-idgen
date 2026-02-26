@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -51,15 +51,15 @@ public class IdentifierSourceControllerTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 	
 	@Test
 	public void exportIdentifiers_shouldReturnJson() throws Exception {
-		Mockito.stub(iss.generateIdentifiers(
+		Mockito.when(iss.generateIdentifiers(
 				Mockito.any(IdentifierSource.class), 
 				Mockito.any(Integer.class), 
-				Mockito.any(String.class))).toReturn(Arrays.asList("1", "2", "3"));
+				Mockito.any(String.class))).thenReturn(Arrays.asList("1", "2", "3"));
 		
 		
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
@@ -74,7 +74,7 @@ public class IdentifierSourceControllerTest {
 
     @Test
     public void importIdentifiers_shouldAcceptJson() throws Exception {
-        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), (List<String>) Mockito.anyCollectionOf(String.class));
+        Mockito.doNothing().when(iss).addIdentifiersToPool(Mockito.any(IdentifierPool.class), Mockito.anyList());
 
         IdentifierPool identifierPool = new IdentifierPool();
         String identifiers = "{\"identifiers\":[\"1\",\"2\",\"3\"]}";

@@ -1,33 +1,20 @@
 package org.openmrs.module.idgen.prefixprovider;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import java.util.Collections;
+import java.lang.reflect.Field;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
 import org.openmrs.LocationAttributeType;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.LocationService;
-import org.openmrs.api.context.Context;
-import org.openmrs.api.context.UserContext;
-import org.openmrs.module.idgen.prefixprovider.LocationBasedPrefixProvider;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class LocationBasedPrefixProviderTest {
 	
 	LocationBasedPrefixProvider locationPrefixProvider;
-	UserContext userContext;
 	
 	// user context locations
 	Location locationB3;
@@ -38,31 +25,21 @@ public class LocationBasedPrefixProviderTest {
 	Location locationA2;
 	
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
 		locationPrefixProvider = new LocationBasedPrefixProvider();
-		
-		mockStatic(Context.class);
-		userContext = mock(UserContext.class);
-		when(Context.getUserContext()).thenReturn(userContext);
-		
-		LocationService ls = mock(LocationService.class);
-		AdministrationService as = mock(AdministrationService.class);
-		when(Context.getLocationService()).thenReturn(ls);
-		when(Context.getAdministrationService()).thenReturn(as);
-		when(ls.getAllLocationAttributeTypes()).thenReturn(Collections.<LocationAttributeType>emptyList());
-		when(as.getGlobalProperty(LocationBasedPrefixProvider.PREFIX_LOCATION_ATTRIBUTE_TYPE_GP))
-		        .thenReturn("Location Code");
+		setPrefixLocationAttributeType("Location Code");
 		setupLocationTree();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		setPrefixLocationAttributeType(null);
 	}
 	
 	@Test
-	public void getValue_shouldReturnPrefixDependingOnLocationInUserContext() {
-		when(userContext.getLocation()).thenReturn(locationB3);
-		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
-		// Change to location A3
-		when(userContext.getLocation()).thenReturn(locationA3);
-		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
-
+	public void getValue_shouldReturnPrefixDependingOnLocation() {
+		Assert.assertThat(locationPrefixProvider.getLocationPrefix(locationB3), is("LOC-5"));
+		Assert.assertThat(locationPrefixProvider.getLocationPrefix(locationA3), is("LOC-A2"));
 	}
 	
 	@Test
@@ -144,8 +121,14 @@ public class LocationBasedPrefixProviderTest {
 	
 	private LocationAttributeType createPrefixAttributeType() {
 		LocationAttributeType prefixAttrType = new LocationAttributeType();
-		prefixAttrType.setName(LocationBasedPrefixProvider.getPrefixLocationAttributeType());
+		prefixAttrType.setName("Location Code");
 		prefixAttrType.setDatatypeClassname("org.openmrs.customdatatype.datatype.FreeTextDatatype");
 		return prefixAttrType;
+	}
+
+	private static void setPrefixLocationAttributeType(String value) throws Exception {
+		Field field = LocationBasedPrefixProvider.class.getDeclaredField("prefixLocationAttributeType");
+		field.setAccessible(true);
+		field.set(null, value);
 	}
 }

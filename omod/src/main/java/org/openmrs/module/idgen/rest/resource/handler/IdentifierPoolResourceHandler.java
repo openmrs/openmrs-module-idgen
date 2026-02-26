@@ -107,6 +107,11 @@ implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
                 + identifierSource.getClass().getName();
     }
 
+	@PropertyGetter("identifiers")
+	public String getIdentifiers(IdentifierPool pool) {
+		return pool.getIdentifiers().toString();
+	}
+
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription representationDescription = new DelegatingResourceDescription();

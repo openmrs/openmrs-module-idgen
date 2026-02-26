@@ -7,9 +7,11 @@ import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.springframework.test.annotation.NotTransactional;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.transaction.TestTransaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -37,10 +39,16 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
     }
 
     @Test
-    @NotTransactional
+    @Rollback(false)
     public void testUnderLoad() throws Exception {
 
-        final List<String> generated = new ArrayList<String>();
+        // Commit test data so threads with their own sessions can see it
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        final List<String> generated = Collections.synchronizedList(new ArrayList<String>());
+        final Object authLock = new Object();
 
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < NUM_THREADS; ++i) {
@@ -48,10 +56,11 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
                 @Override
                 public void run() {
                     Context.openSession();
-                    Context.authenticate("admin", "test");
-                    IdentifierSource source = getService().getIdentifierSource(4);
                     try {
-                        authenticate();
+                        synchronized (authLock) {
+                            Context.authenticate("admin", "test");
+                        }
+                        IdentifierSource source = getService().getIdentifierSource(4);
                         sleep(100);
                         generated.addAll(getService().generateIdentifiers(source, 1, "thread"));
                         sleep(100);
@@ -92,4 +101,3 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
         return Context.getService(IdentifierSourceService.class);
     }
 }
-
