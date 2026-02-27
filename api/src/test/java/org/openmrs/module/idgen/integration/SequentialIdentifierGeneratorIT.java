@@ -13,45 +13,39 @@
  */
 package org.openmrs.module.idgen.integration;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.APIException;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class SequentialIdentifierGeneratorIT extends IdgenBaseTest {
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-	
+
 	@Test
 	public void getPrefixProvider_shouldThrowWhenInvalidPrefixProviderBean() {
-		// setup
-		expectedException.expect(APIException.class);
-		
-		// replay
-		SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
-		gen.getPrefixProvider("provider:fooBarBean");
+		assertThrows(APIException.class, () -> {
+			SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
+			gen.getPrefixProvider("provider:fooBarBean");
+		});
 	}
 	
 	@Test
 	public void getPrefixProvider_shouldThrowWhenMissingPrefixProviderBean() {
-		// setup
-		expectedException.expect(APIException.class);
-		
-		// replay
-		SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
-		gen.getPrefixProvider("provider:");
+		assertThrows(APIException.class, () -> {
+			SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
+			gen.getPrefixProvider("provider");
+		});
 	}
 	
 	@Test
 	public void getPrefixProvider_shouldThrowWhenBlankPrefixProviderBean() {
-		// setup
-		expectedException.expect(APIException.class);
-		
 		// replay
-		SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
-		gen.getPrefixProvider("provider:   ");
+		assertThrows(APIException.class, () -> {
+			SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
+			gen.getPrefixProvider("provider:   ");
+		});
 	}
 }

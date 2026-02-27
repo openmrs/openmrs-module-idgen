@@ -312,7 +312,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 
 
     public void refreshIdentifierSource(IdentifierSource source) {
-        sessionFactory.getCurrentSession().refresh(source);
+		sessionFactory.getCurrentSession().refresh(source);
     }
 
 

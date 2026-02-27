@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>idgen</artifactId>
-	<version>5.1.0-SNAPSHOT</version>
+	<version>6.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>ID Generation</name>
 	<description>Parent project for ID Generation</description>
@@ -104,35 +104,28 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>${byteBuddyVersion}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.10.19</version>
+			<artifactId>mockito-inline</artifactId>
+			<version>4.8.0</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.6.6</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>mockito-all</artifactId>
-					<groupId>org.mockito</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
 	</dependencies>
 
+
 	<properties>
-		<openMRSVersion>1.10.2</openMRSVersion>
+		<openMRSVersion>2.8.0</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<byteBuddyVersion>1.17.6</byteBuddyVersion>
 	</properties>
 	
 	<build>
@@ -249,6 +242,11 @@
 					<configuration>
 						<encoding>UTF-8</encoding>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.2.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

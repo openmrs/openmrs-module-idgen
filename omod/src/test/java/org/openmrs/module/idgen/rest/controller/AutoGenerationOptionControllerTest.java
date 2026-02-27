@@ -10,8 +10,8 @@ package org.openmrs.module.idgen.rest.controller;
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.PatientIdentifierType;

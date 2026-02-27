@@ -1,13 +1,17 @@
 package org.openmrs.module.idgen.integration;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.springframework.test.annotation.NotTransactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,24 +27,34 @@ public class DuplicateIdentifiersPoolComponentTest extends IdgenBaseTest {
 
     public static final int NUM_THREADS = 25;
 
-    @Before
-    public void setUp() throws Exception {
-        executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
-        IdentifierPool identifierPool = (IdentifierPool) getService().getIdentifierSource(4);
-        List<String> identifiers = new ArrayList<String>();
-        for (int i = 1; i <= NUM_THREADS; ++i) {
-            identifiers.add(new String("" + i));
-        }
-        getService().addIdentifiersToPool(identifierPool, identifiers);
-        getService().saveIdentifierSource(identifierPool);
-        Context.flushSession();
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @BeforeEach
+    public void setUp() {
+        new TransactionTemplate(transactionManager).execute(status -> {
+            try {
+                executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
+                IdentifierPool identifierPool = (IdentifierPool) getService().getIdentifierSource(4);
+                List<String> identifiers = new ArrayList<>();
+                for (int i = 1; i <= NUM_THREADS; ++i) {
+                    identifiers.add("" + i);
+                }
+                getService().addIdentifiersToPool(identifierPool, identifiers);
+                getService().saveIdentifierSource(identifierPool);
+                Context.flushSession();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
     }
 
     @Test
-    @NotTransactional
+    @Transactional(propagation = Propagation.NEVER)
     public void testUnderLoad() throws Exception {
 
-        final List<String> generated = new ArrayList<String>();
+        final List<String> generated = new ArrayList<>();
 
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < NUM_THREADS; ++i) {

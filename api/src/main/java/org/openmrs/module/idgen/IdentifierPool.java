@@ -13,13 +13,13 @@
  */
 package org.openmrs.module.idgen;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * Identifier Source which contains a pre-generated pool of identifiers,

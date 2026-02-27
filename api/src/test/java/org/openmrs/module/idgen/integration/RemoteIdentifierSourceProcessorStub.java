@@ -13,7 +13,7 @@
  */
 package org.openmrs.module.idgen.integration;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 import org.openmrs.module.idgen.RemoteIdentifiersMessage;
 import org.openmrs.module.idgen.processor.RemoteIdentifierSourceProcessor;

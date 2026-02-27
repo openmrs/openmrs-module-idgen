@@ -99,7 +99,8 @@ implements DelegatingSubclassHandler<IdentifierSource, IdentifierPool> {
 		
 		return null;
 	}
-	
+
+
 	@PropertyGetter("display")
     public String getDisplayString(IdentifierPool identifierSource) {
         return identifierSource.getIdentifierType() + " - " 
