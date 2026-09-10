@@ -63,7 +63,7 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
     
 	@Override
 	public long getAllCount() {
-		return 8;
+		return 10;
 	}
 
 	@Override

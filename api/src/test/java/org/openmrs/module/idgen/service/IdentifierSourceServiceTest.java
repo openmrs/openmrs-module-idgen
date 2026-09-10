@@ -91,7 +91,7 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 	@Test
 	public void getAllIdentifierSources_shouldReturnAllIdentifierSources() throws Exception {
 		List<IdentifierSource>  sig = identifierSourceService.getAllIdentifierSources(false);
-        assertEquals(8, sig.size());
+        assertEquals(10, sig.size());
 	}
 
 	/**
