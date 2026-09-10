@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdgenBaseTest;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
@@ -26,7 +25,7 @@ import org.openmrs.module.idgen.service.IdentifierSourceService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
 
@@ -35,12 +34,32 @@ public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
     }
 
+
     @Test
-    public void shouldNotGetMoreIdentifiersOnDemandIfConfiguredToUseScheduledTask() {
-        assertThrows(EmptyIdentifierPoolException.class, () -> {
-            IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler
-            getService().generateIdentifier(pool, "this will fail");
-        });
+    public void shouldGetMoreIdentifiersOnDemandAsEmergencyFallbackWhenScheduledTaskPoolIsEmpty() throws Exception {
+        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(4); // Configured to refill from scheduler, but scheduler hasn't run yet
+        String identifier = getService().generateIdentifier(pool, "emergency fallback should still succeed");
+        assertNotNull(identifier);
+        assertEquals(1, pool.getUsedIdentifiers().size());
+    }
+
+    /**
+     * The emergency on-demand fallback must not kick in when the pool already has enough stock
+     * to satisfy the request -- otherwise a scheduled-task pool backed by a flaky/unreachable
+     * remote source would pay for (and potentially fail because of) a synchronous refill attempt
+     * on every request, even though it didn't need to.
+     */
+    @Test
+    public void shouldNotAttemptOnDemandRefillWhenScheduledTaskPoolHasSufficientStock() throws Exception {
+        RemoteIdentifierSourceProcessorStub remoteProcessorStub = new RemoteIdentifierSourceProcessorStub();
+        remoteProcessorStub.setSimulateConnectivityFailure(true);
+        getService().registerProcessor(RemoteIdentifierSource.class, remoteProcessorStub);
+
+        IdentifierPool pool = (IdentifierPool)getService().getIdentifierSource(9); // Configured to refill from scheduler, has stock, remote is unreachable
+        String identifier = getService().generateIdentifier(pool, "should use existing stock without touching remote source");
+
+        assertNotNull(identifier);
+        assertEquals(0, remoteProcessorStub.getTimesCalled(), "on-demand refill should not be attempted while existing stock can satisfy the request");
     }
 
     @Test

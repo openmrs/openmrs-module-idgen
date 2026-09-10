@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -30,7 +32,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
 
-	/** 
+	private final Log log = LogFactory.getLog(getClass());
+
+	/**
 	 * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
 	 */
 	public synchronized List<String> getIdentifiers(IdentifierSource source, int batchSize) {
@@ -38,6 +42,15 @@ public class IdentifierPoolProcessor implements IdentifierSourceProcessor {
 		IdentifierSourceService iss = Context.getService(IdentifierSourceService.class);
         if (!pool.isRefillWithScheduledTask()) {
 		    iss.checkAndRefillIdentifierPool(pool);
+        }
+        else if (iss.getQuantityInPool(pool, true, false) < batchSize) {
+            // even if set to "refill with scheduled task", try to refill on-demand if not enough identifiers available
+            try {
+                iss.checkAndRefillIdentifierPool(pool);
+            }
+            catch (Exception e) {
+                log.warn("On-demand refill of scheduled-task pool " + pool.getName() + " failed", e);
+            }
         }
 		List<PooledIdentifier> available = iss.getAvailableIdentifiers(pool, batchSize);
 		List<String> ret = new ArrayList<String>();

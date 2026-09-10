@@ -29,6 +29,7 @@ public class RemoteIdentifierSourceProcessorStub extends RemoteIdentifierSourceP
 	Stack<String> identifiers;
 	int timesCalled = 0;
 	private Integer batchSize;
+	private boolean simulateConnectivityFailure = false;
 
 	public RemoteIdentifierSourceProcessorStub() {
 		identifiers = new Stack<String>();
@@ -41,9 +42,21 @@ public class RemoteIdentifierSourceProcessorStub extends RemoteIdentifierSourceP
 		this.batchSize = batchSize;
 	}
 
+	/**
+	 * When true, doHttpPost throws instead of returning identifiers, to simulate the remote
+	 * identifier source being unreachable.
+	 */
+	public void setSimulateConnectivityFailure(boolean simulateConnectivityFailure) {
+		this.simulateConnectivityFailure = simulateConnectivityFailure;
+	}
+
 	@Override
 	protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
 		timesCalled++;
+
+		if (simulateConnectivityFailure) {
+			throw new IOException("Simulated connectivity failure to remote identifier source");
+		}
 
 		List<String> list = new ArrayList<String>();
 		for (int i = 0; i < batchSize; i++) {
