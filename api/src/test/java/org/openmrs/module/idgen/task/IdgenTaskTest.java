@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.idgen.task;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openmrs.module.DaemonToken;
@@ -43,6 +44,12 @@ public class IdgenTaskTest extends IdgenBaseTest {
 
         IdgenTask.setDaemonToken(token);
         IdgenTask.setEnabled(true);
+    }
+
+    @AfterEach
+    public void unmockStartingModule() {
+        IdgenTask.setEnabled(false);
+        IdgenTask.setDaemonToken(null);
     }
 
     @Test
