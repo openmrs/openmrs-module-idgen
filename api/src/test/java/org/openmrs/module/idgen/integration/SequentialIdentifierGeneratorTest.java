@@ -21,7 +21,7 @@ import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SequentialIdentifierGeneratorIT extends IdgenBaseTest {
+public class SequentialIdentifierGeneratorTest extends IdgenBaseTest {
 
 
 	@Test
@@ -36,7 +36,7 @@ public class SequentialIdentifierGeneratorIT extends IdgenBaseTest {
 	public void getPrefixProvider_shouldThrowWhenMissingPrefixProviderBean() {
 		assertThrows(APIException.class, () -> {
 			SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
-			gen.getPrefixProvider("provider");
+			gen.getPrefixProvider("provider:");
 		});
 	}
 	

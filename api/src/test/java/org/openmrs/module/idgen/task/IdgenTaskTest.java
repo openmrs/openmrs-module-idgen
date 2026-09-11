@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IdgenTaskIT extends IdgenBaseTest {
+public class IdgenTaskTest extends IdgenBaseTest {
 
     @BeforeEach
     public void mockStartingModule() throws Exception {

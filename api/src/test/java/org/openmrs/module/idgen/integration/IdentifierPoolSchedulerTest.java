@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class IdentifierPoolSchedulerIT extends IdgenBaseTest {
+public class IdentifierPoolSchedulerTest extends IdgenBaseTest {
 
     @BeforeEach
     public void setUp() throws Exception {
