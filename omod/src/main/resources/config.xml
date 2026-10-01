@@ -15,7 +15,7 @@
 	<require_modules>
 		<require_module>org.openmrs.module.webservices.rest</require_module>
 	</require_modules>
-	<require_version>${openMRSVersion}</require_version>
+	<require_version>3.0.0</require_version>
 	
 	<extension>
 		<point>org.openmrs.admin.list</point>

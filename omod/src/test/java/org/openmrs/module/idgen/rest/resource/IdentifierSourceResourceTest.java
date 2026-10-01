@@ -12,7 +12,7 @@ package org.openmrs.module.idgen.rest.resource;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.openmrs.module.webservices.rest.web.resource.impl.BaseDelegatingResourceTest;
 
 
@@ -20,7 +20,7 @@ public class IdentifierSourceResourceTest extends BaseDelegatingResourceTest<Ide
     
     public static final String IDENTIFIER_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a901";
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
     }

@@ -1,6 +1,6 @@
 package org.openmrs.module.idgen.prefixprovider;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The default {@link PrefixProvider} scheme.

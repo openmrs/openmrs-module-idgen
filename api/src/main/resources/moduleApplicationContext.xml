@@ -37,9 +37,14 @@
 		</property>
 	</bean>
 
-	<bean parent="patientServiceTarget">
-		<property name="identifierValidators">
-			<map>
+	<!-- Core 3.0 no longer has a patientServiceTarget bean; add idgen's validators to core's identifierValidators map,
+	     which PatientServiceImpl holds by reference -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+		<property name="targetObject" ref="identifierValidators"/>
+		<property name="targetMethod" value="putAll"/>
+		<property name="arguments">
+			<list>
+			<map key-type="java.lang.Class">
 				<entry key="org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator">
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod10IdentifierValidator"/>
 				</entry>
@@ -50,6 +55,7 @@
 					<bean class="org.openmrs.module.idgen.validator.LuhnMod30IdentifierValidator"/>
 				</entry>
 			</map>
+			</list>
 		</property>
 	</bean>
 

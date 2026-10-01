@@ -15,20 +15,19 @@ package org.openmrs.module.idgen.service.db;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.criterion.Expression;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.IntegerType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.Session;
+import org.hibernate.type.StandardBasicTypes;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
+import org.openmrs.api.db.hibernate.HibernateUtil;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.module.idgen.EmptyIdentifierPoolException;
 import org.openmrs.module.idgen.IdentifierPool;
@@ -38,6 +37,7 @@ import org.openmrs.module.idgen.PooledIdentifier;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -55,11 +55,15 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	
 	//***** INSTANCE METHODS *****
 
+	private Session getCurrentSession() {
+		return sessionFactory.getHibernateSessionFactory().getCurrentSession();
+	}
+
 	/** 
 	 * @see IdentifierSourceService#getIdentifierSource(Integer)
 	 */
 	public IdentifierSource getIdentifierSource(Integer id) throws APIException {
-		return (IdentifierSource) sessionFactory.getCurrentSession().get(IdentifierSource.class, id);
+		return getCurrentSession().get(IdentifierSource.class, id);
 	}
 
 	/** 
@@ -67,20 +71,23 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<IdentifierSource> getAllIdentifierSources(boolean includeRetired) throws DAOException {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
+		Session session = getCurrentSession();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<IdentifierSource> cq = cb.createQuery(IdentifierSource.class);
+		Root<IdentifierSource> root = cq.from(IdentifierSource.class);
 		if (!includeRetired) {
-			criteria.add(Expression.eq("retired", false));
+			cq.where(cb.equal(root.get("retired"), false));
 		}
-		criteria.addOrder(Order.asc("name"));
-		return criteria.list();
+		cq.orderBy(cb.asc(root.get("name")));
+		return session.createQuery(cq).list();
 	}
 
 	/**
 	 * @see IdentifierSourceService#saveIdentifierSource(IdentifierSource)
 	 */
 	public IdentifierSource saveIdentifierSource(IdentifierSource identifierSource) throws APIException {
-		DbSession currentSession = sessionFactory.getCurrentSession();
-		currentSession.saveOrUpdate(identifierSource);
+		Session currentSession = getCurrentSession();
+		identifierSource = HibernateUtil.saveOrUpdate(currentSession, identifierSource);
 		currentSession.flush();
 		refreshIdentifierSource(identifierSource);
 		return identifierSource;
@@ -90,7 +97,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceService#purgeIdentifierSource(IdentifierSource)
 	 */
 	public void purgeIdentifierSource(IdentifierSource identifierSource) {
-		sessionFactory.getCurrentSession().delete(identifierSource);
+		getCurrentSession().remove(identifierSource);
 	}
 	
 	/**
@@ -99,17 +106,18 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<PooledIdentifier> getAvailableIdentifiers(IdentifierPool pool, int quantity) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PooledIdentifier.class);
-		criteria.add(Expression.isNull("dateUsed"));
-		criteria.add(Expression.eq("pool", pool));
-		criteria.setMaxResults(quantity);
+		Session session = getCurrentSession();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<PooledIdentifier> cq = cb.createQuery(PooledIdentifier.class);
+		Root<PooledIdentifier> root = cq.from(PooledIdentifier.class);
+		cq.where(cb.isNull(root.get("dateUsed")), cb.equal(root.get("pool"), pool));
 		if (pool.isSequential()) {
-			criteria.addOrder(Order.asc("identifier"));
+			cq.orderBy(cb.asc(root.get("identifier")));
 		}
 		else {
-			criteria.addOrder(Order.asc("uuid"));
+			cq.orderBy(cb.asc(root.get("uuid")));
 		}
-		List<PooledIdentifier> results = (List<PooledIdentifier>) criteria.list();
+		List<PooledIdentifier> results = session.createQuery(cq).setMaxResults(quantity).list();
 		if (results.size() < quantity) {
 			throw new EmptyIdentifierPoolException("Unable to retrieve " + quantity + " available identifiers from Pool " + pool + ".  Maybe you need to add more identifiers to your pool first.");
 		}
@@ -120,15 +128,15 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 * @see IdentifierSourceDAO#getQuantityInPool(IdentifierPool, boolean, boolean)
 	 */
 	public int getQuantityInPool(IdentifierPool pool, boolean availableOnly, boolean usedOnly) {
-		String hql = "select count(*) from PooledIdentifier where pool_id = " + pool.getId();
+		String hql = "select count(*) from PooledIdentifier where pool.id = :poolId";
 		if (availableOnly) {
-			hql += " and date_used is null";
+			hql += " and dateUsed is null";
 		}
 		if (usedOnly) {
-			hql += " and date_used is not null";
+			hql += " and dateUsed is not null";
 		}
-		Query query = sessionFactory.getCurrentSession().createQuery(hql);
-		return Integer.parseInt(query.uniqueResult().toString());
+		Long count = getCurrentSession().createQuery(hql, Long.class).setParameter("poolId", pool.getId()).uniqueResult();
+		return count.intValue();
 	}
 
     /**
@@ -136,9 +144,12 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
      */
     @Override
     public AutoGenerationOption getAutoGenerationOption(Integer autoGenerationOptionId) throws DAOException {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
-        criteria.add(Expression.eq("id", autoGenerationOptionId));
-        return (AutoGenerationOption)criteria.uniqueResult();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AutoGenerationOption> cq = cb.createQuery(AutoGenerationOption.class);
+        Root<AutoGenerationOption> root = cq.from(AutoGenerationOption.class);
+        cq.where(cb.equal(root.get("id"), autoGenerationOptionId));
+        return session.createQuery(cq).uniqueResult();
     }
 
     /**
@@ -146,52 +157,63 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
     @Override
 	public AutoGenerationOption getAutoGenerationOptionByUuid(String uuid) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
-        criteria.add(Expression.eq("uuid", uuid));
-        return (AutoGenerationOption)criteria.uniqueResult();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AutoGenerationOption> cq = cb.createQuery(AutoGenerationOption.class);
+        Root<AutoGenerationOption> root = cq.from(AutoGenerationOption.class);
+        cq.where(cb.equal(root.get("uuid"), uuid));
+        return session.createQuery(cq).uniqueResult();
 	}
     
     /**
 	 * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType,Location)
 	 */
 	public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type, Location location) throws APIException {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
-		criteria.add(Expression.eq("identifierType", type));
-        criteria.add(Restrictions.or(Expression.eq("location", location), Expression.isNull("location")));
-		return (AutoGenerationOption) criteria.uniqueResult();
+		Session session = getCurrentSession();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<AutoGenerationOption> cq = cb.createQuery(AutoGenerationOption.class);
+		Root<AutoGenerationOption> root = cq.from(AutoGenerationOption.class);
+		cq.where(cb.equal(root.get("identifierType"), type),
+		        cb.or(cb.equal(root.get("location"), location), cb.isNull(root.get("location"))));
+		return session.createQuery(cq).uniqueResult();
 	}
 
     /**
      * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
      */
     public List<AutoGenerationOption> getAutoGenerationOptions(PatientIdentifierType type) throws APIException {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
-        criteria.add(Expression.eq("identifierType", type));
-        return (List<AutoGenerationOption>) criteria.list();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AutoGenerationOption> cq = cb.createQuery(AutoGenerationOption.class);
+        Root<AutoGenerationOption> root = cq.from(AutoGenerationOption.class);
+        cq.where(cb.equal(root.get("identifierType"), type));
+        return session.createQuery(cq).list();
     }
 
     /**
      * @see IdentifierSourceDAO#getAutoGenerationOption(PatientIdentifierType)
      */
     public AutoGenerationOption getAutoGenerationOption(PatientIdentifierType type) throws APIException {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AutoGenerationOption.class);
-        criteria.add(Expression.eq("identifierType", type));
-        return (AutoGenerationOption)criteria.uniqueResult();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AutoGenerationOption> cq = cb.createQuery(AutoGenerationOption.class);
+        Root<AutoGenerationOption> root = cq.from(AutoGenerationOption.class);
+        cq.where(cb.equal(root.get("identifierType"), type));
+        return session.createQuery(cq).uniqueResult();
     }
 
 	/** 
 	 * @see IdentifierSourceDAO#saveAutoGenerationOption(AutoGenerationOption)
 	 */
 	public AutoGenerationOption saveAutoGenerationOption(AutoGenerationOption option) throws APIException {
-		sessionFactory.getCurrentSession().saveOrUpdate(option);
-		return option;
+		return HibernateUtil.saveOrUpdate(getCurrentSession(), option);
 	}
 
 	/** 
 	 * @see IdentifierSourceDAO#purgeAutoGenerationOption(AutoGenerationOption)
 	 */
 	public void purgeAutoGenerationOption(AutoGenerationOption option) throws APIException {
-		sessionFactory.getCurrentSession().delete(option);
+		getCurrentSession().remove(option);
 	}
 
 	/** 
@@ -200,9 +222,13 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	@SuppressWarnings("unchecked")
 	public List<LogEntry> getLogEntries(IdentifierSource source, Date fromDate, Date toDate, 
 										String identifier, User generatedBy, String comment) throws DAOException {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(LogEntry.class);
+		Session session = getCurrentSession();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<LogEntry> cq = cb.createQuery(LogEntry.class);
+		Root<LogEntry> root = cq.from(LogEntry.class);
+		List<Predicate> predicates = new ArrayList<Predicate>();
 		if (source != null) {
-			criteria.add(Expression.eq("source", source));
+			predicates.add(cb.equal(root.get("source"), source));
 		}
 		if (fromDate != null) {
 			Calendar c = Calendar.getInstance();
@@ -211,7 +237,7 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 			c.set(Calendar.MINUTE, 0);
 			c.set(Calendar.SECOND, 0);
 			c.set(Calendar.MILLISECOND, 0);
-			criteria.add(Expression.ge("dateGenerated", fromDate));
+			predicates.add(cb.greaterThanOrEqualTo(root.<Date>get("dateGenerated"), fromDate));
 		}
 		if (toDate != null) {
 			Calendar c = Calendar.getInstance();
@@ -221,19 +247,20 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 			c.set(Calendar.MINUTE, 0);
 			c.set(Calendar.SECOND, 0);
 			c.set(Calendar.MILLISECOND, 0);
-			criteria.add(Expression.lt("dateGenerated", c.getTime()));
+			predicates.add(cb.lessThan(root.<Date>get("dateGenerated"), c.getTime()));
 		}
 		if (identifier != null) {
-			criteria.add(Expression.like("identifier", identifier, MatchMode.ANYWHERE));
+			predicates.add(cb.like(root.<String>get("identifier"), "%" + identifier + "%"));
 		}	
 		if (generatedBy != null) {
-			criteria.add(Expression.eq("generatedBy", generatedBy));
+			predicates.add(cb.equal(root.get("generatedBy"), generatedBy));
 		}
 		if (comment != null) {
-			criteria.add(Expression.like("comment", comment, MatchMode.ANYWHERE));
+			predicates.add(cb.like(root.<String>get("comment"), "%" + comment + "%"));
 		}	
-		criteria.addOrder(Order.desc("dateGenerated"));
-		return (List<LogEntry>) criteria.list();
+		cq.where(predicates.toArray(new Predicate[0]));
+		cq.orderBy(cb.desc(root.get("dateGenerated")));
+		return session.createQuery(cq).list();
 	}
 
 	/**
@@ -241,15 +268,16 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 	 */
 	@SuppressWarnings("unchecked")
 	public LogEntry getMostRecentLogEntry(IdentifierSource source) throws DAOException {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(LogEntry.class);
 		if (source == null) {
 			throw new DAOException("You must specify the Identifier Source that you wish to query");
 		}
-		criteria.add(Restrictions.eq("source", source));
-		criteria.addOrder(Order.desc("dateGenerated"));
-		criteria.addOrder(Order.desc("id"));
-		criteria.setMaxResults(1);
-		return (LogEntry) criteria.uniqueResult();
+		Session session = getCurrentSession();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<LogEntry> cq = cb.createQuery(LogEntry.class);
+		Root<LogEntry> root = cq.from(LogEntry.class);
+		cq.where(cb.equal(root.get("source"), source));
+		cq.orderBy(cb.desc(root.get("dateGenerated")), cb.desc(root.get("id")));
+		return session.createQuery(cq).setMaxResults(1).uniqueResult();
 	}
 
     /**
@@ -257,9 +285,12 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
      */
     @Override
     public IdentifierSource getIdentifierSourceByUuid(String uuid) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
-        criteria.add(Restrictions.eq("uuid", uuid));
-        return (IdentifierSource) criteria.uniqueResult();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<IdentifierSource> cq = cb.createQuery(IdentifierSource.class);
+        Root<IdentifierSource> root = cq.from(IdentifierSource.class);
+        cq.where(cb.equal(root.get("uuid"), uuid));
+        return session.createQuery(cq).uniqueResult();
     }
     
     /**
@@ -267,18 +298,19 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
      */
     @Override
     public List<IdentifierSource> getIdentifierSourcesByType(PatientIdentifierType patientIdentifierType) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(IdentifierSource.class);
-        criteria.add(Expression.eq("identifierType", patientIdentifierType));
-        criteria.add(Expression.like("retired", false));
-        return (List<IdentifierSource>) criteria.list();
+        Session session = getCurrentSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<IdentifierSource> cq = cb.createQuery(IdentifierSource.class);
+        Root<IdentifierSource> root = cq.from(IdentifierSource.class);
+        cq.where(cb.equal(root.get("identifierType"), patientIdentifierType), cb.equal(root.get("retired"), false));
+        return session.createQuery(cq).list();
     }    
 
     /**
 	 * @see org.openmrs.module.idgen.service.db.IdentifierSourceDAO#saveLogEntry(LogEntry)
 	 */
 	public LogEntry saveLogEntry(LogEntry logEntry) throws DAOException {
-		sessionFactory.getCurrentSession().saveOrUpdate(logEntry);
-		return logEntry;
+		return HibernateUtil.saveOrUpdate(getCurrentSession(), logEntry);
 	}
 
     /**
@@ -286,8 +318,8 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
      */
     @Override
     public void saveSequenceValue(SequentialIdentifierGenerator generator, long sequenceValue) {
-        int updated = sessionFactory.getCurrentSession()
-                .createSQLQuery("update idgen_seq_id_gen set next_sequence_value = :val where id = :id")
+        int updated = getCurrentSession()
+                .createNativeMutationQuery("update idgen_seq_id_gen set next_sequence_value = :val where id = :id")
                 .setParameter("val", sequenceValue)
                 .setParameter("id", generator.getId())
                 .executeUpdate();
@@ -301,18 +333,18 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
      */
     @Override
     public Long getSequenceValue(SequentialIdentifierGenerator generator) {
-        Number val = (Number) sessionFactory.getCurrentSession()
-                .createSQLQuery("select next_sequence_value from idgen_seq_id_gen where id = :id")
+        Number val = (Number) getCurrentSession()
+                .createNativeQuery("select next_sequence_value from idgen_seq_id_gen where id = :id", Object.class)
 		        // Added IntegerType.INSTANCE because hibernate in case of PostgreSQL converts null ids to 
 		        // bytea type and causes error. So had to add explicit type.
-		        .setParameter("id", generator.getId(), IntegerType.INSTANCE)
+		        .setParameter("id", generator.getId(), StandardBasicTypes.INTEGER)
                 .uniqueResult();
         return val == null ? null : val.longValue();
 	}
 
 
     public void refreshIdentifierSource(IdentifierSource source) {
-		sessionFactory.getCurrentSession().refresh(source);
+		getCurrentSession().refresh(source);
     }
 
 

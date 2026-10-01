@@ -13,21 +13,20 @@
  */
 package org.openmrs.module.idgen.processor;
 
-import junit.framework.TestCase;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * We don't guarantee that this endpoint will always be up
  */
-@Ignore
-public class RemoteIdentifierSourceProcessorTest extends TestCase {
+@Disabled("We don't guarantee that this endpoint will always be up")
+public class RemoteIdentifierSourceProcessorTest {
 
     @Test
     public void test() {

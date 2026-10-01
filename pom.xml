@@ -23,6 +23,18 @@
 		<module>omod</module>
 	</modules>
 	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.openmrs</groupId>
+				<artifactId>openmrs-bom</artifactId>
+				<version>${openMRSVersion}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
@@ -38,35 +50,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.openmrs.web</groupId>
-			<artifactId>openmrs-web</artifactId>
-			<version>${openMRSVersion}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>javassist</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
-			<version>${openMRSVersion}</version>
-			<classifier>tests</classifier>
-			<type>jar</type>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>javassist</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.openmrs.web</groupId>
-			<artifactId>openmrs-web</artifactId>
 			<version>${openMRSVersion}</version>
 			<classifier>tests</classifier>
 			<type>jar</type>
@@ -96,7 +81,7 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -105,27 +90,13 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy</artifactId>
-			<version>${byteBuddyVersion}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-inline</artifactId>
-			<version>4.8.0</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 
 	<properties>
-		<openMRSVersion>2.8.0</openMRSVersion>
+		<openMRSVersion>3.0.0-SNAPSHOT</openMRSVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<byteBuddyVersion>1.17.6</byteBuddyVersion>
+		<maven.compiler.release>21</maven.compiler.release>
 	</properties>
 	
 	<build>
@@ -171,9 +142,10 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.15.0</version>
 					<configuration>
-						<target>8</target>
-						<source>8</source>
+						<release>${maven.compiler.release}</release>
+						<parameters>true</parameters>
 						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>

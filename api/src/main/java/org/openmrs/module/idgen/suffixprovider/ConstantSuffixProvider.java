@@ -1,6 +1,6 @@
 package org.openmrs.module.idgen.suffixprovider;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The default {@link SuffixProvider} scheme.

@@ -8,7 +8,7 @@
  */
 package org.openmrs.module.idgen.rest.resource;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.LogEntry;
 import org.openmrs.module.idgen.rest.resource.LogEntryResource;
@@ -19,7 +19,7 @@ public class LogEntryResourceTest extends BaseDelegatingResourceTest<LogEntryRes
 
 	private final static String LOG_ENTRY_IDENTIFIER = "100892";
 
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}

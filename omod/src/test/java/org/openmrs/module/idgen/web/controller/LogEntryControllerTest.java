@@ -8,9 +8,9 @@
  */
 package org.openmrs.module.idgen.web.controller;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -23,7 +23,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 	public static String USER_UUID = "1010d442-e134-11de-babe-001e378eb67e";
 	public static String LOG_ENTRY_SOURCE_UUID = "0d47284f-9e9b-4a81-a88b-8bb42bc0a901";
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		getConnection().createStatement().executeUpdate("DELETE FROM idgen_log_entry");
 		Context.clearSession();
@@ -55,8 +55,8 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 	public void shouldListAllLogEntries() throws Exception {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(getAllCount(), Util.getResultsSize(result));
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(getAllCount(), Util.getResultsSize(result));
 	}
 
 	@Test
@@ -64,8 +64,8 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("source", LOG_ENTRY_SOURCE_UUID);
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertNotNull(result);
-		Assert.assertEquals(3, Util.getResultsSize(result));
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(3, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("source", "invalid-source");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("identifier", "H9");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assertions.assertEquals(2, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("identifier", "invalid-identifier");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
 		req.addParameter("toDate", "2017-09-30T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assertions.assertEquals(2, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2015-10-01T12:00:00.423");
 		req.addParameter("toDate", "2016-09-30T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assertions.assertEquals(2, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("comment", "invalid comment");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("generatedBy", USER_UUID);
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assertions.assertEquals(2, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("fromDate", "2016-10-01T12:00:00.423");
 		req.addParameter("toDate", "2017-10-04T12:00:00.423");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(2, Util.getResultsSize(result));
+		Assertions.assertEquals(2, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
 		req.addParameter("generatedby", "7");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 
 	@Test
@@ -160,6 +160,6 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		req.addParameter("identifier", "20000");
 		req.addParameter("comment", "New");
 		SimpleObject result = deserialize(handle(req));
-		Assert.assertEquals(0, Util.getResultsSize(result));
+		Assertions.assertEquals(0, Util.getResultsSize(result));
 	}
 }

@@ -1,15 +1,15 @@
 package org.openmrs.module.idgen;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
@@ -28,12 +28,12 @@ import org.openmrs.module.idgen.suffixprovider.SuffixProvider;
 public class SequentialIdentifierGeneratorTest {
 
 	private MockedStatic<Context> mockedContext;
-	@Before
+	@BeforeEach
 	public void setup() {
 		mockedContext = mockStatic(Context.class);
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		mockedContext.close();
 	}
@@ -64,7 +64,7 @@ public class SequentialIdentifierGeneratorTest {
 	 * @verifies throw an error if generated identifier is shorter than minLength
 	 * @see SequentialIdentifierGenerator#getIdentifierForSeed(long)
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void getIdentifierForSeed_shouldThrowAnErrorIfGeneratedIdentifierIsShorterThanMinLength() throws Exception {
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
 
@@ -72,14 +72,14 @@ public class SequentialIdentifierGeneratorTest {
 		generator.setPrefix("FOO-");
 		generator.setMinLength(6);
 
-		generator.getIdentifierForSeed(1);
+		Assertions.assertThrows(RuntimeException.class, () -> generator.getIdentifierForSeed(1));
 	}
 
 	/**
 	 * @verifies throw an error if generated identifier is longer than maxLength
 	 * @see SequentialIdentifierGenerator#getIdentifierForSeed(long)
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void getIdentifierForSeed_shouldThrowAnErrorIfGeneratedIdentifierIsLongerThanMaxLength() throws Exception {
 		SequentialIdentifierGenerator generator = new SequentialIdentifierGenerator();
 
@@ -87,7 +87,7 @@ public class SequentialIdentifierGeneratorTest {
 		generator.setPrefix("FOO-");
 		generator.setMaxLength(1);
 
-		generator.getIdentifierForSeed(1);
+		Assertions.assertThrows(RuntimeException.class, () -> generator.getIdentifierForSeed(1));
 	}
 
 	@Test
@@ -173,11 +173,11 @@ public class SequentialIdentifierGeneratorTest {
 	public void getPrefixProvider_shouldDefaultProperly() {
 		SequentialIdentifierGenerator gen = new SequentialIdentifierGenerator();
 		
-		Assert.assertEquals("pre-", gen.getPrefixProvider("pre-").getValue());
-		Assert.assertEquals("  -", gen.getPrefixProvider("  -").getValue());
+		Assertions.assertEquals("pre-", gen.getPrefixProvider("pre-").getValue());
+		Assertions.assertEquals("  -", gen.getPrefixProvider("  -").getValue());
 		
-		Assert.assertEquals("", gen.getPrefixProvider(null).getValue());
-		Assert.assertEquals("", gen.getPrefixProvider("").getValue());
-		Assert.assertEquals("", gen.getPrefixProvider(" ").getValue());
+		Assertions.assertEquals("", gen.getPrefixProvider(null).getValue());
+		Assertions.assertEquals("", gen.getPrefixProvider("").getValue());
+		Assertions.assertEquals("", gen.getPrefixProvider(" ").getValue());
 	}
 }
