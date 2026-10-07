@@ -344,7 +344,11 @@ public class HibernateIdentifierSourceDAO implements IdentifierSourceDAO {
 
 
     public void refreshIdentifierSource(IdentifierSource source) {
-		getCurrentSession().refresh(source);
+		// Hibernate 7 refuses to refresh a detached instance, and callers may pass a source loaded in an earlier session
+		Session session = getCurrentSession();
+		if (session.contains(source)) {
+			session.refresh(source);
+		}
     }
 
 
