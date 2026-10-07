@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.openmrs.module.webservices.rest.test.Util;
 
 public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
 	
@@ -84,13 +83,6 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         return service.getAllIdentifierSources(false).size();
     }
 
-    @Override
-    public void shouldGetAll() throws Exception {
-        SimpleObject result = deserialize(handle(newGetRequest(getURI())));
-        assertNotNull(result);
-        assertEquals(getAllCount(), Util.getResultsSize(result));
-    }
-    
     @Test
     public void shouldUploadReservedIdentifiers() throws Exception {
         String reservedIdentifiers = 

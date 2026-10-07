@@ -46,11 +46,6 @@ public class LogEntryControllerTest extends MainResourceControllerTest {
 		return "100892";
 	}
 
-	@Override
-	public void shouldGetAll() throws Exception {
-		super.shouldGetAll();
-	}
-
 	@Test
 	public void shouldListAllLogEntries() throws Exception {
 		MockHttpServletRequest req = request(RequestMethod.GET, getURI());
