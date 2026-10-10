@@ -17,10 +17,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,7 +49,7 @@ public class IdentifierSourceControllerTest {
 	@Mock
 	private IdentifierSourceService iss;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 	}
@@ -69,7 +69,7 @@ public class IdentifierSourceControllerTest {
 		
 		controller.exportIdentifiers(null, mockRequest, mockResponse, generator, 3, "Mirebalais", null, null);
 
-		Assert.assertEquals("{\"identifiers\":[\"1\",\"2\",\"3\"]}", mockResponse.getContentAsString());
+		Assertions.assertEquals("{\"identifiers\":[\"1\",\"2\",\"3\"]}", mockResponse.getContentAsString());
 	}
 
     @Test
@@ -86,6 +86,6 @@ public class IdentifierSourceControllerTest {
 
         controller.addIdentifiersFromFile(null, mockRequest, mockResponse, identifierPool, mockMultipartFile);
         String response = (String) mockRequest.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR);
-        Assert.assertEquals(response, "Success: Identifiers successfully uploaded.");
+        Assertions.assertEquals(response, "Success: Identifiers successfully uploaded.");
     }
 }

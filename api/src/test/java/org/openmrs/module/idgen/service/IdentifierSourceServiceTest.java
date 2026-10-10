@@ -85,6 +85,15 @@ public class IdentifierSourceServiceTest extends IdgenBaseTest {
 		assertEquals("[LOC_1-000009, LOC_1-000010, LOC_1-000011, LOC_1-000012]", sig.toString());
 	}
 
+	@Test
+	public void generateIdentifiers_shouldGenerateFromADetachedSource() {
+		IdentifierSource is = identifierSourceService.getIdentifierSource(1);
+		Context.flushSession();
+		Context.evictFromSession(is);
+		List<String> sig = identifierSourceService.generateIdentifiers(is, 2, "hello");
+		assertEquals("[G-0, H-8]", sig.toString());
+	}
+
 	/**
 	 * @see {@link IdentifierSourceService#getAllIdentifierSources(boolean)}
 	 */

@@ -39,7 +39,7 @@ public abstract class IdgenTask extends TimerTask {
 	public synchronized void createAndRunTask() {
 		try {
 			log.info("Running idgen task: " + getClass().getSimpleName());
-			Daemon.runInDaemonThread(getRunnableTask(), daemonToken);
+			Daemon.runInDaemonThreadWithoutResult(getRunnableTask(), daemonToken);
 		}
 		catch (Exception e) {
 			log.error("An error occurred while running scheduled idgen task", e);

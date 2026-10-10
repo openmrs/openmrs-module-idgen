@@ -6,7 +6,7 @@
 	<class name="IdentifierSource" table="idgen_identifier_source" abstract="true">
 	
 		<id name="id" type="int" column="id" unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">idgen_identifier_source_id_seq</param>
 			</generator>
 		</id>
@@ -44,7 +44,7 @@
 		<joined-subclass name="RemoteIdentifierSource" table="idgen_remote_source">
 			<key column="id"/>
 			<property name="url" type="string" not-null="true" />
-            <property name="user" type="string" not-null="false" />
+            <property name="user" type="string" column="`user`" not-null="false" />
             <property name="password" type="string" not-null="false" />
 		</joined-subclass>
 
@@ -65,7 +65,7 @@
 	
 	<class name="PooledIdentifier" table="idgen_pooled_identifier">
 		<id name="id" type="int" column="id" unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">idgen_pooled_identifier_id_seq</param>
 			</generator>
 		</id>
@@ -78,7 +78,7 @@
 	
 	<class name="AutoGenerationOption" table="idgen_auto_generation_option">
 		<id name="id" type="int" column="id" unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">idgen_auto_generation_option_id_seq</param>
 			</generator>
 		</id>
@@ -92,7 +92,7 @@
 	
 	<class name="LogEntry" table="idgen_log_entry">
 		<id name="id" type="int" column="id" unsaved-value="0">
-			<generator class="native">
+			<generator class="identity">
 				<param name="sequence">idgen_log_entry_id_seq</param>
 			</generator>
 		</id>

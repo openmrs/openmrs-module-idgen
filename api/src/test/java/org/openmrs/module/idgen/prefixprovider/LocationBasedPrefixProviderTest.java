@@ -7,10 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.openmrs.Location;
 import org.openmrs.LocationAttribute;
@@ -35,7 +36,7 @@ public class LocationBasedPrefixProviderTest {
 
 	MockedStatic<Context> mockedContext;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		locationPrefixProvider = new LocationBasedPrefixProvider();
 		
@@ -53,7 +54,7 @@ public class LocationBasedPrefixProviderTest {
 		setupLocationTree();
 	}
 
-	@After
+	@AfterEach
 	public void teardown() {
 		mockedContext.close();
 	}
@@ -61,16 +62,16 @@ public class LocationBasedPrefixProviderTest {
 	@Test
 	public void getValue_shouldReturnPrefixDependingOnLocationInUserContext() {
 		when(userContext.getLocation()).thenReturn(locationB3);
-		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
+		MatcherAssert.assertThat(locationPrefixProvider.getValue(), is("LOC-5"));
 		// Change to location A3
 		when(userContext.getLocation()).thenReturn(locationA3);
-		Assert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
+		MatcherAssert.assertThat(locationPrefixProvider.getValue(), is("LOC-A2"));
 
 	}
 	
 	@Test
 	public void getLocationPrefix_shouldPickTheNearestValidPrefixUpTheTree() {
-		Assert.assertEquals("LOC-A2", locationPrefixProvider.getLocationPrefix(locationA3));
+		Assertions.assertEquals("LOC-A2", locationPrefixProvider.getLocationPrefix(locationA3));
 	}
 	
 	@Test
@@ -80,20 +81,20 @@ public class LocationBasedPrefixProviderTest {
 		// Invalidate prefix attributes for locations found in the middle of the tree
 		locationA2PrefixAtt.setValue(" ");
 		location5PrefixAtt.setValue(" ");
-		Assert.assertEquals("LOC-3", locationPrefixProvider.getLocationPrefix(locationA3));
+		Assertions.assertEquals("LOC-3", locationPrefixProvider.getLocationPrefix(locationA3));
 	}
 	
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void getLocationPrefix_throwAnExceptionIfNoValidPrefixIsFound() {
 		// Invalidate valid prefixes
 		LocationAttribute location2PrefixAtt = location3.getActiveAttributes().iterator().next();
 		location2PrefixAtt.setValue(" ");
-		locationPrefixProvider.getLocationPrefix(location3);
+		Assertions.assertThrows(RuntimeException.class, () -> locationPrefixProvider.getLocationPrefix(location3));
 	}
 	
 	@Test
 	public void getLocationPrefixRecursively_shouldPickThePrefixFromCurrentLocationIfOneIsSet() {
-		Assert.assertEquals("LOC-5", locationPrefixProvider.getLocationPrefix(location5));
+		Assertions.assertEquals("LOC-5", locationPrefixProvider.getLocationPrefix(location5));
 	}
 	
 	private void setupLocationTree() {

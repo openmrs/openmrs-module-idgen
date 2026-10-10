@@ -9,10 +9,10 @@
  */
 package org.openmrs.module.idgen.rest.controller;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.idgen.IdgenModuleActivator;
 import org.openmrs.module.idgen.rest.resource.IdentifierResource;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -26,7 +26,7 @@ public class IdentifierResourceTest extends MainResourceControllerTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @Before
+    @BeforeEach
     public void init() {
         new TransactionTemplate(transactionManager).execute(status -> {
             try {

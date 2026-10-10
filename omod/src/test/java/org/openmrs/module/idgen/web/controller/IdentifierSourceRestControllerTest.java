@@ -11,10 +11,8 @@ package org.openmrs.module.idgen.web.controller;
 import java.util.List;
 import org.apache.commons.beanutils.PropertyUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdgenModuleActivator;
@@ -31,13 +29,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThat;
-import org.openmrs.module.webservices.rest.test.Util;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class IdentifierSourceRestControllerTest extends MainResourceControllerTest {
 	
@@ -56,10 +54,7 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() {
         new TransactionTemplate(transactionManager).execute(status -> {
             try {
@@ -88,13 +83,6 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
         return service.getAllIdentifierSources(false).size();
     }
 
-    @Override
-    public void shouldGetAll() throws Exception {
-        SimpleObject result = deserialize(handle(newGetRequest(getURI())));
-        assertNotNull(result);
-        assertEquals(getAllCount(), Util.getResultsSize(result));
-    }
-    
     @Test
     public void shouldUploadReservedIdentifiers() throws Exception {
         String reservedIdentifiers = 
@@ -325,16 +313,15 @@ public class IdentifierSourceRestControllerTest extends MainResourceControllerTe
     
     @Test
     public void shouldThrowAnExceptionWhenARequiredParameterIsMissing() throws Exception {
-        expectedException.expect(org.openmrs.module.webservices.validation.ValidationException.class);
-        expectedException.expectMessage(allOf(containsString("source type"), containsString("patient identifier type"), containsString("name")));
-        
         SimpleObject sequentialIdentifierSource = new SimpleObject();
         sequentialIdentifierSource.add("description", "test identifier source");
         sequentialIdentifierSource.add("sourceType", "");
 
         String jsonSequentialIdentifierSource = new ObjectMapper().writeValueAsString(sequentialIdentifierSource);
         MockHttpServletRequest req = newPostRequest(getURI(), jsonSequentialIdentifierSource);
-        handle(req);
+        org.openmrs.module.webservices.validation.ValidationException e = assertThrows(
+                org.openmrs.module.webservices.validation.ValidationException.class, () -> handle(req));
+        assertThat(e.getMessage(), allOf(containsString("source type"), containsString("patient identifier type"), containsString("name")));
     }
 
     @Test

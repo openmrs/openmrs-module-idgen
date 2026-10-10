@@ -21,7 +21,7 @@ package org.openmrs.module.idgen.rest.resource;
 import org.openmrs.module.idgen.AutoGenerationOption;
 import org.openmrs.api.context.Context;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.openmrs.module.idgen.service.IdentifierSourceService;
 import org.openmrs.module.idgen.rest.resource.AutoGenerationOptionResource;
 
@@ -31,7 +31,7 @@ public class AutoGenerationOptionResourceTest extends BaseDelegatingResourceTest
 	
 	public static final int AUTO_GENERATION_OPTION_ID = 2;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}

@@ -13,7 +13,7 @@
  */
 package org.openmrs.module.idgen;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.prefixprovider.ConstantPrefixProvider;

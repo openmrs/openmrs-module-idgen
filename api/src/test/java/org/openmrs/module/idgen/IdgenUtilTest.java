@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.idgen;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.openmrs.test.Verifies;
 
 public class IdgenUtilTest {
@@ -28,9 +28,9 @@ public class IdgenUtilTest {
 		char[] hexChars = "0123456789ABCDEF".toCharArray();
 		long numericValue = 43804337214L;
 		String hexValue = IdgenUtil.convertToBase(numericValue, hexChars, 0);
-		Assert.assertEquals("A32F1243E", hexValue);
+		Assertions.assertEquals("A32F1243E", hexValue);
 		long back = IdgenUtil.convertFromBase(hexValue, hexChars);
-		Assert.assertEquals(numericValue, back);	
+		Assertions.assertEquals(numericValue, back);	
 	}
 
 }

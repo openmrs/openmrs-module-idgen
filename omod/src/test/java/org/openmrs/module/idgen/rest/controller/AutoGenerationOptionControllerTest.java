@@ -12,8 +12,8 @@ package org.openmrs.module.idgen.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.AutoGenerationOption;
@@ -25,11 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.openmrs.module.webservices.validation.ValidationException;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests CRUD operations for {@link AutoGenerationOption}s via web service calls
@@ -51,7 +52,7 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 	
 	public static final String IDENTIFIER_TYPE_UUID = "2f470aa8-1d73-43b7-81b5-01f0c0dfa53c";
 	
-	@Before
+	@BeforeEach
 	public void before() throws Exception {
 		executeDataSet("org/openmrs/module/idgen/include/TestData.xml");
 	}
@@ -122,13 +123,13 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		assertEquals(true, newAutoGenerationOption.isManualEntryEnabled());
 	}
 	
-	@Test(expected = ValidationException.class)
+	@Test
 	public void shouldNotCreateNewAutoGenerationOptionWithNullParameters() throws Exception {
 		SimpleObject autoGenerationOption = new SimpleObject();
 		String json = new ObjectMapper().writeValueAsString(autoGenerationOption);
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI());
 		req.setContent(json.getBytes());
-		handle(req);
+		assertThrows(ValidationException.class, () -> handle(req));
 	}
 	
 	@Test
@@ -154,13 +155,13 @@ public class AutoGenerationOptionControllerTest extends MainResourceControllerTe
 		assertFalse(updatedAutogenerationOption.isManualEntryEnabled());
 	}
 	
-	@Test(expected = ResourceDoesNotSupportOperationException.class)
+	@Test
 	public void shouldNotEditAnAutoGenerationOptionProvidedWithAllNullParams() throws Exception {
 		SimpleObject autoGenerationOption = new SimpleObject();
 		String json = new ObjectMapper().writeValueAsString(autoGenerationOption);
 		MockHttpServletRequest req = request(RequestMethod.POST, getURI() + "/" + getUuid());
 		req.setContent(json.getBytes());
-		handle(req);
+		assertThrows(ResourceDoesNotSupportOperationException.class, () -> handle(req));
 	}
 	
 	@Test
