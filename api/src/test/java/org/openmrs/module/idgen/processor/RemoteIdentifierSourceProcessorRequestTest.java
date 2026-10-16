@@ -11,8 +11,6 @@ package org.openmrs.module.idgen.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
@@ -63,37 +60,9 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 		}
 	}
 
-	@Test
-	public void buildRestHttpPost_shouldPostJsonWithBasicAuthentication() throws Exception {
-		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site+One";
-		HttpPost post = processor.buildRestHttpPost(source(url, "user", "pass"), 5);
-
-		Assert.assertEquals("https://localhost" + REST_PATH, post.getURI().toString());
-		Assert.assertEquals("Basic " + base64("user:pass"), post.getFirstHeader("Authorization").getValue());
-		Assert.assertEquals("application/json", post.getFirstHeader("Accept").getValue());
-		Assert.assertTrue(post.getEntity().getContentType().getValue().startsWith("application/json"));
-
-		Map<String, Object> expectedBody = new HashMap<String, Object>();
-		expectedBody.put("generateIdentifiers", true);
-		expectedBody.put("sourceUuid", SOURCE_UUID);
-		expectedBody.put("numberToGenerate", 5);
-		expectedBody.put("comment", "Site One");
-		Assert.assertEquals(expectedBody, new ObjectMapper().readValue(EntityUtils.toString(post.getEntity()), Map.class));
-	}
-
-	@Test
-	public void buildRestHttpPost_shouldOmitCommentAndAuthorizationIfNotConfigured() throws Exception {
-		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID;
-		HttpPost post = processor.buildRestHttpPost(source(url, null, null), 5);
-
-		Assert.assertNull(post.getFirstHeader("Authorization"));
-		Map<?, ?> body = new ObjectMapper().readValue(EntityUtils.toString(post.getEntity()), Map.class);
-		Assert.assertFalse(body.containsKey("comment"));
-	}
-
 	@Test(expected = IllegalArgumentException.class)
-	public void buildRestHttpPost_shouldFailWithoutSourceUuid() throws Exception {
-		processor.buildRestHttpPost(source("https://localhost" + REST_PATH, "user", "pass"), 5);
+	public void getIdentifiers_shouldFailForRestUrlWithoutSourceUuid() throws Exception {
+		processor.getIdentifiers(source("https://localhost" + REST_PATH, "user", "pass"), 5);
 	}
 
 	@Test
@@ -110,21 +79,38 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test
 	public void getIdentifiers_shouldGetIdentifiersFromRestEndpoint() throws Exception {
-		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 0) + "?sourceUuid=" + SOURCE_UUID + "&comment=Site";
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE) + "?sourceUuid=" + SOURCE_UUID + "&comment=Site+One";
 
 		List<String> identifiers = processor.getIdentifiers(source(url, "user", "pass"), 2);
 
 		Assert.assertEquals(Arrays.asList("1234A", "1235B"), identifiers);
 		Assert.assertEquals("POST", receivedRequest.get("method"));
+		Assert.assertEquals(REST_PATH, receivedRequest.get("uri"));
 		Assert.assertEquals("Basic " + base64("user:pass"), receivedRequest.get("authorization"));
-		Map<?, ?> body = new ObjectMapper().readValue(receivedRequest.get("body"), Map.class);
-		Assert.assertEquals(SOURCE_UUID, body.get("sourceUuid"));
-		Assert.assertEquals(2, body.get("numberToGenerate"));
+		Assert.assertEquals("application/json", receivedRequest.get("accept"));
+		Assert.assertTrue(receivedRequest.get("contentType").startsWith("application/json"));
+
+		Map<String, Object> expectedBody = new HashMap<String, Object>();
+		expectedBody.put("generateIdentifiers", true);
+		expectedBody.put("sourceUuid", SOURCE_UUID);
+		expectedBody.put("numberToGenerate", 2);
+		expectedBody.put("comment", "Site One");
+		Assert.assertEquals(expectedBody, new ObjectMapper().readValue(receivedRequest.get("body"), Map.class));
+	}
+
+	@Test
+	public void getIdentifiers_shouldOmitCommentAndAuthorizationForRestUrlIfNotConfigured() throws Exception {
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE) + "?sourceUuid=" + SOURCE_UUID;
+
+		processor.getIdentifiers(source(url, null, null), 2);
+
+		Assert.assertNull(receivedRequest.get("authorization"));
+		Assert.assertFalse(new ObjectMapper().readValue(receivedRequest.get("body"), Map.class).containsKey("comment"));
 	}
 
 	@Test
 	public void getIdentifiers_shouldGetIdentifiersFromExportIdentifiersEndpoint() throws Exception {
-		String url = startServer(EXPORT_PATH, 200, IDENTIFIERS_RESPONSE, 0) + "?source=1";
+		String url = startServer(EXPORT_PATH, 200, IDENTIFIERS_RESPONSE) + "?source=1";
 
 		Assert.assertEquals(Arrays.asList("1234A", "1235B"), processor.getIdentifiers(source(url, "user", "pass"), 2));
 		Assert.assertEquals("numberToGenerate=2&username=user&password=pass", receivedRequest.get("body"));
@@ -133,37 +119,14 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	@Test
 	public void getIdentifiers_shouldFailIfRemoteServerRespondsWithAnError() throws Exception {
 		// a valid body, so that only the status check can cause the failure
-		String url = startServer(REST_PATH, 401, IDENTIFIERS_RESPONSE, 0) + "?sourceUuid=" + SOURCE_UUID;
+		String url = startServer(REST_PATH, 401, IDENTIFIERS_RESPONSE) + "?sourceUuid=" + SOURCE_UUID;
 		assertFailsWithCause(source(url, "user", "wrong"), IOException.class, "401");
 	}
 
 	@Test
 	public void getIdentifiers_shouldOnlyAcceptStatus200FromExportIdentifiersEndpoint() throws Exception {
-		String url = startServer(EXPORT_PATH, 201, IDENTIFIERS_RESPONSE, 0) + "?source=1";
+		String url = startServer(EXPORT_PATH, 201, IDENTIFIERS_RESPONSE) + "?source=1";
 		assertFailsWithCause(source(url, "user", "pass"), IOException.class, "201");
-	}
-
-	@Test
-	public void getIdentifiers_shouldFailIfRemoteServerDoesNotRespondWithinTimeout() throws Exception {
-		useShortSocketTimeout();
-		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 1500) + "?sourceUuid=" + SOURCE_UUID;
-		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
-	}
-
-	@Test
-	public void getIdentifiers_shouldFailIfExportIdentifiersEndpointDoesNotRespondWithinTimeout() throws Exception {
-		useShortSocketTimeout();
-		String url = startServer(EXPORT_PATH, 200, IDENTIFIERS_RESPONSE, 1500) + "?source=1";
-		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
-	}
-
-	private void useShortSocketTimeout() {
-		processor = new RemoteIdentifierSourceProcessor() {
-			@Override
-			protected int getSocketTimeout() {
-				return 500;
-			}
-		};
 	}
 
 	private void assertFailsWithCause(RemoteIdentifierSource source, Class<? extends Exception> causeType, String messageContains) {
@@ -180,22 +143,18 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	}
 
 	/**
-	 * Starts a server on a free port that records the request it receives and, after the given delay, responds with
-	 * the given status and body
+	 * Starts a server on a free port that records the request it receives and responds with the given status and body
 	 * @return the url of the given path on the server
 	 */
-	private String startServer(String path, final int status, final String responseBody, final long delayMs) throws Exception {
+	private String startServer(String path, final int status, final String responseBody) throws Exception {
 		server = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
 		server.createContext(path, exchange -> {
 			receivedRequest.put("method", exchange.getRequestMethod());
+			receivedRequest.put("uri", exchange.getRequestURI().toString());
 			receivedRequest.put("authorization", exchange.getRequestHeaders().getFirst("Authorization"));
+			receivedRequest.put("accept", exchange.getRequestHeaders().getFirst("Accept"));
+			receivedRequest.put("contentType", exchange.getRequestHeaders().getFirst("Content-Type"));
 			receivedRequest.put("body", read(exchange.getRequestBody()));
-			try {
-				Thread.sleep(delayMs);
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
 			byte[] response = responseBody.getBytes(StandardCharsets.UTF_8);
 			exchange.sendResponseHeaders(status, response.length == 0 ? -1 : response.length);
 			try (OutputStream out = exchange.getResponseBody()) {

@@ -102,8 +102,8 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 
         HttpClient client = new DefaultHttpClient();
-        HttpConnectionParams.setConnectionTimeout(client.getParams(), getConnectTimeout());
-        HttpConnectionParams.setSoTimeout(client.getParams(), getSocketTimeout());
+        HttpConnectionParams.setConnectionTimeout(client.getParams(), CONNECT_TIMEOUT_MS);
+        HttpConnectionParams.setSoTimeout(client.getParams(), SOCKET_TIMEOUT_MS);
         HttpResponse httpResponse;
         String responseText;
         Integer statusCode;
@@ -127,48 +127,12 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
     }
 
     /**
-     * Requests the batch from the REST API (eg. .../ws/rest/v1/idgen/identifiersource?sourceUuid=...&comment=...).
+     * Requests the batch from the REST API (eg. .../ws/rest/v1/idgen/identifiersource?sourceUuid=...&comment=...),
+     * posting a JSON body that takes the sourceUuid and comment from the url (any other query parameters are not sent),
+     * with the user and password in a Basic Authorization header.
      * Unlike exportIdentifiers.form, this uses HttpClient's current defaults (eg. strict hostname verification)
      */
     protected String doRestHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
-        HttpPost post = buildRestHttpPost(source, batchSize);
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(getConnectTimeout())
-                .setConnectionRequestTimeout(getConnectTimeout())
-                .setSocketTimeout(getSocketTimeout())
-                .build();
-
-        try (CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
-             CloseableHttpResponse httpResponse = client.execute(post)) {
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String responseText = httpResponse.getEntity() == null ? "" : EntityUtils.toString(httpResponse.getEntity());
-            // the REST API responds to a successful request with 201 Created
-            if (statusCode < 200 || statusCode >= 300) {
-                throw new IOException("Unexpected response: " + statusCode + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
-            }
-            return responseText;
-        }
-    }
-
-    /**
-     * @return the milliseconds to wait to connect to the remote server
-     */
-    protected int getConnectTimeout() {
-        return CONNECT_TIMEOUT_MS;
-    }
-
-    /**
-     * @return the milliseconds to wait for data from the remote server, which has to generate the whole batch
-     */
-    protected int getSocketTimeout() {
-        return SOCKET_TIMEOUT_MS;
-    }
-
-    /**
-     * Builds the request to the REST API: a JSON body, taking the sourceUuid and comment from the url (any other query
-     * parameters are not sent), with the user and password in a Basic Authorization header
-     */
-    protected HttpPost buildRestHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
         URI uri;
         try {
             uri = URI.create(source.getUrl());
@@ -201,7 +165,23 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
             String credentials = source.getUser() + ":" + StringUtils.defaultString(source.getPassword());
             post.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8)));
         }
-        return post;
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(CONNECT_TIMEOUT_MS)
+                .setConnectionRequestTimeout(CONNECT_TIMEOUT_MS)
+                .setSocketTimeout(SOCKET_TIMEOUT_MS)
+                .build();
+
+        try (CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+             CloseableHttpResponse httpResponse = client.execute(post)) {
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            String responseText = httpResponse.getEntity() == null ? "" : EntityUtils.toString(httpResponse.getEntity());
+            // the REST API responds to a successful request with 201 Created
+            if (statusCode < 200 || statusCode >= 300) {
+                throw new IOException("Unexpected response: " + statusCode + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
+            }
+            return responseText;
+        }
     }
 
     /**
