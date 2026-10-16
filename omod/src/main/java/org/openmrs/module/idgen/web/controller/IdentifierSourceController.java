@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -202,7 +203,7 @@ public class IdentifierSourceController {
 
         // A web authentication scheme (eg. 2FA in the authentication module) has already logged in with these
         // parameters, and rejects authenticating again with a username and password
-        if (!Context.isAuthenticated() && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password) && !isAuthenticatedAs(username)) {
             Context.authenticate(username, password);
         }
 
@@ -219,7 +220,15 @@ public class IdentifierSourceController {
         
         new ObjectMapper().writeValue(out, new RemoteIdentifiersMessage(batch));
     }
-    
+
+    /**
+     * @return true if the current user is authenticated with the given username or system id
+     */
+    private boolean isAuthenticatedAs(String username) {
+        User user = Context.isAuthenticated() ? Context.getAuthenticatedUser() : null;
+        return user != null && (username.equals(user.getUsername()) || username.equals(user.getSystemId()));
+    }
+
     /**
      * Upload Identifiers From File
      */

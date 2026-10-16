@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -96,17 +97,32 @@ public class IdentifierSourceControllerTest {
 	 * logged in with the username and password parameters, and authenticating again with them fails
 	 */
 	@Test
-	public void exportIdentifiers_shouldNotAuthenticateAgainIfAlreadyAuthenticated() throws Exception {
+	public void exportIdentifiers_shouldNotAuthenticateAgainIfAlreadyAuthenticatedAsThatUser() throws Exception {
 		when(iss.generateIdentifiers(Mockito.any(IdentifierSource.class), Mockito.any(Integer.class), Mockito.any(String.class)))
 				.thenReturn(Arrays.asList("1"));
 		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
 			context.when(Context::isAuthenticated).thenReturn(true);
+			context.when(Context::getAuthenticatedUser).thenReturn(user("user"));
 
 			MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 			controller.exportIdentifiers(null, new MockHttpServletRequest(), mockResponse, new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");
 
 			context.verify(() -> Context.authenticate(Mockito.anyString(), Mockito.anyString()), Mockito.never());
 			Assert.assertEquals("{\"identifiers\":[\"1\"]}", mockResponse.getContentAsString());
+		}
+	}
+
+	@Test
+	public void exportIdentifiers_shouldAuthenticateIfAuthenticatedAsAnotherUser() throws Exception {
+		when(iss.generateIdentifiers(Mockito.any(IdentifierSource.class), Mockito.any(Integer.class), Mockito.any(String.class)))
+				.thenReturn(Arrays.asList("1"));
+		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
+			context.when(Context::isAuthenticated).thenReturn(true);
+			context.when(Context::getAuthenticatedUser).thenReturn(user("someoneElse"));
+
+			controller.exportIdentifiers(null, new MockHttpServletRequest(), new MockHttpServletResponse(), new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");
+
+			context.verify(() -> Context.authenticate("user", "pass"));
 		}
 	}
 
@@ -121,5 +137,11 @@ public class IdentifierSourceControllerTest {
 
 			context.verify(() -> Context.authenticate("user", "pass"));
 		}
+	}
+
+	private User user(String username) {
+		User user = new User();
+		user.setUsername(username);
+		return user;
 	}
 }

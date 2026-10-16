@@ -28,6 +28,7 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,8 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	@Before
 	public void setUp() {
 		processor = new RemoteIdentifierSourceProcessor();
-		receivedRequest = new HashMap<String, String>();
+		// written by the server's thread and read by the test's thread; some values can be null, so not a ConcurrentHashMap
+		receivedRequest = Collections.synchronizedMap(new HashMap<String, String>());
 	}
 
 	@After
@@ -159,7 +161,7 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 				return 500;
 			}
 		};
-		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 3000) + "?sourceUuid=" + SOURCE_UUID;
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 1500) + "?sourceUuid=" + SOURCE_UUID;
 		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
 	}
 
