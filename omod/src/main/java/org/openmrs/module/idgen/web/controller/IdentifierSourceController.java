@@ -200,10 +200,12 @@ public class IdentifierSourceController {
                                    @RequestParam(required=false, value="username") String username,
                                    @RequestParam(required=false, value="password") String password) throws Exception {
 
-        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        // A web authentication scheme (eg. 2FA in the authentication module) has already logged in with these
+        // parameters, and rejects authenticating again with a username and password
+        if (!Context.isAuthenticated() && StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
             Context.authenticate(username, password);
         }
-    	
+
 
         if (StringUtils.isEmpty(comment)) {
             comment = "Batch Export of " + numberToGenerate + " to file";
