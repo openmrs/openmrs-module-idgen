@@ -20,9 +20,11 @@ import org.junit.Test;
 import org.openmrs.module.idgen.RemoteIdentifierSource;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
@@ -33,6 +35,12 @@ import java.util.Map;
 public class RemoteIdentifierSourceProcessorRequestTest {
 
 	private static final String SOURCE_UUID = "52250ca2-d25f-11e4-8dbf-54ee7513a7ff";
+
+	private static final String REST_PATH = "/openmrs/ws/rest/v1/idgen/identifiersource";
+
+	private static final String EXPORT_PATH = "/openmrs/module/idgen/exportIdentifiers.form";
+
+	private static final String IDENTIFIERS_RESPONSE = "{\"identifiers\":[\"1234A\",\"1235B\"]}";
 
 	private RemoteIdentifierSourceProcessor processor;
 
@@ -55,7 +63,7 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test
 	public void buildHttpPost_shouldPostFormWithCredentialsForExportIdentifiersUrl() throws Exception {
-		String url = "http://localhost/openmrs/module/idgen/exportIdentifiers.form?source=1&comment=Site";
+		String url = "http://localhost" + EXPORT_PATH + "?source=1&comment=Site";
 		HttpPost post = processor.buildHttpPost(source(url, "user", "pass"), 5);
 
 		Assert.assertEquals(url, post.getURI().toString());
@@ -65,11 +73,12 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test
 	public void buildHttpPost_shouldPostJsonWithBasicAuthenticationForRestUrl() throws Exception {
-		String url = "https://localhost/openmrs/ws/rest/v1/idgen/identifiersource?sourceUuid=" + SOURCE_UUID + "&comment=Site+One";
+		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site+One";
 		HttpPost post = processor.buildHttpPost(source(url, "user", "pass"), 5);
 
-		Assert.assertEquals("https://localhost/openmrs/ws/rest/v1/idgen/identifiersource", post.getURI().toString());
+		Assert.assertEquals("https://localhost" + REST_PATH, post.getURI().toString());
 		Assert.assertEquals("Basic " + base64("user:pass"), post.getFirstHeader("Authorization").getValue());
+		Assert.assertEquals("application/json", post.getFirstHeader("Accept").getValue());
 		Assert.assertTrue(post.getEntity().getContentType().getValue().startsWith("application/json"));
 
 		Map<String, Object> expectedBody = new HashMap<String, Object>();
@@ -82,7 +91,7 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test
 	public void buildHttpPost_shouldOmitCommentAndAuthorizationForRestUrlIfNotConfigured() throws Exception {
-		String url = "https://localhost/openmrs/ws/rest/v1/idgen/identifiersource?sourceUuid=" + SOURCE_UUID;
+		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID;
 		HttpPost post = processor.buildHttpPost(source(url, null, null), 5);
 
 		Assert.assertNull(post.getFirstHeader("Authorization"));
@@ -92,12 +101,24 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void buildHttpPost_shouldFailForRestUrlWithoutSourceUuid() throws Exception {
-		processor.buildHttpPost(source("https://localhost/openmrs/ws/rest/v1/idgen/identifiersource", "user", "pass"), 5);
+		processor.buildHttpPost(source("https://localhost" + REST_PATH, "user", "pass"), 5);
+	}
+
+	@Test
+	public void buildHttpPost_shouldFailWithClearErrorForRestUrlThatIsNotValid() throws Exception {
+		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site One";
+		try {
+			processor.buildHttpPost(source(url, "user", "pass"), 5);
+			Assert.fail("Expected an IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			Assert.assertTrue(e.getMessage(), e.getMessage().contains("is not valid") && e.getMessage().contains(url));
+		}
 	}
 
 	@Test
 	public void getIdentifiers_shouldGetIdentifiersFromRestEndpoint() throws Exception {
-		String url = startServer(201, "{\"identifiers\":[\"1234A\",\"1235B\"]}") + "?sourceUuid=" + SOURCE_UUID + "&comment=Site";
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 0) + "?sourceUuid=" + SOURCE_UUID + "&comment=Site";
 
 		List<String> identifiers = processor.getIdentifiers(source(url, "user", "pass"), 2);
 
@@ -109,23 +130,69 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 		Assert.assertEquals(2, body.get("numberToGenerate"));
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
+	public void getIdentifiers_shouldGetIdentifiersFromExportIdentifiersEndpoint() throws Exception {
+		String url = startServer(EXPORT_PATH, 200, IDENTIFIERS_RESPONSE, 0) + "?source=1";
+
+		Assert.assertEquals(Arrays.asList("1234A", "1235B"), processor.getIdentifiers(source(url, "user", "pass"), 2));
+		Assert.assertEquals("numberToGenerate=2&username=user&password=pass", receivedRequest.get("body"));
+	}
+
+	@Test
 	public void getIdentifiers_shouldFailIfRemoteServerRespondsWithAnError() throws Exception {
-		String url = startServer(401, "") + "?sourceUuid=" + SOURCE_UUID;
-		processor.getIdentifiers(source(url, "user", "wrong"), 2);
+		// a valid body, so that only the status check can cause the failure
+		String url = startServer(REST_PATH, 401, IDENTIFIERS_RESPONSE, 0) + "?sourceUuid=" + SOURCE_UUID;
+		assertFailsWithCause(source(url, "user", "wrong"), IOException.class, "401");
+	}
+
+	@Test
+	public void getIdentifiers_shouldOnlyAcceptStatus200FromExportIdentifiersEndpoint() throws Exception {
+		String url = startServer(EXPORT_PATH, 201, IDENTIFIERS_RESPONSE, 0) + "?source=1";
+		assertFailsWithCause(source(url, "user", "pass"), IOException.class, "201");
+	}
+
+	@Test
+	public void getIdentifiers_shouldFailIfRemoteServerDoesNotRespondWithinTimeout() throws Exception {
+		processor = new RemoteIdentifierSourceProcessor() {
+			@Override
+			protected int getSocketTimeout() {
+				return 500;
+			}
+		};
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 3000) + "?sourceUuid=" + SOURCE_UUID;
+		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
+	}
+
+	private void assertFailsWithCause(RemoteIdentifierSource source, Class<? extends Exception> causeType, String messageContains) {
+		try {
+			processor.getIdentifiers(source, 2);
+			Assert.fail("Expected getIdentifiers to fail");
+		}
+		catch (RuntimeException e) {
+			Assert.assertTrue("Unexpected cause: " + e.getCause(), causeType.isInstance(e.getCause()));
+			if (messageContains != null) {
+				Assert.assertTrue(e.getCause().getMessage(), e.getCause().getMessage().contains(messageContains));
+			}
+		}
 	}
 
 	/**
-	 * Starts a server on a free port that records the request it receives and responds with the given status and body
-	 * @return the url of its identifier source REST endpoint
+	 * Starts a server on a free port that records the request it receives and, after the given delay, responds with
+	 * the given status and body
+	 * @return the url of the given path on the server
 	 */
-	private String startServer(final int status, final String responseBody) throws Exception {
-		String path = "/openmrs/ws/rest/v1/idgen/identifiersource";
+	private String startServer(String path, final int status, final String responseBody, final long delayMs) throws Exception {
 		server = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
 		server.createContext(path, exchange -> {
 			receivedRequest.put("method", exchange.getRequestMethod());
 			receivedRequest.put("authorization", exchange.getRequestHeaders().getFirst("Authorization"));
 			receivedRequest.put("body", read(exchange.getRequestBody()));
+			try {
+				Thread.sleep(delayMs);
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 			byte[] response = responseBody.getBytes(StandardCharsets.UTF_8);
 			exchange.sendResponseHeaders(status, response.length == 0 ? -1 : response.length);
 			try (OutputStream out = exchange.getResponseBody()) {
@@ -148,7 +215,7 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 		return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private String read(InputStream in) throws java.io.IOException {
+	private String read(InputStream in) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
 		for (int n = in.read(buffer); n != -1; n = in.read(buffer)) {

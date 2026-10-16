@@ -26,15 +26,16 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +53,17 @@ import org.springframework.stereotype.Component;
 public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcessor {
 
     private static Log log = LogFactory.getLog(RemoteIdentifierSourceProcessor.class);
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public static final String REST_SOURCE_UUID_PARAMETER = "sourceUuid";
+
+    public static final String REST_COMMENT_PARAMETER = "comment";
+
+    private static final int CONNECT_TIMEOUT_MS = 30000;
+
+    private static final int SOCKET_TIMEOUT_MS = 300000;
+
     /**
      * @see IdentifierSourceProcessor#getIdentifiers(IdentifierSource, int)
      */
@@ -67,8 +79,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
         
         try {
-        	ObjectMapper mapper = new ObjectMapper();
-        	RemoteIdentifiersMessage message = mapper.readValue(response, RemoteIdentifiersMessage.class);
+        	RemoteIdentifiersMessage message = MAPPER.readValue(response, RemoteIdentifiersMessage.class);
         	return message.getIdentifiers();
         }
         catch (IOException ex) {
@@ -78,34 +89,50 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 
     protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
         HttpPost post = buildHttpPost(source, batchSize);
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(getConnectTimeout())
+                .setConnectionRequestTimeout(getConnectTimeout())
+                .setSocketTimeout(getSocketTimeout())
+                .build();
 
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse httpResponse;
         String responseText;
-        Integer statusCode;
-
-        try {
-            httpResponse = client.execute(post);
-            responseText = EntityUtils.toString(httpResponse.getEntity());
+        int statusCode;
+        String reasonPhrase;
+        try (CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+             CloseableHttpResponse httpResponse = client.execute(post)) {
             statusCode = httpResponse.getStatusLine().getStatusCode();
-        }
-        finally {
-            // always release the connection!
-            post.releaseConnection();
+            reasonPhrase = httpResponse.getStatusLine().getReasonPhrase();
+            responseText = httpResponse.getEntity() == null ? "" : EntityUtils.toString(httpResponse.getEntity());
         }
 
         // the REST API responds to a successful request with 201 Created
-        if (statusCode < 200 || statusCode >= 300) {
-            throw new IOException("Unexpected response: " + httpResponse.getStatusLine().getStatusCode() + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
+        boolean successful = isRestUrl(source.getUrl()) ? (statusCode >= 200 && statusCode < 300) : statusCode == 200;
+        if (!successful) {
+            throw new IOException("Unexpected response: " + statusCode + " " + reasonPhrase + "\n" + responseText);
         }
 
         return responseText;
     }
 
     /**
+     * @return the milliseconds to wait to connect to the remote server
+     */
+    protected int getConnectTimeout() {
+        return CONNECT_TIMEOUT_MS;
+    }
+
+    /**
+     * @return the milliseconds to wait for data from the remote server, which has to generate the whole batch
+     */
+    protected int getSocketTimeout() {
+        return SOCKET_TIMEOUT_MS;
+    }
+
+    /**
      * Builds the request for a batch of identifiers from the source's url.
      * A url to the REST API (eg. .../ws/rest/v1/idgen/identifiersource?sourceUuid=...&comment=...) is sent a JSON body,
      * taking the sourceUuid and comment from the url, with the user and password in a Basic Authorization header.
+     * Any other query parameters are not sent.
      * Any other url (eg. .../module/idgen/exportIdentifiers.form?source=...) is sent a form post, with the user and
      * password as parameters.
      */
@@ -127,25 +154,34 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
     }
 
     protected HttpPost buildRestHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
+        URI uri;
+        try {
+            uri = URI.create(source.getUrl());
+        }
+        catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("The url of a remote identifier source is not valid (are its parameters url-encoded?): " + source.getUrl(), e);
+        }
         Map<String, String> parameters = new HashMap<String, String>();
-        for (NameValuePair parameter : URLEncodedUtils.parse(URI.create(source.getUrl()), StandardCharsets.UTF_8)) {
+        for (NameValuePair parameter : URLEncodedUtils.parse(uri, StandardCharsets.UTF_8)) {
             parameters.put(parameter.getName(), parameter.getValue());
         }
-        String sourceUuid = parameters.get("sourceUuid");
+        String sourceUuid = parameters.get(REST_SOURCE_UUID_PARAMETER);
         if (StringUtils.isBlank(sourceUuid)) {
-            throw new IllegalArgumentException("The url of a remote identifier source using the REST API must include a sourceUuid parameter: " + source.getUrl());
+            throw new IllegalArgumentException("The url of a remote identifier source using the REST API must include a " + REST_SOURCE_UUID_PARAMETER + " parameter: " + source.getUrl());
         }
+        String comment = parameters.get(REST_COMMENT_PARAMETER);
 
         Map<String, Object> body = new LinkedHashMap<String, Object>();
         body.put("generateIdentifiers", true);
-        body.put("sourceUuid", sourceUuid);
+        body.put(REST_SOURCE_UUID_PARAMETER, sourceUuid);
         body.put("numberToGenerate", batchSize);
-        if (StringUtils.isNotBlank(parameters.get("comment"))) {
-            body.put("comment", parameters.get("comment"));
+        if (StringUtils.isNotBlank(comment)) {
+            body.put(REST_COMMENT_PARAMETER, comment);
         }
 
         HttpPost post = new HttpPost(StringUtils.substringBefore(source.getUrl(), "?"));
-        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(body), ContentType.APPLICATION_JSON));
+        post.setEntity(new StringEntity(MAPPER.writeValueAsString(body), ContentType.APPLICATION_JSON));
+        post.setHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
         if (StringUtils.isNotBlank(source.getUser())) {
             String credentials = source.getUser() + ":" + StringUtils.defaultString(source.getPassword());
             post.setHeader("Authorization", "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8)));
@@ -153,14 +189,12 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         return post;
     }
 
+    /**
+     * @return true if the url is to the REST API.  Checked on the url's text, before any query string, so that a REST
+     * url that isn't valid fails with an error about that rather than being sent as a form post
+     */
     protected boolean isRestUrl(String url) {
-        try {
-            String path = URI.create(url).getPath();
-            return path != null && path.contains("/ws/rest/");
-        }
-        catch (IllegalArgumentException e) {
-            return false;
-        }
+        return url != null && StringUtils.substringBefore(url, "?").contains("/ws/rest/");
     }
 
 }
