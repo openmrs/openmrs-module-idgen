@@ -35,8 +35,10 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.util.EntityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -89,16 +91,12 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 
     protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
         HttpPost post = buildHttpPost(source, batchSize);
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(getConnectTimeout())
-                .setConnectionRequestTimeout(getConnectTimeout())
-                .setSocketTimeout(getSocketTimeout())
-                .build();
+        boolean restUrl = isRestUrl(source.getUrl());
 
         String responseText;
         int statusCode;
         String reasonPhrase;
-        try (CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+        try (CloseableHttpClient client = restUrl ? buildRestHttpClient() : buildLegacyHttpClient();
              CloseableHttpResponse httpResponse = client.execute(post)) {
             statusCode = httpResponse.getStatusLine().getStatusCode();
             reasonPhrase = httpResponse.getStatusLine().getReasonPhrase();
@@ -106,12 +104,36 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
 
         // the REST API responds to a successful request with 201 Created
-        boolean successful = isRestUrl(source.getUrl()) ? (statusCode >= 200 && statusCode < 300) : statusCode == 200;
+        boolean successful = restUrl ? (statusCode >= 200 && statusCode < 300) : statusCode == 200;
         if (!successful) {
             throw new IOException("Unexpected response: " + statusCode + " " + reasonPhrase + "\n" + responseText);
         }
 
         return responseText;
+    }
+
+    /**
+     * @return a client for the REST API, with HttpClient's current defaults (eg. strict hostname verification)
+     */
+    protected CloseableHttpClient buildRestHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(getConnectTimeout())
+                .setConnectionRequestTimeout(getConnectTimeout())
+                .setSocketTimeout(getSocketTimeout())
+                .build();
+        return HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+    }
+
+    /**
+     * @return a client for exportIdentifiers.form, the same as was always used for it (eg. its hostname verification),
+     * so that existing configurations keep working, with timeouts added
+     */
+    @SuppressWarnings("deprecation")
+    protected CloseableHttpClient buildLegacyHttpClient() {
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpConnectionParams.setConnectionTimeout(client.getParams(), getConnectTimeout());
+        HttpConnectionParams.setSoTimeout(client.getParams(), getSocketTimeout());
+        return client;
     }
 
     /**

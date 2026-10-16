@@ -155,14 +155,25 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 
 	@Test
 	public void getIdentifiers_shouldFailIfRemoteServerDoesNotRespondWithinTimeout() throws Exception {
+		useShortSocketTimeout();
+		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 1500) + "?sourceUuid=" + SOURCE_UUID;
+		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
+	}
+
+	@Test
+	public void getIdentifiers_shouldFailIfExportIdentifiersEndpointDoesNotRespondWithinTimeout() throws Exception {
+		useShortSocketTimeout();
+		String url = startServer(EXPORT_PATH, 200, IDENTIFIERS_RESPONSE, 1500) + "?source=1";
+		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
+	}
+
+	private void useShortSocketTimeout() {
 		processor = new RemoteIdentifierSourceProcessor() {
 			@Override
 			protected int getSocketTimeout() {
 				return 500;
 			}
 		};
-		String url = startServer(REST_PATH, 201, IDENTIFIERS_RESPONSE, 1500) + "?sourceUuid=" + SOURCE_UUID;
-		assertFailsWithCause(source(url, "user", "pass"), SocketTimeoutException.class, null);
 	}
 
 	private void assertFailsWithCause(RemoteIdentifierSource source, Class<? extends Exception> causeType, String messageContains) {
