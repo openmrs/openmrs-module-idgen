@@ -26,7 +26,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -85,50 +87,67 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
     }
 
     protected String doHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
-        HttpPost post = buildHttpPost(source, batchSize);
-        boolean restUrl = isRestUrl(source.getUrl());
-
-        String responseText;
-        int statusCode;
-        String reasonPhrase;
-        try (CloseableHttpClient client = restUrl ? buildRestHttpClient() : buildLegacyHttpClient();
-             CloseableHttpResponse httpResponse = client.execute(post)) {
-            statusCode = httpResponse.getStatusLine().getStatusCode();
-            reasonPhrase = httpResponse.getStatusLine().getReasonPhrase();
-            responseText = httpResponse.getEntity() == null ? "" : EntityUtils.toString(httpResponse.getEntity());
+        if (isRestUrl(source.getUrl())) {
+            return doRestHttpPost(source, batchSize);
         }
 
-        // the REST API responds to a successful request with 201 Created
-        boolean successful = restUrl ? (statusCode >= 200 && statusCode < 300) : statusCode == 200;
-        if (!successful) {
-            throw new IOException("Unexpected response: " + statusCode + " " + reasonPhrase + "\n" + responseText);
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        nameValuePairs.add(new BasicNameValuePair("numberToGenerate", Integer.toString(batchSize)));
+        if (StringUtils.isNotBlank(source.getUser())) {
+            nameValuePairs.add(new BasicNameValuePair("username", source.getUser()));
+            nameValuePairs.add(new BasicNameValuePair("password", source.getPassword()));
+        }
+
+        HttpPost post = new HttpPost(source.getUrl());
+        post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
+
+        HttpClient client = new DefaultHttpClient();
+        HttpConnectionParams.setConnectionTimeout(client.getParams(), getConnectTimeout());
+        HttpConnectionParams.setSoTimeout(client.getParams(), getSocketTimeout());
+        HttpResponse httpResponse;
+        String responseText;
+        Integer statusCode;
+
+        try {
+            httpResponse = client.execute(post);
+            responseText = EntityUtils.toString(httpResponse.getEntity());
+            statusCode = httpResponse.getStatusLine().getStatusCode();
+        }
+        finally {
+            // always release the connection!
+            post.releaseConnection();
+            client.getConnectionManager().shutdown();
+        }
+
+        if (statusCode != 200) {
+            throw new IOException("Unexpected response: " + httpResponse.getStatusLine().getStatusCode() + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
         }
 
         return responseText;
     }
 
     /**
-     * @return a client for the REST API, with HttpClient's current defaults (eg. strict hostname verification)
+     * Requests the batch from the REST API (eg. .../ws/rest/v1/idgen/identifiersource?sourceUuid=...&comment=...).
+     * Unlike exportIdentifiers.form, this uses HttpClient's current defaults (eg. strict hostname verification)
      */
-    protected CloseableHttpClient buildRestHttpClient() {
+    protected String doRestHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
+        HttpPost post = buildRestHttpPost(source, batchSize);
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(getConnectTimeout())
                 .setConnectionRequestTimeout(getConnectTimeout())
                 .setSocketTimeout(getSocketTimeout())
                 .build();
-        return HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
-    }
 
-    /**
-     * @return a client for exportIdentifiers.form, the same as was always used for it (eg. its hostname verification),
-     * so that existing configurations keep working, with timeouts added
-     */
-    @SuppressWarnings("deprecation")
-    protected CloseableHttpClient buildLegacyHttpClient() {
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpConnectionParams.setConnectionTimeout(client.getParams(), getConnectTimeout());
-        HttpConnectionParams.setSoTimeout(client.getParams(), getSocketTimeout());
-        return client;
+        try (CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+             CloseableHttpResponse httpResponse = client.execute(post)) {
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            String responseText = httpResponse.getEntity() == null ? "" : EntityUtils.toString(httpResponse.getEntity());
+            // the REST API responds to a successful request with 201 Created
+            if (statusCode < 200 || statusCode >= 300) {
+                throw new IOException("Unexpected response: " + statusCode + " " + httpResponse.getStatusLine().getReasonPhrase() + "\n" + responseText);
+            }
+            return responseText;
+        }
     }
 
     /**
@@ -146,30 +165,9 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
     }
 
     /**
-     * Builds the request for a batch of identifiers from the source's url.
-     * A url to the REST API (eg. .../ws/rest/v1/idgen/identifiersource?sourceUuid=...&comment=...) is sent a JSON body,
-     * taking the sourceUuid and comment from the url, with the user and password in a Basic Authorization header.
-     * Any other query parameters are not sent.
-     * Any other url (eg. .../module/idgen/exportIdentifiers.form?source=...) is sent a form post, with the user and
-     * password as parameters.
+     * Builds the request to the REST API: a JSON body, taking the sourceUuid and comment from the url (any other query
+     * parameters are not sent), with the user and password in a Basic Authorization header
      */
-    protected HttpPost buildHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
-        if (isRestUrl(source.getUrl())) {
-            return buildRestHttpPost(source, batchSize);
-        }
-
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new BasicNameValuePair("numberToGenerate", Integer.toString(batchSize)));
-        if (StringUtils.isNotBlank(source.getUser())) {
-            nameValuePairs.add(new BasicNameValuePair("username", source.getUser()));
-            nameValuePairs.add(new BasicNameValuePair("password", source.getPassword()));
-        }
-
-        HttpPost post = new HttpPost(source.getUrl());
-        post.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
-        return post;
-    }
-
     protected HttpPost buildRestHttpPost(RemoteIdentifierSource source, int batchSize) throws IOException {
         URI uri;
         try {

@@ -64,19 +64,9 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	}
 
 	@Test
-	public void buildHttpPost_shouldPostFormWithCredentialsForExportIdentifiersUrl() throws Exception {
-		String url = "http://localhost" + EXPORT_PATH + "?source=1&comment=Site";
-		HttpPost post = processor.buildHttpPost(source(url, "user", "pass"), 5);
-
-		Assert.assertEquals(url, post.getURI().toString());
-		Assert.assertNull(post.getFirstHeader("Authorization"));
-		Assert.assertEquals("numberToGenerate=5&username=user&password=pass", EntityUtils.toString(post.getEntity()));
-	}
-
-	@Test
-	public void buildHttpPost_shouldPostJsonWithBasicAuthenticationForRestUrl() throws Exception {
+	public void buildRestHttpPost_shouldPostJsonWithBasicAuthentication() throws Exception {
 		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site+One";
-		HttpPost post = processor.buildHttpPost(source(url, "user", "pass"), 5);
+		HttpPost post = processor.buildRestHttpPost(source(url, "user", "pass"), 5);
 
 		Assert.assertEquals("https://localhost" + REST_PATH, post.getURI().toString());
 		Assert.assertEquals("Basic " + base64("user:pass"), post.getFirstHeader("Authorization").getValue());
@@ -92,9 +82,9 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	}
 
 	@Test
-	public void buildHttpPost_shouldOmitCommentAndAuthorizationForRestUrlIfNotConfigured() throws Exception {
+	public void buildRestHttpPost_shouldOmitCommentAndAuthorizationIfNotConfigured() throws Exception {
 		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID;
-		HttpPost post = processor.buildHttpPost(source(url, null, null), 5);
+		HttpPost post = processor.buildRestHttpPost(source(url, null, null), 5);
 
 		Assert.assertNull(post.getFirstHeader("Authorization"));
 		Map<?, ?> body = new ObjectMapper().readValue(EntityUtils.toString(post.getEntity()), Map.class);
@@ -102,15 +92,15 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void buildHttpPost_shouldFailForRestUrlWithoutSourceUuid() throws Exception {
-		processor.buildHttpPost(source("https://localhost" + REST_PATH, "user", "pass"), 5);
+	public void buildRestHttpPost_shouldFailWithoutSourceUuid() throws Exception {
+		processor.buildRestHttpPost(source("https://localhost" + REST_PATH, "user", "pass"), 5);
 	}
 
 	@Test
-	public void buildHttpPost_shouldFailWithClearErrorForRestUrlThatIsNotValid() throws Exception {
+	public void getIdentifiers_shouldFailWithClearErrorForRestUrlThatIsNotValid() throws Exception {
 		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site One";
 		try {
-			processor.buildHttpPost(source(url, "user", "pass"), 5);
+			processor.getIdentifiers(source(url, "user", "pass"), 5);
 			Assert.fail("Expected an IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
