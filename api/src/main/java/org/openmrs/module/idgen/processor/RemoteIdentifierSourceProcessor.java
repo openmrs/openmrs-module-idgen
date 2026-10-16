@@ -140,7 +140,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The url of a remote identifier source is not valid (are its parameters url-encoded?): " + source.getUrl(), e);
         }
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         for (NameValuePair parameter : URLEncodedUtils.parse(uri, StandardCharsets.UTF_8)) {
             parameters.put(parameter.getName(), parameter.getValue());
         }
@@ -150,7 +150,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
         String comment = parameters.get("comment");
 
-        Map<String, Object> body = new LinkedHashMap<String, Object>();
+        Map<String, Object> body = new LinkedHashMap<>();
         body.put("generateIdentifiers", true);
         body.put("sourceUuid", sourceUuid);
         body.put("numberToGenerate", batchSize);
