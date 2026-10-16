@@ -58,10 +58,6 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static final String REST_SOURCE_UUID_PARAMETER = "sourceUuid";
-
-    public static final String REST_COMMENT_PARAMETER = "comment";
-
     private static final int CONNECT_TIMEOUT_MS = 30000;
 
     private static final int SOCKET_TIMEOUT_MS = 300000;
@@ -187,18 +183,18 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         for (NameValuePair parameter : URLEncodedUtils.parse(uri, StandardCharsets.UTF_8)) {
             parameters.put(parameter.getName(), parameter.getValue());
         }
-        String sourceUuid = parameters.get(REST_SOURCE_UUID_PARAMETER);
+        String sourceUuid = parameters.get("sourceUuid");
         if (StringUtils.isBlank(sourceUuid)) {
-            throw new IllegalArgumentException("The url of a remote identifier source using the REST API must include a " + REST_SOURCE_UUID_PARAMETER + " parameter: " + source.getUrl());
+            throw new IllegalArgumentException("The url of a remote identifier source using the REST API must include a sourceUuid parameter: " + source.getUrl());
         }
-        String comment = parameters.get(REST_COMMENT_PARAMETER);
+        String comment = parameters.get("comment");
 
         Map<String, Object> body = new LinkedHashMap<String, Object>();
         body.put("generateIdentifiers", true);
-        body.put(REST_SOURCE_UUID_PARAMETER, sourceUuid);
+        body.put("sourceUuid", sourceUuid);
         body.put("numberToGenerate", batchSize);
         if (StringUtils.isNotBlank(comment)) {
-            body.put(REST_COMMENT_PARAMETER, comment);
+            body.put("comment", comment);
         }
 
         HttpPost post = new HttpPost(StringUtils.substringBefore(source.getUrl(), "?"));
