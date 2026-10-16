@@ -56,8 +56,6 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
 
     private static Log log = LogFactory.getLog(RemoteIdentifierSourceProcessor.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private static final int CONNECT_TIMEOUT_MS = 30000;
 
     private static final int SOCKET_TIMEOUT_MS = 300000;
@@ -77,7 +75,8 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
         
         try {
-        	RemoteIdentifiersMessage message = MAPPER.readValue(response, RemoteIdentifiersMessage.class);
+        	ObjectMapper mapper = new ObjectMapper();
+        	RemoteIdentifiersMessage message = mapper.readValue(response, RemoteIdentifiersMessage.class);
         	return message.getIdentifiers();
         }
         catch (IOException ex) {
@@ -198,7 +197,7 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         }
 
         HttpPost post = new HttpPost(StringUtils.substringBefore(source.getUrl(), "?"));
-        post.setEntity(new StringEntity(MAPPER.writeValueAsString(body), ContentType.APPLICATION_JSON));
+        post.setEntity(new StringEntity(new ObjectMapper().writeValueAsString(body), ContentType.APPLICATION_JSON));
         post.setHeader("Accept", ContentType.APPLICATION_JSON.getMimeType());
         if (StringUtils.isNotBlank(source.getUser())) {
             String credentials = source.getUser() + ":" + StringUtils.defaultString(source.getPassword());
