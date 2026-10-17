@@ -23,8 +23,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.User;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
 import org.openmrs.module.idgen.SequentialIdentifierGenerator;
@@ -88,4 +91,57 @@ public class IdentifierSourceControllerTest {
         String response = (String) mockRequest.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR);
         Assert.assertEquals(response, "Success: Identifiers successfully uploaded.");
     }
+
+	/**
+	 * With a web authentication scheme (eg. 2FA in the authentication module), the authentication filter has already
+	 * logged in with the username and password parameters, and authenticating again with them fails
+	 */
+	@Test
+	public void exportIdentifiers_shouldNotAuthenticateAgainIfAlreadyAuthenticatedAsThatUser() throws Exception {
+		when(iss.generateIdentifiers(Mockito.any(IdentifierSource.class), Mockito.any(Integer.class), Mockito.any(String.class)))
+				.thenReturn(Arrays.asList("1"));
+		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
+			context.when(Context::isAuthenticated).thenReturn(true);
+			context.when(Context::getAuthenticatedUser).thenReturn(user("User"));
+
+			MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+			controller.exportIdentifiers(null, new MockHttpServletRequest(), mockResponse, new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");
+
+			context.verify(() -> Context.authenticate(Mockito.anyString(), Mockito.anyString()), Mockito.never());
+			Assert.assertEquals("{\"identifiers\":[\"1\"]}", mockResponse.getContentAsString());
+		}
+	}
+
+	@Test
+	public void exportIdentifiers_shouldAuthenticateIfAuthenticatedAsAnotherUser() throws Exception {
+		when(iss.generateIdentifiers(Mockito.any(IdentifierSource.class), Mockito.any(Integer.class), Mockito.any(String.class)))
+				.thenReturn(Arrays.asList("1"));
+		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
+			context.when(Context::isAuthenticated).thenReturn(true);
+			context.when(Context::getAuthenticatedUser).thenReturn(user("someoneElse"));
+
+			controller.exportIdentifiers(null, new MockHttpServletRequest(), new MockHttpServletResponse(), new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");
+
+			context.verify(() -> Context.authenticate("user", "pass"));
+		}
+	}
+
+	@Test
+	public void exportIdentifiers_shouldAuthenticateWithUsernameAndPasswordIfNotAuthenticated() throws Exception {
+		when(iss.generateIdentifiers(Mockito.any(IdentifierSource.class), Mockito.any(Integer.class), Mockito.any(String.class)))
+				.thenReturn(Arrays.asList("1"));
+		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
+			context.when(Context::isAuthenticated).thenReturn(false);
+
+			controller.exportIdentifiers(null, new MockHttpServletRequest(), new MockHttpServletResponse(), new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");
+
+			context.verify(() -> Context.authenticate("user", "pass"));
+		}
+	}
+
+	private User user(String username) {
+		User user = new User();
+		user.setUsername(username);
+		return user;
+	}
 }

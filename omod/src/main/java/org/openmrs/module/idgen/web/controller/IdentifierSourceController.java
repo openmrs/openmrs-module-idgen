@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.idgen.IdentifierPool;
 import org.openmrs.module.idgen.IdentifierSource;
@@ -200,10 +201,12 @@ public class IdentifierSourceController {
                                    @RequestParam(required=false, value="username") String username,
                                    @RequestParam(required=false, value="password") String password) throws Exception {
 
-        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+        // A web authentication scheme (eg. 2FA in the authentication module) has already logged in with these
+        // parameters, and rejects authenticating again with a username and password
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password) && !isAuthenticatedAs(username)) {
             Context.authenticate(username, password);
         }
-    	
+
 
         if (StringUtils.isEmpty(comment)) {
             comment = "Batch Export of " + numberToGenerate + " to file";
@@ -217,7 +220,15 @@ public class IdentifierSourceController {
         
         new ObjectMapper().writeValue(out, new RemoteIdentifiersMessage(batch));
     }
-    
+
+    /**
+     * @return true if the current user is authenticated with the given username or system id, ignoring case as login does
+     */
+    private boolean isAuthenticatedAs(String username) {
+        User user = Context.isAuthenticated() ? Context.getAuthenticatedUser() : null;
+        return user != null && (username.equalsIgnoreCase(user.getUsername()) || username.equalsIgnoreCase(user.getSystemId()));
+    }
+
     /**
      * Upload Identifiers From File
      */
