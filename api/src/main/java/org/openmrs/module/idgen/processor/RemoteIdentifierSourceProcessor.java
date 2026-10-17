@@ -140,6 +140,10 @@ public class RemoteIdentifierSourceProcessor implements IdentifierSourceProcesso
         catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("The url of a remote identifier source is not valid (are its parameters url-encoded?): " + source.getUrl(), e);
         }
+        // a post to any other resource (eg. .../identifiersource/<uuid>) would update it rather than generate identifiers
+        if (uri.getPath() == null || !uri.getPath().endsWith("/idgen/identifiersource")) {
+            throw new IllegalArgumentException("The url of a remote identifier source using the REST API must be to .../ws/rest/v1/idgen/identifiersource: " + source.getUrl());
+        }
         Map<String, String> parameters = new HashMap<>();
         for (NameValuePair parameter : URLEncodedUtils.parse(uri, StandardCharsets.UTF_8)) {
             parameters.put(parameter.getName(), parameter.getValue());

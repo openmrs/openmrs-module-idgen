@@ -65,6 +65,22 @@ public class RemoteIdentifierSourceProcessorRequestTest {
 		processor.getIdentifiers(source("https://localhost" + REST_PATH, "user", "pass"), 5);
 	}
 
+	/**
+	 * A post to a specific source's resource would update that source on the remote server
+	 */
+	@Test
+	public void getIdentifiers_shouldNotPostToRestUrlForSpecificSource() throws Exception {
+		String url = startServer(REST_PATH, 200, "{}") + "/" + SOURCE_UUID + "?sourceUuid=" + SOURCE_UUID;
+		try {
+			processor.getIdentifiers(source(url, "user", "pass"), 5);
+			Assert.fail("Expected an IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			Assert.assertTrue(e.getMessage(), e.getMessage().contains("must be to .../ws/rest/v1/idgen/identifiersource"));
+		}
+		Assert.assertNull("No request should be sent", receivedRequest.get("method"));
+	}
+
 	@Test
 	public void getIdentifiers_shouldFailWithClearErrorForRestUrlThatIsNotValid() throws Exception {
 		String url = "https://localhost" + REST_PATH + "?sourceUuid=" + SOURCE_UUID + "&comment=Site One";
