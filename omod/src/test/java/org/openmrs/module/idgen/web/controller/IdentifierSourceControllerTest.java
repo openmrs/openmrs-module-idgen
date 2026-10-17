@@ -102,7 +102,7 @@ public class IdentifierSourceControllerTest {
 				.thenReturn(Arrays.asList("1"));
 		try (MockedStatic<Context> context = Mockito.mockStatic(Context.class)) {
 			context.when(Context::isAuthenticated).thenReturn(true);
-			context.when(Context::getAuthenticatedUser).thenReturn(user("user"));
+			context.when(Context::getAuthenticatedUser).thenReturn(user("User"));
 
 			MockHttpServletResponse mockResponse = new MockHttpServletResponse();
 			controller.exportIdentifiers(null, new MockHttpServletRequest(), mockResponse, new SequentialIdentifierGenerator(), 1, "Site", "user", "pass");

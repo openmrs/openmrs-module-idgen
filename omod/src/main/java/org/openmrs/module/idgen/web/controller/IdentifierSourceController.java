@@ -222,11 +222,11 @@ public class IdentifierSourceController {
     }
 
     /**
-     * @return true if the current user is authenticated with the given username or system id
+     * @return true if the current user is authenticated with the given username or system id, ignoring case as login does
      */
     private boolean isAuthenticatedAs(String username) {
         User user = Context.isAuthenticated() ? Context.getAuthenticatedUser() : null;
-        return user != null && (username.equals(user.getUsername()) || username.equals(user.getSystemId()));
+        return user != null && (username.equalsIgnoreCase(user.getUsername()) || username.equalsIgnoreCase(user.getSystemId()));
     }
 
     /**
